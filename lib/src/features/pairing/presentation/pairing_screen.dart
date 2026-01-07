@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
+import '../../../core/data/services/firebase_service.dart';
+import '../../../core/data/models/user_model.dart';
 
-class PairingScreen extends StatefulWidget {
+class PairingScreen extends ConsumerStatefulWidget {
   const PairingScreen({super.key});
 
   @override
-  State<PairingScreen> createState() => _PairingScreenState();
+  ConsumerState<PairingScreen> createState() => _PairingScreenState();
 }
 
-class _PairingScreenState extends State<PairingScreen> {
+class _PairingScreenState extends ConsumerState<PairingScreen> {
   final _codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
+  bool _isLoading = true;
+  String? _userCode;
+  String? _userName;
+  String? _errorMessage;
 
-  // Mock username - in real app this would come from user data
-  final String _username = 'Petr';
-  final String _userCode = 'PETR-8821';
+  @override
+  void initState() {
+    super.initState();
+    // Load user data when screen initializes
+    _loadUserData();
+  }
 
   @override
   void dispose() {
@@ -28,12 +39,99 @@ class _PairingScreenState extends State<PairingScreen> {
     super.dispose();
   }
 
+  /// Load current user's data to display their invite code
+  /// 
+  /// This fetches the user document from Firestore to get:
+  /// - The user's invite code (to display and share)
+  /// - The user's display name (for personalization)
+  /// 
+  /// If the user doesn't have an inviteCode (e.g., old account),
+  /// it will be automatically generated and saved.
+  Future<void> _loadUserData() async {
+    try {
+      final firebaseService = ref.read(firebaseServiceProvider);
+      final currentUser = firebaseService.currentUser;
+      
+      // Safety check: ensure user is authenticated
+      if (currentUser == null) {
+        if (mounted) {
+          setState(() {
+            _errorMessage = 'Uživatel není přihlášen';
+            _isLoading = false;
+          });
+        }
+        return;
+      }
+
+      // Get user data from Firestore
+      var userData = await firebaseService.getUserData();
+
+      // If user document doesn't exist, create it with inviteCode
+      // This can happen if user was created before we added inviteCode generation
+      if (userData == null) {
+        // Try to create user document using createOrUpdateUser
+        // This will generate inviteCode automatically
+        final displayName = currentUser.displayName ?? 'User';
+        userData = await firebaseService.createOrUpdateUser(
+          uid: currentUser.uid,
+          email: currentUser.email ?? '',
+          displayName: displayName,
+          photoUrl: currentUser.photoURL,
+        );
+      } 
+      // If user exists but doesn't have inviteCode, generate and save it
+      else if (userData.inviteCode == null || userData.inviteCode!.isEmpty) {
+        // Use createOrUpdateUser to generate missing inviteCode
+        userData = await firebaseService.createOrUpdateUser(
+          uid: currentUser.uid,
+          email: userData.email,
+          displayName: userData.displayName ?? 'User',
+          photoUrl: userData.photoUrl,
+        );
+      }
+
+      // Update UI with user data
+      if (mounted) {
+        setState(() {
+          _userCode = userData?.inviteCode ?? 'N/A';
+          _userName = userData?.displayName ?? 'Uživatel';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      // Handle errors gracefully
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Chyba při načítání dat: ${e.toString()}';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  /// Copy the user's invite code to clipboard
+  /// 
+  /// Shows a snackbar confirmation when the code is copied.
   void _copyCode() {
-    Clipboard.setData(ClipboardData(text: _userCode));
+    if (_userCode == null || _userCode == 'N/A') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Kód není k dispozici'),
+          backgroundColor: AppTheme.colors.love,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+      return;
+    }
+
+    Clipboard.setData(ClipboardData(text: _userCode!));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Kód zkopírován'),
-        backgroundColor: AppTheme.colors.card,
+        backgroundColor: AppTheme.colors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -43,39 +141,153 @@ class _PairingScreenState extends State<PairingScreen> {
     );
   }
 
+  /// Submit partner's invite code to create a pair
+  /// 
+  /// This method:
+  /// 1. Validates the input code
+  /// 2. Finds the partner user by their invite code
+  /// 3. Creates a couple document in Firestore
+  /// 4. Updates both users with the coupleId
+  /// 5. Redirects to home page on success
+  /// 
+  /// Shows error messages if pairing fails.
   Future<void> _submitCode() async {
+    // Validate form first
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     setState(() {
       _isSubmitting = true;
+      _errorMessage = null;
     });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      final firebaseService = ref.read(firebaseServiceProvider);
+      final currentUser = firebaseService.currentUser;
 
-    if (mounted) {
-      setState(() {
-        _isSubmitting = false;
-      });
+      // Safety check: ensure user is authenticated
+      if (currentUser == null) {
+        throw Exception('Uživatel není přihlášen');
+      }
 
-      // TODO: Handle pairing logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Spárování s ${_codeController.text.trim()}...'),
-          backgroundColor: AppTheme.colors.success,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      // Get the entered code and normalize it (uppercase)
+      final partnerCode = _codeController.text.trim().toUpperCase();
+
+      // Safety check: prevent pairing with yourself
+      if (partnerCode == _userCode) {
+        throw Exception('Nemůžete se spárovat sami se sebou');
+      }
+
+      // Find partner user by their invite code
+      final partnerUser = await firebaseService.findUserByInviteCode(partnerCode);
+
+      if (partnerUser == null) {
+        throw Exception('Uživatel s tímto kódem nebyl nalezen');
+      }
+
+      // Safety check: verify partner is not already paired
+      if (partnerUser.coupleId != null && partnerUser.coupleId!.isNotEmpty) {
+        throw Exception('Tento uživatel je již spárovaný');
+      }
+
+      // Create the pair - this will create the couple document and update both users
+      await firebaseService.pairUsers(currentUser.uid, partnerUser.uid);
+
+      // Success! Show success message and redirect to home
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Úspěšně spárováno s ${partnerUser.displayName ?? partnerCode}!'),
+            backgroundColor: AppTheme.colors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 2),
           ),
-        ),
-      );
+        );
+
+        // Redirect to home page after successful pairing
+        // Use go() to replace the current route so user can't go back to pairing
+        context.go('/home');
+      }
+    } catch (e) {
+      // Handle errors and show user-friendly message
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+          _isSubmitting = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_errorMessage ?? 'Chyba při spárování'),
+            backgroundColor: AppTheme.colors.love,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Show loading state while fetching user data
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppTheme.colors.background,
+        appBar: AppBar(
+          title: const Text('Spárování'),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Show error state if user data couldn't be loaded
+    if (_errorMessage != null && _userCode == null) {
+      return Scaffold(
+        backgroundColor: AppTheme.colors.background,
+        appBar: AppBar(
+          title: const Text('Spárování'),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  PhosphorIconsBold.warning,
+                  size: 64,
+                  color: AppTheme.colors.love,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  _errorMessage ?? 'Chyba',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppTheme.colors.text,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton(
+                  onPressed: _loadUserData,
+                  child: const Text('Zkusit znovu'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
       appBar: AppBar(
@@ -146,7 +358,7 @@ class _PairingScreenState extends State<PairingScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              _userCode,
+                              _userCode ?? 'Načítání...',
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineSmall
@@ -272,13 +484,15 @@ class _PairingScreenState extends State<PairingScreen> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Zadejte prosím kód';
                     }
-                    if (value.trim() == _userCode) {
+                    final normalizedValue = value.trim().toUpperCase();
+                    if (_userCode != null && normalizedValue == _userCode) {
                       return 'Nemůžete se spárovat sami se sebou';
                     }
                     // Basic format validation (LETTERS-NUMBERS)
+                    // Format: NAME-1234 (e.g., PETR-8821, ANNA-1234)
                     final pattern = RegExp(r'^[A-Z]+-\d+$');
-                    if (!pattern.hasMatch(value.trim().toUpperCase())) {
-                      return 'Neplatný formát kódu';
+                    if (!pattern.hasMatch(normalizedValue)) {
+                      return 'Neplatný formát kódu (např. PETR-8821)';
                     }
                     return null;
                   },

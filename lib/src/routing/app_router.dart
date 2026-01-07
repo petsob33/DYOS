@@ -20,6 +20,8 @@ part 'app_router.g.dart';
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
   final authState = ref.watch(authStateProvider);
+  // Watch the pairing status - this will be null while loading, true/false when ready
+  final isPairedAsync = ref.watch(isUserPairedProvider);
 
   return GoRouter(
     initialLocation: '/login',
@@ -27,17 +29,48 @@ GoRouter appRouter(AppRouterRef ref) {
       // Wait for auth state to be available
       final authStateValue = authState.valueOrNull;
       final isAuthenticated = authStateValue != null;
-      final isLoggingIn = state.matchedLocation == '/login' || 
-                          state.matchedLocation == '/register';
+      
+      // Define public routes (don't require authentication)
+      final isPublicRoute = state.matchedLocation == '/login' || 
+                           state.matchedLocation == '/register' ||
+                           state.matchedLocation == '/firebase-test';
+      
+      // Define pairing route (requires auth but not pairing)
+      final isPairingRoute = state.matchedLocation == '/pairing';
+      
+      // Define protected routes (require both auth and pairing)
+      final isProtectedRoute = !isPublicRoute && !isPairingRoute;
 
-      // If not authenticated and trying to access protected routes, redirect to login
-      if (!isAuthenticated && !isLoggingIn) {
+      // If not authenticated and trying to access protected/pairing routes, redirect to login
+      if (!isAuthenticated && (isProtectedRoute || isPairingRoute)) {
         return '/login';
       }
 
-      // If authenticated and on login/register, redirect to home
-      if (isAuthenticated && isLoggingIn) {
-        return '/home';
+      // If authenticated, check pairing status
+      if (isAuthenticated) {
+        // Wait for pairing status to be determined
+        final isPairedValue = isPairedAsync.valueOrNull;
+        
+        // If still loading pairing status, don't redirect yet
+        if (isPairedValue == null) {
+          return null; // Wait for async value
+        }
+
+        // If user is on login/register, redirect based on pairing status
+        if (isPublicRoute && (state.matchedLocation == '/login' || state.matchedLocation == '/register')) {
+          // If paired, go to home; if not paired, go to pairing
+          return isPairedValue ? '/home' : '/pairing';
+        }
+
+        // If user is trying to access protected routes but not paired, redirect to pairing
+        if (isProtectedRoute && !isPairedValue) {
+          return '/pairing';
+        }
+
+        // If user is on pairing screen but already paired, redirect to home
+        if (isPairingRoute && isPairedValue) {
+          return '/home';
+        }
       }
 
       return null; // No redirect needed

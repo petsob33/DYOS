@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -128,12 +129,17 @@ class AuthService {
       // This stores app-specific data that's not in Firebase Auth
       // We only create if user was successfully created (null check)
       if (credential.user != null) {
+        // Generate unique invite code for pairing
+        // Format: NAME-1234 (e.g., PETR-8821, ANNA-1234)
+        final inviteCode = _generateInviteCode(displayName);
+        
         final userModel = UserModel(
           uid: credential.user!.uid,           // Use Firebase Auth UID as document ID
           email: email.trim(),                  // Store email
           displayName: displayName,            // Store display name
+          inviteCode: inviteCode,              // Generate invite code for pairing
           createdAt: DateTime.now(),           // Track when account was created
-          // Other fields (inviteCode, coupleId, etc.) will be set later
+          // Other fields (coupleId, etc.) will be set later
         );
         // Save to Firestore through repository layer
         await _userRepository.createUser(userModel);
@@ -155,6 +161,27 @@ class AuthService {
   /// Firestore data remains (user document is not deleted).
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  /// Generate unique invite code for user pairing
+  /// 
+  /// Creates a code in the format "NAME-1234" where:
+  /// - NAME is the first 4 characters of display name (uppercase)
+  /// - 1234 is a random 4-digit number (1000-9999)
+  /// 
+  /// Example: "Petr" → "PETR-8821"
+  /// Example: "Anna" → "ANNA-1234"
+  /// 
+  /// [displayName] - User's display name to use as prefix
+  /// Returns: Unique invite code string
+  String _generateInviteCode(String displayName) {
+    // Get first 4 characters of name (or all if shorter than 4)
+    final prefix = displayName.toUpperCase().substring(
+        0, displayName.length > 4 ? 4 : displayName.length);
+    // Generate random 4-digit number (1000-9999)
+    final random = Random();
+    final number = random.nextInt(9000) + 1000;
+    return '$prefix-$number';
   }
 
   /// Handle Firebase Auth exceptions and return user-friendly messages

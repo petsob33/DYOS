@@ -82,5 +82,41 @@ final currentUserProvider = AutoDisposeProvider<User?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserRef = AutoDisposeProviderRef<User?>;
+String _$isUserPairedHash() => r'099014ca29b8c27729b58d1992fedef34ebe5350';
+
+/// Provider that checks if the current user is paired with a partner
+///
+/// This provider checks if the authenticated user has a coupleId in their
+/// user document. It's used by the router to redirect users to the pairing
+/// screen if they're not yet paired.
+///
+/// Returns:
+/// - true if user is paired (has a coupleId)
+/// - false if user is not paired (no coupleId or null)
+/// - null if user is not authenticated or data is loading
+///
+/// Example:
+/// ```dart
+/// final isPaired = ref.watch(isUserPairedProvider);
+/// if (isPaired == false) {
+///   // Redirect to pairing screen
+/// }
+/// ```
+///
+/// Copied from [isUserPaired].
+@ProviderFor(isUserPaired)
+final isUserPairedProvider = AutoDisposeFutureProvider<bool?>.internal(
+  isUserPaired,
+  name: r'isUserPairedProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$isUserPairedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef IsUserPairedRef = AutoDisposeFutureProviderRef<bool?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

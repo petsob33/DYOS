@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
+    // Users can read/write their own document
+    // Users can query by inviteCode (for pairing)
+    // Users can read other users' basic info (for pairing)
+    match /users/{userId} {
+      // Allow users to read their own document
+      allow get: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow users to create their own document (during registration)
+      allow create: if request.auth != null && 
+                       request.auth.uid == userId &&
+                       // Ensure user sets their own UID correctly
+                       request.resource.data.uid == userId;
+      
+      // Allow users to update their own document
+      allow update: if request.auth != null && 
+                       request.auth.uid == userId &&
+                       // Prevent changing UID
+                       request.resource.data.uid == userId;
+      
+      // Allow authenticated users to read other users' documents (needed for pairing)
+      // This allows users to find their partner by invite code
+      // Note: This also allows list queries which are needed for inviteCode search
+      allow read: if request.auth != null;
+      
+      // Allow users to update other users' coupleId field (for pairing)
+      // This is needed when user A pairs with user B - user A needs to update user B's coupleId
+      // Security: Only allow updating coupleId field, not other fields
+      allow update: if request.auth != null &&
+                       // Only allow updating coupleId field
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coupleId']) &&
+                       // Ensure UID doesn't change
+                       request.resource.data.uid == resource.data.uid;
+    }
+    
+    // ============================================
+    // COUPLES COLLECTION
+    // ============================================
+    // Users can read/write couple documents where they are a member
+    match /couples/{coupleId} {
+      // Helper function to check if user is a member of this couple
+      function isMember() {
+        return request.auth != null && 
+               request.auth.uid in resource.data.members;
+      }
+      
+      // Helper function to check if user will be a member after write
+      function willBeMember() {
+        return request.auth != null && 
+               request.auth.uid in request.resource.data.members;
+      }
+      
+      // Allow reading if user is a member
+      allow read: if isMember();
+      
+      // Allow creating couple if user is in the members array
+      // Only allow pairs of exactly 2 users
+      allow create: if willBeMember() && 
+                       request.resource.data.members.size() == 2;
+      
+      // Allow updating if user is a member
+      // Users can update their own status within the couple document
+      allow update: if isMember() && willBeMember();
+      
+      // Don't allow deletion (couples should persist)
+      allow delete: if false;
+    }
+    
+    // ============================================
+    // DEFAULT DENY
+    // ============================================
+    // Deny all other operations by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

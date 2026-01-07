@@ -14,9 +14,17 @@ class CoupleModel with _$CoupleModel {
   @JsonSerializable(explicitToJson: true)
   const factory CoupleModel({
     required String id,
-    required List<String> members, // Array of user UIDs
-    DateTime? anniversaryDate,
+    required List<String> members, // Array of user UIDs (important for Security Rules!)
+    DateTime? anniversaryDate, // For counting days together
     @TimestampConverter() DateTime? createdAt,
+    
+    // Subscription fields
+    @Default('free') String subscriptionTier, // "free" | "premium" | "trial"
+    @TimestampConverter() DateTime? subscriptionExpiry, // When premium subscription ends
+    
+    // Status widget data - stored here to avoid reading extra documents on app start
+    // Key is user UID, value is their status (emoji + text)
+    Map<String, CoupleStatus>? status,
   }) = _CoupleModel;
 
   factory CoupleModel.fromJson(Map<String, dynamic> json) =>
@@ -46,4 +54,21 @@ class TimestampConverter implements JsonConverter<DateTime?, dynamic> {
   @override
   dynamic toJson(DateTime? date) =>
       date != null ? Timestamp.fromDate(date) : null;
+}
+
+/// Status information for a user within a couple
+/// 
+/// This stores the emoji and text status that appears in the dashboard.
+/// The status is stored in the couple document for quick access.
+@freezed
+class CoupleStatus with _$CoupleStatus {
+  @JsonSerializable(explicitToJson: true)
+  const factory CoupleStatus({
+    required String emoji,
+    required String text,
+    @TimestampConverter() DateTime? updatedAt,
+  }) = _CoupleStatus;
+
+  factory CoupleStatus.fromJson(Map<String, dynamic> json) =>
+      _$CoupleStatusFromJson(json);
 }

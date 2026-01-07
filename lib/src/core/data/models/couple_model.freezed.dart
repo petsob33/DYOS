@@ -23,10 +23,18 @@ CoupleModel _$CoupleModelFromJson(Map<String, dynamic> json) {
 mixin _$CoupleModel {
   String get id => throw _privateConstructorUsedError;
   List<String> get members =>
-      throw _privateConstructorUsedError; // Array of user UIDs
-  DateTime? get anniversaryDate => throw _privateConstructorUsedError;
+      throw _privateConstructorUsedError; // Array of user UIDs (important for Security Rules!)
+  DateTime? get anniversaryDate =>
+      throw _privateConstructorUsedError; // For counting days together
   @TimestampConverter()
-  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError; // Subscription fields
+  String get subscriptionTier =>
+      throw _privateConstructorUsedError; // "free" | "premium" | "trial"
+  @TimestampConverter()
+  DateTime? get subscriptionExpiry => throw _privateConstructorUsedError; // When premium subscription ends
+  // Status widget data - stored here to avoid reading extra documents on app start
+  // Key is user UID, value is their status (emoji + text)
+  Map<String, CoupleStatus>? get status => throw _privateConstructorUsedError;
 
   /// Serializes this CoupleModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -50,6 +58,9 @@ abstract class $CoupleModelCopyWith<$Res> {
     List<String> members,
     DateTime? anniversaryDate,
     @TimestampConverter() DateTime? createdAt,
+    String subscriptionTier,
+    @TimestampConverter() DateTime? subscriptionExpiry,
+    Map<String, CoupleStatus>? status,
   });
 }
 
@@ -72,6 +83,9 @@ class _$CoupleModelCopyWithImpl<$Res, $Val extends CoupleModel>
     Object? members = null,
     Object? anniversaryDate = freezed,
     Object? createdAt = freezed,
+    Object? subscriptionTier = null,
+    Object? subscriptionExpiry = freezed,
+    Object? status = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -91,6 +105,18 @@ class _$CoupleModelCopyWithImpl<$Res, $Val extends CoupleModel>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            subscriptionTier: null == subscriptionTier
+                ? _value.subscriptionTier
+                : subscriptionTier // ignore: cast_nullable_to_non_nullable
+                      as String,
+            subscriptionExpiry: freezed == subscriptionExpiry
+                ? _value.subscriptionExpiry
+                : subscriptionExpiry // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            status: freezed == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as Map<String, CoupleStatus>?,
           )
           as $Val,
     );
@@ -111,6 +137,9 @@ abstract class _$$CoupleModelImplCopyWith<$Res>
     List<String> members,
     DateTime? anniversaryDate,
     @TimestampConverter() DateTime? createdAt,
+    String subscriptionTier,
+    @TimestampConverter() DateTime? subscriptionExpiry,
+    Map<String, CoupleStatus>? status,
   });
 }
 
@@ -132,6 +161,9 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
     Object? members = null,
     Object? anniversaryDate = freezed,
     Object? createdAt = freezed,
+    Object? subscriptionTier = null,
+    Object? subscriptionExpiry = freezed,
+    Object? status = freezed,
   }) {
     return _then(
       _$CoupleModelImpl(
@@ -151,6 +183,18 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        subscriptionTier: null == subscriptionTier
+            ? _value.subscriptionTier
+            : subscriptionTier // ignore: cast_nullable_to_non_nullable
+                  as String,
+        subscriptionExpiry: freezed == subscriptionExpiry
+            ? _value.subscriptionExpiry
+            : subscriptionExpiry // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        status: freezed == status
+            ? _value._status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as Map<String, CoupleStatus>?,
       ),
     );
   }
@@ -165,7 +209,11 @@ class _$CoupleModelImpl implements _CoupleModel {
     required final List<String> members,
     this.anniversaryDate,
     @TimestampConverter() this.createdAt,
-  }) : _members = members;
+    this.subscriptionTier = 'free',
+    @TimestampConverter() this.subscriptionExpiry,
+    final Map<String, CoupleStatus>? status,
+  }) : _members = members,
+       _status = status;
 
   factory _$CoupleModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$CoupleModelImplFromJson(json);
@@ -180,16 +228,40 @@ class _$CoupleModelImpl implements _CoupleModel {
     return EqualUnmodifiableListView(_members);
   }
 
-  // Array of user UIDs
+  // Array of user UIDs (important for Security Rules!)
   @override
   final DateTime? anniversaryDate;
+  // For counting days together
   @override
   @TimestampConverter()
   final DateTime? createdAt;
+  // Subscription fields
+  @override
+  @JsonKey()
+  final String subscriptionTier;
+  // "free" | "premium" | "trial"
+  @override
+  @TimestampConverter()
+  final DateTime? subscriptionExpiry;
+  // When premium subscription ends
+  // Status widget data - stored here to avoid reading extra documents on app start
+  // Key is user UID, value is their status (emoji + text)
+  final Map<String, CoupleStatus>? _status;
+  // When premium subscription ends
+  // Status widget data - stored here to avoid reading extra documents on app start
+  // Key is user UID, value is their status (emoji + text)
+  @override
+  Map<String, CoupleStatus>? get status {
+    final value = _status;
+    if (value == null) return null;
+    if (_status is EqualUnmodifiableMapView) return _status;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'CoupleModel(id: $id, members: $members, anniversaryDate: $anniversaryDate, createdAt: $createdAt)';
+    return 'CoupleModel(id: $id, members: $members, anniversaryDate: $anniversaryDate, createdAt: $createdAt, subscriptionTier: $subscriptionTier, subscriptionExpiry: $subscriptionExpiry, status: $status)';
   }
 
   @override
@@ -202,7 +274,12 @@ class _$CoupleModelImpl implements _CoupleModel {
             (identical(other.anniversaryDate, anniversaryDate) ||
                 other.anniversaryDate == anniversaryDate) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.subscriptionTier, subscriptionTier) ||
+                other.subscriptionTier == subscriptionTier) &&
+            (identical(other.subscriptionExpiry, subscriptionExpiry) ||
+                other.subscriptionExpiry == subscriptionExpiry) &&
+            const DeepCollectionEquality().equals(other._status, _status));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -213,6 +290,9 @@ class _$CoupleModelImpl implements _CoupleModel {
     const DeepCollectionEquality().hash(_members),
     anniversaryDate,
     createdAt,
+    subscriptionTier,
+    subscriptionExpiry,
+    const DeepCollectionEquality().hash(_status),
   );
 
   /// Create a copy of CoupleModel
@@ -235,6 +315,9 @@ abstract class _CoupleModel implements CoupleModel {
     required final List<String> members,
     final DateTime? anniversaryDate,
     @TimestampConverter() final DateTime? createdAt,
+    final String subscriptionTier,
+    @TimestampConverter() final DateTime? subscriptionExpiry,
+    final Map<String, CoupleStatus>? status,
   }) = _$CoupleModelImpl;
 
   factory _CoupleModel.fromJson(Map<String, dynamic> json) =
@@ -243,17 +326,234 @@ abstract class _CoupleModel implements CoupleModel {
   @override
   String get id;
   @override
-  List<String> get members; // Array of user UIDs
+  List<String> get members; // Array of user UIDs (important for Security Rules!)
   @override
-  DateTime? get anniversaryDate;
+  DateTime? get anniversaryDate; // For counting days together
   @override
   @TimestampConverter()
-  DateTime? get createdAt;
+  DateTime? get createdAt; // Subscription fields
+  @override
+  String get subscriptionTier; // "free" | "premium" | "trial"
+  @override
+  @TimestampConverter()
+  DateTime? get subscriptionExpiry; // When premium subscription ends
+  // Status widget data - stored here to avoid reading extra documents on app start
+  // Key is user UID, value is their status (emoji + text)
+  @override
+  Map<String, CoupleStatus>? get status;
 
   /// Create a copy of CoupleModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CoupleModelImplCopyWith<_$CoupleModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+CoupleStatus _$CoupleStatusFromJson(Map<String, dynamic> json) {
+  return _CoupleStatus.fromJson(json);
+}
+
+/// @nodoc
+mixin _$CoupleStatus {
+  String get emoji => throw _privateConstructorUsedError;
+  String get text => throw _privateConstructorUsedError;
+  @TimestampConverter()
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this CoupleStatus to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of CoupleStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $CoupleStatusCopyWith<CoupleStatus> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CoupleStatusCopyWith<$Res> {
+  factory $CoupleStatusCopyWith(
+    CoupleStatus value,
+    $Res Function(CoupleStatus) then,
+  ) = _$CoupleStatusCopyWithImpl<$Res, CoupleStatus>;
+  @useResult
+  $Res call({
+    String emoji,
+    String text,
+    @TimestampConverter() DateTime? updatedAt,
+  });
+}
+
+/// @nodoc
+class _$CoupleStatusCopyWithImpl<$Res, $Val extends CoupleStatus>
+    implements $CoupleStatusCopyWith<$Res> {
+  _$CoupleStatusCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of CoupleStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? emoji = null,
+    Object? text = null,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(
+      _value.copyWith(
+            emoji: null == emoji
+                ? _value.emoji
+                : emoji // ignore: cast_nullable_to_non_nullable
+                      as String,
+            text: null == text
+                ? _value.text
+                : text // ignore: cast_nullable_to_non_nullable
+                      as String,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$CoupleStatusImplCopyWith<$Res>
+    implements $CoupleStatusCopyWith<$Res> {
+  factory _$$CoupleStatusImplCopyWith(
+    _$CoupleStatusImpl value,
+    $Res Function(_$CoupleStatusImpl) then,
+  ) = __$$CoupleStatusImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String emoji,
+    String text,
+    @TimestampConverter() DateTime? updatedAt,
+  });
+}
+
+/// @nodoc
+class __$$CoupleStatusImplCopyWithImpl<$Res>
+    extends _$CoupleStatusCopyWithImpl<$Res, _$CoupleStatusImpl>
+    implements _$$CoupleStatusImplCopyWith<$Res> {
+  __$$CoupleStatusImplCopyWithImpl(
+    _$CoupleStatusImpl _value,
+    $Res Function(_$CoupleStatusImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of CoupleStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? emoji = null,
+    Object? text = null,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(
+      _$CoupleStatusImpl(
+        emoji: null == emoji
+            ? _value.emoji
+            : emoji // ignore: cast_nullable_to_non_nullable
+                  as String,
+        text: null == text
+            ? _value.text
+            : text // ignore: cast_nullable_to_non_nullable
+                  as String,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+@JsonSerializable(explicitToJson: true)
+class _$CoupleStatusImpl implements _CoupleStatus {
+  const _$CoupleStatusImpl({
+    required this.emoji,
+    required this.text,
+    @TimestampConverter() this.updatedAt,
+  });
+
+  factory _$CoupleStatusImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CoupleStatusImplFromJson(json);
+
+  @override
+  final String emoji;
+  @override
+  final String text;
+  @override
+  @TimestampConverter()
+  final DateTime? updatedAt;
+
+  @override
+  String toString() {
+    return 'CoupleStatus(emoji: $emoji, text: $text, updatedAt: $updatedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CoupleStatusImpl &&
+            (identical(other.emoji, emoji) || other.emoji == emoji) &&
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, emoji, text, updatedAt);
+
+  /// Create a copy of CoupleStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CoupleStatusImplCopyWith<_$CoupleStatusImpl> get copyWith =>
+      __$$CoupleStatusImplCopyWithImpl<_$CoupleStatusImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CoupleStatusImplToJson(this);
+  }
+}
+
+abstract class _CoupleStatus implements CoupleStatus {
+  const factory _CoupleStatus({
+    required final String emoji,
+    required final String text,
+    @TimestampConverter() final DateTime? updatedAt,
+  }) = _$CoupleStatusImpl;
+
+  factory _CoupleStatus.fromJson(Map<String, dynamic> json) =
+      _$CoupleStatusImpl.fromJson;
+
+  @override
+  String get emoji;
+  @override
+  String get text;
+  @override
+  @TimestampConverter()
+  DateTime? get updatedAt;
+
+  /// Create a copy of CoupleStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CoupleStatusImplCopyWith<_$CoupleStatusImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -93,21 +93,78 @@ class FirebaseService {
     }
   }
 
-  // Pair two users
+  /// Pair two users together
+  /// 
+  /// This method creates a couple document in Firestore with:
+  /// - Both user UIDs in the members array
+  /// - Initial subscription tier set to "free"
+  /// - Empty status objects for both users (to be updated later)
+  /// - Anniversary date set to current date (can be updated later)
+  /// 
+  /// It also updates both user documents with the coupleId.
+  /// 
+  /// Returns the created CoupleModel.
+  /// Throws an exception if pairing fails.
   Future<CoupleModel> pairUsers(String currentUserId, String partnerUserId) async {
+    // Safety check: prevent pairing with yourself
+    if (currentUserId == partnerUserId) {
+      throw Exception('Cannot pair user with themselves');
+    }
+
+    // Safety check: verify both users exist
+    final currentUserDoc = await _firestore.collection('users').doc(currentUserId).get();
+    final partnerUserDoc = await _firestore.collection('users').doc(partnerUserId).get();
+    
+    if (!currentUserDoc.exists) {
+      throw Exception('Current user not found');
+    }
+    if (!partnerUserDoc.exists) {
+      throw Exception('Partner user not found');
+    }
+
+    // Safety check: verify neither user is already paired
+    final currentUser = UserModel.fromFirestore(currentUserDoc);
+    final partnerUser = UserModel.fromFirestore(partnerUserDoc);
+    
+    if (currentUser.coupleId != null && currentUser.coupleId!.isNotEmpty) {
+      throw Exception('Current user is already paired');
+    }
+    if (partnerUser.coupleId != null && partnerUser.coupleId!.isNotEmpty) {
+      throw Exception('Partner user is already paired');
+    }
+
     final batch = _firestore.batch();
 
-    // Create couple document
+    // Create couple document with new structure
     final coupleId = 'couple_${DateTime.now().millisecondsSinceEpoch}';
     final coupleRef = _firestore.collection('couples').doc(coupleId);
+
+    // Initialize status map with empty statuses for both users
+    // This allows the dashboard to display status without reading additional documents
+    final statusMap = <String, CoupleStatus>{
+      currentUserId: CoupleStatus(
+        emoji: '😊',
+        text: 'Ready to connect',
+        updatedAt: DateTime.now(),
+      ),
+      partnerUserId: CoupleStatus(
+        emoji: '😊',
+        text: 'Ready to connect',
+        updatedAt: DateTime.now(),
+      ),
+    };
 
     final couple = CoupleModel(
       id: coupleId,
       members: [currentUserId, partnerUserId],
-      anniversaryDate: DateTime.now(), // Can be updated later
+      anniversaryDate: DateTime.now(), // Can be updated later by users
       createdAt: DateTime.now(),
+      subscriptionTier: 'free', // Default to free tier
+      subscriptionExpiry: null, // No expiry for free tier
+      status: statusMap,
     );
 
+    // Set the couple document
     batch.set(coupleRef, couple.toJson());
 
     // Update both users with coupleId
@@ -117,6 +174,7 @@ class FirebaseService {
     batch.update(currentUserRef, {'coupleId': coupleId});
     batch.update(partnerUserRef, {'coupleId': coupleId});
 
+    // Commit all changes atomically
     await batch.commit();
     return couple;
   }
