@@ -15,7 +15,7 @@ FirebaseService firebaseService(FirebaseServiceRef ref) {
 
 class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.in stance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -28,7 +28,7 @@ class FirebaseService {
     try {
       final doc = await _firestore.collection('users').doc(user.uid).get();
       if (!doc.exists) return null;
-      return UserModel.fromJson(doc.data()!);
+      return UserModel.fromFirestore(doc);
     } catch (e) {
       return null;
     }
@@ -40,15 +40,15 @@ class FirebaseService {
     required String email,
     required String displayName,
     String? photoUrl,
-    String? platform,
   }) async {
     final userRef = _firestore.collection('users').doc(uid);
     final userDoc = await userRef.get();
 
     String inviteCode;
+    UserModel? existingUser;
     if (userDoc.exists) {
-      final existingUser = UserModel.fromJson(userDoc.data()!);
-      inviteCode = existingUser.inviteCode;
+      existingUser = UserModel.fromFirestore(userDoc);
+      inviteCode = existingUser.inviteCode ?? _generateInviteCode(displayName);
     } else {
       // Generate unique invite code
       inviteCode = _generateInviteCode(displayName);
@@ -60,13 +60,8 @@ class FirebaseService {
       displayName: displayName,
       photoUrl: photoUrl,
       inviteCode: inviteCode,
-      createdAt: userDoc.exists
-          ? UserModel.fromJson(userDoc.data()!).createdAt
-          : DateTime.now(),
-      platform: platform,
-      coupleId: userDoc.exists
-          ? UserModel.fromJson(userDoc.data()!).coupleId
-          : null,
+      createdAt: existingUser?.createdAt ?? DateTime.now(),
+      coupleId: existingUser?.coupleId,
     );
 
     await userRef.set(userData.toJson(), SetOptions(merge: true));
@@ -92,7 +87,7 @@ class FirebaseService {
           .get();
 
       if (query.docs.isEmpty) return null;
-      return UserModel.fromJson(query.docs.first.data());
+      return UserModel.fromFirestore(query.docs.first);
     } catch (e) {
       return null;
     }

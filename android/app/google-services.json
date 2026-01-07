@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "112080403338",
+    "project_id": "dyos-520c2",
+    "storage_bucket": "dyos-520c2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112080403338:android:ce16810cf989c44169a673",
+        "android_client_info": {
+          "package_name": "com.example.dyos_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACRejU_OP5XI5LQaOTayZ1J3PVsk6wAPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

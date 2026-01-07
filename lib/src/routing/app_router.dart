@@ -5,6 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../core/constants/app_spacing.dart';
 import '../core/theme/app_theme.dart';
+import '../core/providers/auth_providers.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/register_screen.dart';
+import '../features/auth/presentation/firebase_test_screen.dart';
 import '../features/data/presentation/data_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/lists/presentation/lists_screen.dart';
@@ -15,9 +19,45 @@ part 'app_router.g.dart';
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
+  final authState = ref.watch(authStateProvider);
+
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/login',
+    redirect: (context, state) {
+      // Wait for auth state to be available
+      final authStateValue = authState.valueOrNull;
+      final isAuthenticated = authStateValue != null;
+      final isLoggingIn = state.matchedLocation == '/login' || 
+                          state.matchedLocation == '/register';
+
+      // If not authenticated and trying to access protected routes, redirect to login
+      if (!isAuthenticated && !isLoggingIn) {
+        return '/login';
+      }
+
+      // If authenticated and on login/register, redirect to home
+      if (isAuthenticated && isLoggingIn) {
+        return '/home';
+      }
+
+      return null; // No redirect needed
+    },
     routes: [
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/firebase-test',
+        name: 'firebase-test',
+        builder: (context, state) => const FirebaseTestScreen(),
+      ),
       GoRoute(
         path: '/pairing',
         name: 'pairing',

@@ -1,53 +1,57 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Tři magické řádky, které propojí generované soubory
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
 @freezed
 class UserModel with _$UserModel {
+  // Tady řekneš: Chci, aby se to umělo převést i na JSON (explicitToJson: true)
+  @JsonSerializable(explicitToJson: true)
   const factory UserModel({
     required String uid,
     required String email,
-    required String displayName,
+    String? displayName,
     String? photoUrl,
+    String? inviteCode,
     String? coupleId,
-    required String inviteCode,
-    String? fcmToken,
-    @TimestampConverter() required DateTime createdAt,
-    String? platform,
-    @Default(UserSettings()) UserSettings settings,
+    DateTime? dateOfBirth,
+    UserStatus? status,
+    
+    // Firestore Timestamp musíme převést na DateTime
+    @TimestampConverter() DateTime? createdAt, 
   }) = _UserModel;
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return UserModel.fromJson(data).copyWith(uid: doc.id);
+  }
 }
 
+// Pomocná třída pro status
 @freezed
-class UserSettings with _$UserSettings {
-  const factory UserSettings({
-    @Default('system') String theme,
-    @Default(true) bool notificationsEnabled,
-  }) = _UserSettings;
+class UserStatus with _$UserStatus {
+  const factory UserStatus({
+    required String emoji,
+    required String text,
+    @TimestampConverter() DateTime? updatedAt,
+  }) = _UserStatus;
 
-  factory UserSettings.fromJson(Map<String, dynamic> json) =>
-      _$UserSettingsFromJson(json);
+  factory UserStatus.fromJson(Map<String, dynamic> json) => _$UserStatusFromJson(json);
 }
 
-class TimestampConverter implements JsonConverter<DateTime, Object> {
+// Konvertor pro datum (zkopíruj a neřeš)
+class TimestampConverter implements JsonConverter<DateTime?, dynamic> {
   const TimestampConverter();
 
   @override
-  DateTime fromJson(Object json) {
-    if (json is Timestamp) {
-      return json.toDate();
-    }
-    if (json is String) {
-      return DateTime.parse(json);
-    }
-    throw ArgumentError('Cannot convert $json to DateTime');
+  DateTime? fromJson(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    return value as DateTime?;
   }
 
   @override
-  Object toJson(DateTime object) => Timestamp.fromDate(object);
+  dynamic toJson(DateTime? date) => date != null ? Timestamp.fromDate(date) : null;
 }
