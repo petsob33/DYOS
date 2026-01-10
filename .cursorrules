@@ -1,0 +1,43 @@
+# Cursor AI Rules for DYOS Flutter Project
+
+## Project Context
+- Flutter/Dart mobile app for couples
+- Uses Riverpod for state management
+- Firebase for backend (Auth, Firestore, Storage)
+- GoRouter for navigation
+- Freezed for data models
+
+## Code Style
+- Use single quotes for strings
+- Prefer const constructors where possible
+- Use meaningful variable and function names
+- Follow Flutter/Dart conventions
+- Maximum line length: 100 characters
+
+## Architecture
+- Feature-based folder structure
+- Separate presentation, data, and domain layers
+- Use Riverpod providers for state management
+- Use Freezed for immutable data models
+- Use GoRouter for navigation
+
+## Best Practices
+- Always handle async operations with proper error handling
+- Use type-safe models (Freezed)
+- Validate user input
+- Handle loading and error states in UI
+- Write tests for critical functionality (especially pairing)
+
+## Naming Conventions
+- Files: snake_case (e.g., `home_screen.dart`)
+- Classes: PascalCase (e.g., `HomeScreen`)
+- Variables/functions: camelCase (e.g., `getUserData`)
+- Constants: lowerCamelCase with const (e.g., `const appSpacing`)
+
+## When Writing Code
+- Add comments for complex logic
+- Use meaningful names
+- Keep functions small and focused
+- Handle edge cases
+- Consider error states
+- Write tests for new features

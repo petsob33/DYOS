@@ -1,17 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
+import '../../../core/providers/auth_providers.dart';
+import '../../../core/data/models/couple_model.dart';
+import '../../../core/data/models/user_model.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
   Widget build(BuildContext context) {
+    // Watch pairing status - router will handle redirects automatically
+    // We just need to watch it to trigger rebuilds when status changes
+    final isPairedAsync = ref.watch(isUserPairedProvider);
+    
+    // If user is not paired, show loading or let router handle redirect
+    // Don't navigate directly here to avoid key conflicts
+    if (isPairedAsync.hasValue && isPairedAsync.value == false) {
+      // Router will handle the redirect, just show loading state
+      return Scaffold(
+        backgroundColor: AppTheme.colors.background,
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // Get couple data and partner data
+    final coupleAsync = ref.watch(currentCoupleProvider);
+    final partnerAsync = ref.watch(partnerProvider);
+    final currentUserAsync = ref.watch(currentUserDataProvider);
+    
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
+      appBar: AppBar(
+        backgroundColor: AppTheme.colors.background,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon(
+              PhosphorIconsBold.gear,
+              color: AppTheme.colors.text,
+            ),
+            onPressed: () {
+              context.push('/settings');
+            },
+            tooltip: 'Settings',
+          ),
+        ],
+      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -45,7 +94,13 @@ class HomeScreen extends StatelessWidget {
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              sliver: SliverToBoxAdapter(child: _StatusHeader()),
+              sliver: SliverToBoxAdapter(
+                child: _StatusHeader(
+                  coupleAsync: coupleAsync,
+                  partnerAsync: partnerAsync,
+                  currentUserAsync: currentUserAsync,
+                ),
+              ),
             ),
             SliverToBoxAdapter(
               child: Padding(
@@ -83,27 +138,174 @@ final _cards = <Widget>[
 ];
 
 class _StatusHeader extends StatelessWidget {
+  const _StatusHeader({
+    required this.coupleAsync,
+    required this.partnerAsync,
+    required this.currentUserAsync,
+  });
+
+  final AsyncValue<CoupleModel?> coupleAsync;
+  final AsyncValue<UserModel?> partnerAsync;
+  final AsyncValue<UserModel?> currentUserAsync;
+
   @override
   Widget build(BuildContext context) {
-    return BentoCard(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        children: [ 
-          const _AvatarStatus(name: 'You', emoji: '🚀', status: 'Focus mode'),
-          const SizedBox(width: AppSpacing.lg),
-          Expanded(
-            child: Divider(
-              color: AppTheme.colors.textSecondary.withOpacity(0.1),
-              thickness: 1,
+    return coupleAsync.when(
+      data: (couple) {
+        if (couple == null) {
+          // Not paired yet - show placeholder
+          return BentoCard(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Center(
+              child: Text(
+                'Spárujte se s partnerem pro zobrazení statusu',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.colors.textSecondary,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+
+        // Get current user and partner data
+        return currentUserAsync.when(
+          data: (currentUser) {
+            final currentUserId = currentUser?.uid ?? '';
+            
+            // Get current user's status from couple document
+            final currentUserStatus = (currentUserId.isNotEmpty && couple.status != null)
+                ? couple.status![currentUserId]
+                : null;
+            
+            // Get partner's status
+            return partnerAsync.when(
+              data: (partner) {
+                final partnerStatus = (partner != null && partner.uid.isNotEmpty && couple.status != null)
+                    ? couple.status![partner.uid]
+                    : null;
+                
+                // Debug: print both names to see what we have
+                debugPrint('Current user: ${currentUser?.displayName ?? 'null'} (${currentUser?.uid ?? 'no uid'})');
+                debugPrint('Partner: ${partner?.displayName ?? 'null'} (${partner?.uid ?? 'no uid'})');
+                debugPrint('Couple members: ${couple.members}');
+                
+                return BentoCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _AvatarStatus(
+                          name: currentUser?.displayName ?? 'You',
+                          emoji: currentUserStatus?.emoji ?? '😊',
+                          status: currentUserStatus?.text ?? 'Ready',
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Container(
+                        width: 1,
+                        height: 40,
+                        color: AppTheme.colors.textSecondary.withOpacity(0.1),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: _AvatarStatus(
+                          name: partner?.displayName ?? 'Partner',
+                          emoji: partnerStatus?.emoji ?? '😊',
+                          status: partnerStatus?.text ?? 'Ready',
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              loading: () => BentoCard(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _AvatarStatus(
+                        name: currentUser?.displayName ?? 'You',
+                        emoji: currentUserStatus?.emoji ?? '😊',
+                        status: currentUserStatus?.text ?? 'Ready',
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: AppTheme.colors.textSecondary.withOpacity(0.1),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    const Expanded(
+                      child: _AvatarStatus(
+                        name: 'Partner',
+                        emoji: '😊',
+                        status: 'Loading...',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              error: (error, stackTrace) {
+                debugPrint('Partner error: $error');
+                debugPrint('Stack trace: $stackTrace');
+                return BentoCard(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _AvatarStatus(
+                          name: currentUser?.displayName ?? 'You',
+                          emoji: currentUserStatus?.emoji ?? '😊',
+                          status: currentUserStatus?.text ?? 'Ready',
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Container(
+                        width: 1,
+                        height: 40,
+                        color: AppTheme.colors.textSecondary.withOpacity(0.1),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      const Expanded(
+                        child: _AvatarStatus(
+                          name: 'Partner',
+                          emoji: '😊',
+                          status: 'Error',
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+          loading: () => BentoCard(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          error: (_, __) => BentoCard(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: const _AvatarStatus(
+              name: 'You',
+              emoji: '😊',
+              status: 'Error',
             ),
           ),
-          const SizedBox(width: AppSpacing.lg),
-          const _AvatarStatus(
-            name: 'Partner',
-            emoji: '🌿',
-            status: 'Deep work',
-          ),
-        ],
+        );
+      },
+      loading: () => BentoCard(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => BentoCard(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: const _AvatarStatus(
+          name: 'You',
+          emoji: '😊',
+          status: 'Ready',
+        ),
       ),
     );
   }
@@ -126,67 +328,142 @@ class _AvatarStatus extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         CircleAvatar(
-          radius: 24,
+          radius: 20,
           backgroundColor: AppTheme.colors.background,
-          child: Text(emoji, style: const TextStyle(fontSize: 24)),
+          child: Text(emoji, style: const TextStyle(fontSize: 20)),
         ),
-        const SizedBox(width: AppSpacing.md),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              name,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.colors.text,
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-            ),
-            Text(
-              status,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+              const SizedBox(height: 2),
+              Text(
+                status,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppTheme.colors.textSecondary,
+                  fontSize: 12,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 }
 
-class _DaysTogetherCard extends StatelessWidget {
+class _DaysTogetherCard extends ConsumerWidget {
   const _DaysTogetherCard();
 
   @override
-  Widget build(BuildContext context) {
-    return BentoCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Days Together',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: AppTheme.colors.textSecondary,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final coupleAsync = ref.watch(currentCoupleProvider);
+    
+    return coupleAsync.when(
+      data: (couple) {
+        if (couple?.anniversaryDate == null) {
+          return BentoCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Days Together',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppTheme.colors.textSecondary,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  '0',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.colors.text,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Set your anniversary date',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.colors.textSecondary,
+                      ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
+          );
+        }
+        
+        final daysTogether = DateTime.now().difference(couple!.anniversaryDate!).inDays;
+        
+        return BentoCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Days Together',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppTheme.colors.textSecondary,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                '$daysTogether',
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.colors.text,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Stronger every day.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.colors.textSecondary,
+                    ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            '842',
-            style: Theme.of(context).textTheme.displayMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: AppTheme.colors.text,
+        );
+      },
+      loading: () => BentoCard(
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => BentoCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Days Together',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.colors.textSecondary,
+                  ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Stronger every day.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.colors.textSecondary,
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              '0',
+              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.colors.text,
+                  ),
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

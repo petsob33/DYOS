@@ -9,6 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../../core/data/services/firebase_service.dart';
 import '../../../core/data/models/user_model.dart';
+import '../../../core/providers/auth_providers.dart';
 
 class PairingScreen extends ConsumerStatefulWidget {
   const PairingScreen({super.key});
@@ -194,6 +195,10 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
       // Create the pair - this will create the couple document and update both users
       await firebaseService.pairUsers(currentUser.uid, partnerUser.uid);
 
+      // Refresh the pairing status provider to get updated status
+      // This ensures the router sees the updated pairing status before navigation
+      await ref.refresh(isUserPairedProvider.future);
+
       // Success! Show success message and redirect to home
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -210,6 +215,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
 
         // Redirect to home page after successful pairing
         // Use go() to replace the current route so user can't go back to pairing
+        // The router will now see that the user is paired and allow navigation
         context.go('/home');
       }
     } catch (e) {

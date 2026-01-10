@@ -195,4 +195,43 @@ class FirebaseService {
     final userData = await getUserData();
     return userData?.coupleId != null && userData!.coupleId!.isNotEmpty;
   }
+
+  /// Get partner's user data
+  /// 
+  /// Finds the partner user by looking at the couple's members array
+  /// and returning the user that is not the current user.
+  /// 
+  /// Returns: UserModel of the partner, or null if not found
+  Future<UserModel?> getPartner() async {
+    final user = currentUser;
+    if (user == null) return null;
+
+    try {
+      // Get current user's data to find coupleId
+      final userData = await getUserData();
+      if (userData?.coupleId == null || userData!.coupleId!.isEmpty) {
+        return null; // User is not paired
+      }
+
+      // Get couple data
+      final couple = await getCoupleData(userData.coupleId!);
+      if (couple == null) return null;
+
+      // Find partner's UID (the other member, not the current user)
+      final partnerUid = couple.members.firstWhere(
+        (uid) => uid != user.uid,
+        orElse: () => '',
+      );
+
+      if (partnerUid.isEmpty) return null;
+
+      // Get partner's user document
+      final partnerDoc = await _firestore.collection('users').doc(partnerUid).get();
+      if (!partnerDoc.exists) return null;
+
+      return UserModel.fromFirestore(partnerDoc);
+    } catch (e) {
+      return null;
+    }
+  }
 }

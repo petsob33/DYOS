@@ -74,6 +74,30 @@ service cloud.firestore {
     }
     
     // ============================================
+    // WAITLIST COLLECTION
+    // ============================================
+    // Public write access for waitlist signups (no auth required)
+    // Allow read only for checking if email already exists (single document get)
+    // List queries are not allowed (privacy)
+    match /waitlist/{emailId} {
+      // Allow anyone to create a waitlist entry
+      // Only validate that email field exists and is a string
+      // Note: Email validation and case normalization is handled in client code
+      allow create: if request.resource.data.email is string &&
+                       request.resource.data.email == emailId;
+      
+      // Allow reading single document to check if email already exists
+      // This allows get() but not list() queries
+      allow get: if true;
+      
+      // Don't allow list queries (privacy - prevents listing all emails)
+      allow list: if false;
+      
+      // Don't allow updates or deletes from client
+      allow update, delete: if false;
+    }
+    
+    // ============================================
     // DEFAULT DENY
     // ============================================
     // Deny all other operations by default

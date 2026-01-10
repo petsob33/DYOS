@@ -14,21 +14,27 @@ import '../features/home/presentation/home_screen.dart';
 import '../features/lists/presentation/lists_screen.dart';
 import '../features/memory/presentation/memory_screen.dart';
 import '../features/pairing/presentation/pairing_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
 
 part 'app_router.g.dart';
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
+  // Watch auth state - Stream<User?>
   final authState = ref.watch(authStateProvider);
-  // Watch the pairing status - this will be null while loading, true/false when ready
-  final isPairedAsync = ref.watch(isUserPairedProvider);
+  // Watch user data - Stream<UserModel?>
+  final userState = ref.watch(userProvider);
 
   return GoRouter(
     initialLocation: '/login',
     redirect: (context, state) {
-      // Wait for auth state to be available
-      final authStateValue = authState.valueOrNull;
-      final isAuthenticated = authStateValue != null;
+      // Get current auth state
+      final firebaseUser = authState.valueOrNull;
+      final isAuthenticated = firebaseUser != null;
+      
+      // Get current user data (UserModel from Firestore)
+      final userModel = userState.valueOrNull;
+      final hasCoupleId = userModel?.coupleId != null && userModel!.coupleId!.isNotEmpty;
       
       // Define public routes (don't require authentication)
       final isPublicRoute = state.matchedLocation == '/login' || 
@@ -41,39 +47,28 @@ GoRouter appRouter(AppRouterRef ref) {
       // Define protected routes (require both auth and pairing)
       final isProtectedRoute = !isPublicRoute && !isPairingRoute;
 
-      // If not authenticated and trying to access protected/pairing routes, redirect to login
-      if (!isAuthenticated && (isProtectedRoute || isPairingRoute)) {
-        return '/login';
+      // If no user, redirect to login (unless already on public route)
+      if (!isAuthenticated) {
+        return isPublicRoute ? null : '/login';
       }
 
-      // If authenticated, check pairing status
-      if (isAuthenticated) {
-        // Wait for pairing status to be determined
-        final isPairedValue = isPairedAsync.valueOrNull;
-        
-        // If still loading pairing status, don't redirect yet
-        if (isPairedValue == null) {
-          return null; // Wait for async value
-        }
-
-        // If user is on login/register, redirect based on pairing status
-        if (isPublicRoute && (state.matchedLocation == '/login' || state.matchedLocation == '/register')) {
-          // If paired, go to home; if not paired, go to pairing
-          return isPairedValue ? '/home' : '/pairing';
-        }
-
-        // If user is trying to access protected routes but not paired, redirect to pairing
-        if (isProtectedRoute && !isPairedValue) {
-          return '/pairing';
-        }
-
-        // If user is on pairing screen but already paired, redirect to home
-        if (isPairingRoute && isPairedValue) {
-          return '/home';
-        }
+      // User is authenticated - check if still loading user data
+      if (userState.isLoading) {
+        return null; // Wait for user data to load
       }
 
-      return null; // No redirect needed
+      // If user but no coupleId, redirect to pairing (unless already on pairing/login/register)
+      if (!hasCoupleId) {
+        return (isPairingRoute || isPublicRoute) ? null : '/pairing';
+      }
+
+      // User has coupleId - if on login/register/pairing, redirect to home shell
+      if (isPublicRoute || isPairingRoute) {
+        return '/home';
+      }
+
+      // Both user and coupleId exist, allow access to protected routes (home shell)
+      return null;
     },
     routes: [
       GoRoute(
@@ -95,6 +90,11 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/pairing',
         name: 'pairing',
         builder: (context, state) => const PairingScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

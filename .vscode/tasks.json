@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Flutter: Clean",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["clean"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Get Dependencies",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["pub", "get"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Analyze",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["analyze"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Build Runner",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["pub", "run", "build_runner", "build", "--delete-conflicting-outputs"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Run Tests",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["test"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Run Pairing Tests",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["test", "test/pairing/"],
+      "problemMatcher": []
+    }
+  ]
+}
