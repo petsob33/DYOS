@@ -10,34 +10,8 @@ service cloud.firestore {
     // Users can query by inviteCode (for pairing)
     // Users can read other users' basic info (for pairing)
     match /users/{userId} {
-      // Allow users to read their own document
-      allow get: if request.auth != null && request.auth.uid == userId;
-      
-      // Allow users to create their own document (during registration)
-      allow create: if request.auth != null && 
-                       request.auth.uid == userId &&
-                       // Ensure user sets their own UID correctly
-                       request.resource.data.uid == userId;
-      
-      // Allow users to update their own document
-      allow update: if request.auth != null && 
-                       request.auth.uid == userId &&
-                       // Prevent changing UID
-                       request.resource.data.uid == userId;
-      
-      // Allow authenticated users to read other users' documents (needed for pairing)
-      // This allows users to find their partner by invite code
-      // Note: This also allows list queries which are needed for inviteCode search
-      allow read: if request.auth != null;
-      
-      // Allow users to update other users' coupleId field (for pairing)
-      // This is needed when user A pairs with user B - user A needs to update user B's coupleId
-      // Security: Only allow updating coupleId field, not other fields
-      allow update: if request.auth != null &&
-                       // Only allow updating coupleId field
-                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coupleId']) &&
-                       // Ensure UID doesn't change
-                       request.resource.data.uid == resource.data.uid;
+      // Users can read and write their own document.
+      allow read, write: if request.auth.uid == userId;
     }
     
     // ============================================

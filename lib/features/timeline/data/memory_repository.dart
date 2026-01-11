@@ -146,34 +146,28 @@ class MemoryRepository {
   /// The stream automatically updates when memories are added, updated, or deleted.
   /// 
   /// [coupleId] - The ID of the couple to get memories for
+  /// [category] - Optional category to filter memories by
   /// 
   /// Returns: Stream<List<Memory>> ordered by date descending
-  /// 
-  /// The stream will:
-  /// - Emit current list immediately
-  /// - Emit updated list whenever memories change
-  /// - Filter by coupleId automatically
-  Stream<List<Memory>> getMemories(String coupleId) {
+  Stream<List<Memory>> getMemories(String coupleId, {MemoryCategory? category}) {
     if (coupleId.isEmpty) {
       return Stream.value([]);
     }
     
-    // Query Firestore collection: couples/{coupleId}/memories
-    // Returns a stream that automatically updates when memories change
-    return _firestore
+    Query query = _firestore
         .collection('couples')
         .doc(coupleId)
-        .collection('memories')
-        .snapshots()
-        .map((snapshot) {
-          // Parse all documents to Memory objects
-          final memories = _parseMemories(snapshot.docs);
-          
-          // Sort by date descending (newest first)
-          memories.sort((a, b) => b.date.compareTo(a.date));
-          
-          return memories;
-        });
+        .collection('memories');
+        
+    if (category != null) {
+      query = query.where('category', isEqualTo: category.name);
+    }
+    
+    return query.snapshots().map((snapshot) {
+      final memories = _parseMemories(snapshot.docs);
+      memories.sort((a, b) => b.date.compareTo(a.date));
+      return memories;
+    });
   }
 
   /// Helper method to parse memory documents

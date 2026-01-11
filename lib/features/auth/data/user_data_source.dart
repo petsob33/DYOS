@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import '../domain/user_model.dart';
 
 /// Data source layer for user operations in Firebase Firestore
@@ -22,11 +23,14 @@ class UserDataSource {
   /// Firestore instance - can be injected for testing
   /// Defaults to FirebaseFirestore.instance if not provided
   final FirebaseFirestore _firestore;
+  final FirebaseFunctions _functions;
 
   /// Constructor with optional Firestore instance for testing
   /// If not provided, uses the default Firebase Firestore instance
-  UserDataSource({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+  UserDataSource({FirebaseFirestore? firestore, FirebaseFunctions? functions})
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _functions = functions ?? FirebaseFunctions.instance;
+
 
   /// Collection reference for users
   /// 
@@ -90,18 +94,12 @@ class UserDataSource {
   /// Note: Invite codes are stored in uppercase, so we convert search term
   Future<UserModel?> getUserByInviteCode(String inviteCode) async {
     try {
-      // Query Firestore for user with matching invite code
-      // where() creates a filter condition
-      // limit(1) stops after first match (performance optimization)
-      final query = await _usersCollection
-          .where('inviteCode', isEqualTo: inviteCode.toUpperCase())
-          .limit(1)
-          .get();
-
-      // Check if any documents matched
-      if (query.docs.isEmpty) return null;
-      // Convert first (and only) result to UserModel
-      return UserModel.fromFirestore(query.docs.first);
+      final callable = _functions.httpsCallable('getUserByInviteCode');
+      final result = await callable.call({'inviteCode': inviteCode});
+      if (result.data == null) {
+        return null;
+      }
+      return UserModel.fromJson(Map<String, dynamic>.from(result.data));
     } catch (e) {
       // Fail gracefully
       return null;

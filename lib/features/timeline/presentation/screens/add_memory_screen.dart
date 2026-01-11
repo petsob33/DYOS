@@ -180,63 +180,41 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controllerState = ref.watch(addMemoryControllerProvider);
-    final isUploading = controllerState.maybeWhen(
-      uploading: () => true,
-      orElse: () => false,
-    );
+    final isUploading = ref.watch(addMemoryControllerProvider) is AddMemoryUploading;
 
     // Listen to state changes to handle success/error
     ref.listen<AddMemoryState>(
       addMemoryControllerProvider,
       (previous, next) {
-        // Only handle state transitions from uploading to success/error
-        // This prevents triggering on initial build or state resets
-        final wasUploading = previous?.maybeWhen(uploading: () => true, orElse: () => false) ?? false;
-        
-        if (wasUploading) {
-          next.when(
-            initial: () {},
-            uploading: () {
-              // Still uploading, do nothing
-            },
-            success: (createdMemory) {
-              // Show success message
-              final memory = createdMemory as Memory;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Memory "${memory.caption.isEmpty ? 'Untitled' : memory.caption}" saved successfully!',
-                  ),
-                  backgroundColor: AppTheme.colors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-              // Reset controller state
-              ref.read(addMemoryControllerProvider.notifier).reset();
-              // Pop screen
-              if (mounted) {
-                context.pop();
-              }
-            },
-            error: (message) {
-              // Show error message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(message),
-                  backgroundColor: AppTheme.colors.love,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            },
+        if (next is AddMemorySuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Memory "${next.memory.caption.isEmpty ? 'Untitled' : next.memory.caption}" saved successfully!',
+              ),
+              backgroundColor: AppTheme.colors.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          ref.read(addMemoryControllerProvider.notifier).reset();
+          if (mounted) {
+            context.pop();
+          }
+        } else if (next is AddMemoryError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(next.message),
+              backgroundColor: AppTheme.colors.love,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              duration: const Duration(seconds: 3),
+            ),
           );
         }
       },

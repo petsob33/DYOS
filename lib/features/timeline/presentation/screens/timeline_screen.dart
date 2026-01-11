@@ -11,13 +11,6 @@ import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 
 /// Timeline screen displaying all memories in chronological order
-/// 
-/// Features:
-/// - Real-time updates via memoriesStreamProvider
-/// - Loading skeleton/spinner
-/// - Error handling
-/// - Grouped by month
-/// - Beautiful MemoryCard widgets
 class TimelineScreen extends ConsumerWidget {
   const TimelineScreen({super.key});
 
@@ -39,35 +32,41 @@ class TimelineScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: memoriesAsync.when(
-        data: (memories) {
-          if (memories.isEmpty) {
-            return _EmptyState();
-          }
+      body: Column(
+        children: [
+          const _CategoryFilter(),
+          Expanded(
+            child: memoriesAsync.when(
+              data: (memories) {
+                if (memories.isEmpty) {
+                  return _EmptyState();
+                }
 
-          // Group memories by month/year
-          final groupedMemories = <String, List<Memory>>{};
-          for (final memory in memories) {
-            final monthKey = _formatMonthYear(memory.date);
-            groupedMemories.putIfAbsent(monthKey, () => []).add(memory);
-          }
+                final groupedMemories = <String, List<Memory>>{};
+                for (final memory in memories) {
+                  final monthKey = _formatMonthYear(memory.date);
+                  groupedMemories.putIfAbsent(monthKey, () => []).add(memory);
+                }
 
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            itemCount: groupedMemories.length,
-            itemBuilder: (context, index) {
-              final monthKey = groupedMemories.keys.elementAt(index);
-              final monthMemories = groupedMemories[monthKey]!;
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  itemCount: groupedMemories.length,
+                  itemBuilder: (context, index) {
+                    final monthKey = groupedMemories.keys.elementAt(index);
+                    final monthMemories = groupedMemories[monthKey]!;
 
-              return _TimelineMonthSection(
-                month: monthKey,
-                memories: monthMemories,
-              );
-            },
-          );
-        },
-        loading: () => const _LoadingState(),
-        error: (error, stack) => _ErrorState(error: error.toString()),
+                    return _TimelineMonthSection(
+                      month: monthKey,
+                      memories: monthMemories,
+                    );
+                  },
+                );
+              },
+              loading: () => const _LoadingState(),
+              error: (error, stack) => _ErrorState(error: error.toString()),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -98,6 +97,38 @@ class TimelineScreen extends ConsumerWidget {
       'December'
     ];
     return '${months[date.month - 1]} ${date.year}';
+  }
+}
+
+class _CategoryFilter extends ConsumerWidget {
+  const _CategoryFilter();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    final allCategories = [null, ...MemoryCategory.values];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      child: Row(
+        children: allCategories.map((category) {
+          final isSelected = category == selectedCategory;
+          return Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: ChoiceChip(
+              label: Text(category?.displayName ?? 'All'),
+              selected: isSelected,
+              onSelected: (selected) {
+                if (selected) {
+                  ref.read(selectedCategoryProvider.notifier).state = category;
+                }
+              },
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }
 
@@ -235,12 +266,6 @@ class _TimelineMonthSection extends StatelessWidget {
 }
 
 /// Memory card widget with Apple-style design
-/// 
-/// Features:
-/// - Clean, rounded corners (24px)
-/// - Header: Date and Category Chip
-/// - Body: PageView for multiple images with dots, single image display
-/// - Footer: Caption and location
 class MemoryCard extends StatefulWidget {
   const MemoryCard({super.key, required this.memory});
 

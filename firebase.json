@@ -8,6 +8,10 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  },
   "hosting": {
     "public": "public",
     "ignore": [
@@ -35,7 +39,7 @@
         "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|ico)",
         "headers": [
           {
-            "key": "Cache-Control",
+            "key": "Cache-Control",.
             "value": "max-age=86400"
           }
         ]
