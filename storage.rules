@@ -1,0 +1,54 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules
+// These rules control who can upload, read, update, and delete files in Firebase Storage
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ============================================
+    // MEMORIES STORAGE
+    // ============================================
+    // Storage path: memories/{coupleId}/{filename}
+    // Members of a couple can upload and read memory media files
+    match /memories/{coupleId}/{fileName} {
+      // Helper function to check if user is authenticated
+      function isAuthenticated() {
+        return request.auth != null;
+      }
+      
+      // Helper function to check if user is a member of the couple
+      // Note: This requires a Firestore read, which is acceptable for security
+      function isCoupleMember() {
+        return isAuthenticated() && 
+               exists(/databases/(default)/documents/couples/$(coupleId)) &&
+               request.auth.uid in get(/databases/(default)/documents/couples/$(coupleId)).data.members;
+      }
+      
+      // Allow reading if user is a couple member
+      allow read: if isCoupleMember();
+      
+      // Allow writing (upload/update) if user is authenticated and couple member
+      // Only allow files up to 10MB (images/videos)
+      // Note: contentType might be null during upload, so we check file extension via path
+      allow write: if isAuthenticated() && 
+                     isCoupleMember() &&
+                     request.resource.size < 10 * 1024 * 1024 &&
+                     // Allow common image and video formats (check contentType or path)
+                     (request.resource.contentType.matches('image/.*') ||
+                      request.resource.contentType.matches('video/.*') ||
+                      fileName.matches('.*\\.(jpg|jpeg|png|gif|webp|mp4|mov|avi)$'));
+      
+      // Allow deletion if user is a couple member
+      allow delete: if isCoupleMember();
+    }
+    
+    // ============================================
+    // DEFAULT DENY
+    // ============================================
+    // Deny all other paths by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,43 +1,39 @@
-# Cursor AI Rules for DYOS Flutter Project
+# DYOS Project Rules
 
-## Project Context
-- Flutter/Dart mobile app for couples
-- Uses Riverpod for state management
-- Firebase for backend (Auth, Firestore, Storage)
-- GoRouter for navigation
-- Freezed for data models
+## Tech Stack
+- Framework: Flutter (Latest Stable)
+- Language: Dart
+- State Management: Riverpod (Use Annotation Syntax @riverpod)
+- Navigation: GoRouter
+- Backend: Firebase (Auth, Firestore, Storage, Functions)
+- Monetization: RevenueCat
+- UI Library: flutter_staggered_grid_view, google_fonts, flutter_animate
 
-## Code Style
-- Use single quotes for strings
-- Prefer const constructors where possible
-- Use meaningful variable and function names
-- Follow Flutter/Dart conventions
-- Maximum line length: 100 characters
+## Design System (Strict)
+- Font: 'Inter' (Google Fonts)
+- Border Radius: 24.0 (Global for cards)
+- Styling: "Premium Bento Grid" style. Clean, soft shadows, no hard borders.
+- Colors:
+  - Background: #F2F2F7
+  - Cards: #FFFFFF
+  - Primary: #5E5CE6 (Indigo)
+  - Text Main: #1C1C1E
+  - Text Secondary: #8E8E93
+  - Functional: Love (#FF375F), Success (#34C759), Alert (#FF9F0A)
 
-## Architecture
-- Feature-based folder structure
-- Separate presentation, data, and domain layers
-- Use Riverpod providers for state management
-- Use Freezed for immutable data models
-- Use GoRouter for navigation
+## Architecture: Feature-First
+- Place code in `lib/features/<feature_name>/`
+- Structure inside feature: `data` (repos), `domain` (models), `presentation` (UI + providers).
+- Use Repository pattern for Firestore interactions.
+- Models must use `freezed` and `json_serializable`.
 
-## Best Practices
-- Always handle async operations with proper error handling
-- Use type-safe models (Freezed)
-- Validate user input
-- Handle loading and error states in UI
-- Write tests for critical functionality (especially pairing)
+## Coding Standards
+- Use `AsyncValue` for async UI states.
+- Avoid `setState` where possible; use Riverpod Consumers.
+- All Strings must be hardcoded for now (v1.0), localization later.
+- Use `gap` package for spacing instead of SizedBox.
+- Always implement Optimistic UI for list updates (update local state immediately, then sync).
 
-## Naming Conventions
-- Files: snake_case (e.g., `home_screen.dart`)
-- Classes: PascalCase (e.g., `HomeScreen`)
-- Variables/functions: camelCase (e.g., `getUserData`)
-- Constants: lowerCamelCase with const (e.g., `const appSpacing`)
-
-## When Writing Code
-- Add comments for complex logic
-- Use meaningful names
-- Keep functions small and focused
-- Handle edge cases
-- Consider error states
-- Write tests for new features
+## Firebase Schema Context
+- Users collection: `users/{uid}`
+- Couples collection: `couples/{coupleId}` (contains subcollections: timeline, intimacy_logs, lists)

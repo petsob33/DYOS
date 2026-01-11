@@ -44,6 +44,8 @@ dependencies:
   firebase_storage: ^12.3.1
   purchases_flutter: ^9.10.3
   phosphor_flutter: ^2.0.1
+  image_picker: ^1.1.2
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -86,7 +88,6 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   # fonts:
-  #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf

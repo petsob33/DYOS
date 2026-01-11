@@ -71,6 +71,57 @@ service cloud.firestore {
       
       // Don't allow deletion (couples should persist)
       allow delete: if false;
+      
+      // ============================================
+      // MEMORIES SUBCOLLECTION
+      // ============================================
+      // Members of a couple can create, read, update memories
+      // Only the author can update/delete their own memories
+      match /memories/{memoryId} {
+        // Helper function to check if user is authenticated
+        function isAuthenticated() {
+          return request.auth != null;
+        }
+        
+        // Helper function to check if couple document exists
+        function coupleExists() {
+          return exists(/databases/$(database)/documents/couples/$(coupleId));
+        }
+        
+        // Helper function to check if user is a member of the couple
+        // Check if couple exists first to avoid errors, then check membership
+        function isCoupleMember() {
+          return isAuthenticated() && 
+                 coupleExists() &&
+                 request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+        
+        // Helper function to check if user is the author of the memory
+        // Only works for existing documents (update/delete operations)
+        function isAuthor() {
+          return isAuthenticated() && 
+                 resource != null &&
+                 resource.data.authorId == request.auth.uid;
+        }
+        
+        // Allow reading (list and get) if user is authenticated and couple member
+        // This allows both list() queries and get() operations
+        // Explicitly allow both list and get for better clarity
+        allow list, get: if isCoupleMember();
+        
+        // Allow creating if user is a couple member and sets themselves as author
+        // Also validate that pairId matches the coupleId in the path
+        allow create: if isCoupleMember() && 
+                        request.resource.data.authorId == request.auth.uid &&
+                        request.resource.data.pairId == coupleId;
+        
+        // Allow updating if user is a couple member
+        // For now, allow any couple member to update (can be restricted later)
+        allow update: if isCoupleMember();
+        
+        // Allow deletion if user is a couple member and is the author
+        allow delete: if isCoupleMember() && isAuthor();
+      }
     }
     
     // ============================================
