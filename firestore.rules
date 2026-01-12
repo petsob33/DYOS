@@ -98,6 +98,36 @@ service cloud.firestore {
         // Historie se nesmí měnit
         allow update: if false;
       }
+      
+      // --------------------------------------------
+      // NOTES (Subcollection)
+      // --------------------------------------------
+      match /notes/{noteId} {
+        // Funkce pro členství v páru
+        function isCoupleMember() {
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+        
+        function isAuthor() {
+          return resource.data.authorId == request.auth.uid;
+        }
+
+        // Čtení a listování pro členy páru
+        allow list, get: if isCoupleMember();
+        
+        // Vytvoření: Člen páru + autor jsem já + správný typ
+        allow create: if isCoupleMember() && 
+                         request.resource.data.authorId == request.auth.uid &&
+                         request.resource.data.type is string;
+                         
+        // Update: Kterýkoliv člen páru (může upravit i poznámky partnera)
+        allow update: if isCoupleMember();
+        
+        // Smazat může jen autor
+        allow delete: if isCoupleMember() && isAuthor();
+      }
     }
     
     // ============================================

@@ -7,6 +7,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
+import '../../../../models/notes_provider.dart';
+import '../../../../widgets/home/quick_note_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../auth/domain/couple_model.dart';
 import '../../../auth/domain/user_model.dart';
@@ -55,7 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (currentUserAsync.isLoading || coupleAsync.isLoading) {
       return Scaffold(
         backgroundColor: AppTheme.colors.background,
-        body: const Center(
+        body: const Center( 
           child: CircularProgressIndicator(), 
         ),
       );
@@ -527,41 +529,35 @@ class _CountdownCard extends StatelessWidget {
   }
 }
 
-class _QuickNoteCard extends StatelessWidget {
+class _QuickNoteCard extends ConsumerWidget {
   const _QuickNoteCard();
 
   @override
-  Widget build(BuildContext context) {
-    return BentoCard(
-      background: AppTheme.colors.primary.withOpacity(0.08),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Quick note',
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(color: AppTheme.colors.primary),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Shared note:',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.colors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Koupit víno 🍷',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppTheme.colors.text,
-              fontWeight: FontWeight.w700,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final latestNoteAsync = ref.watch(latestSharedNoteProvider);
+    
+    return latestNoteAsync.when(
+      data: (note) {
+        return QuickNoteCard(
+          content: note?.content ?? '',
+          onTap: () {
+            context.push('/add-note');
+          },
+        );
+      },
+      loading: () => const QuickNoteCard(
+        content: '',
       ),
+      error: (error, stackTrace) {
+        debugPrint('Error loading latest note: $error');
+        debugPrint('Stack trace: $stackTrace');
+        return QuickNoteCard(
+          content: '',
+          onTap: () {
+            context.push('/add-note');
+          },
+        );
+      },
     );
   }
 }

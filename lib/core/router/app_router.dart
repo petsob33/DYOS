@@ -17,6 +17,8 @@ import '../../features/tracker/presentation/data_screen.dart';
 import '../../features/tracker/presentation/widgets/add_intimacy_sheet.dart';
 import '../../features/lists/lists_screen.dart';
 import '../../features/lists/settings_screen.dart';
+import '../../features/notes/presentation/screens/add_note_screen.dart';
+import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
 
@@ -102,6 +104,24 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/add-memory',
         name: 'add-memory',
         builder: (context, state) => const AddMemoryScreen(),
+      ),
+      GoRoute(
+        path: '/add-note',
+        name: 'add-note',
+        builder: (context, state) {
+          final typeParam = state.uri.queryParameters['type'];
+          NoteType? initialType;
+          if (typeParam != null) {
+            try {
+              initialType = NoteType.values.firstWhere(
+                (e) => e.name == typeParam,
+              );
+            } catch (e) {
+              // Invalid type parameter, use default
+            }
+          }
+          return AddNoteScreen(initialType: initialType);
+        },
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -335,9 +355,7 @@ class _QuickAddSheet extends StatelessWidget {
               _QuickActionChip(
                 icon: PhosphorIconsBold.chatTeardropText,
                 label: 'Add note',
-                onTap: () {
-                  // TODO: Implement add note
-                },
+                navigationRoute: '/add-note',
               ),
               _QuickActionChip(
                 icon: PhosphorIconsBold.camera,
