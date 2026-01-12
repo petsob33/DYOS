@@ -18,6 +18,8 @@ import '../../features/tracker/presentation/widgets/add_intimacy_sheet.dart';
 import '../../features/lists/lists_screen.dart';
 import '../../features/lists/settings_screen.dart';
 import '../../features/notes/presentation/screens/add_note_screen.dart';
+import '../../features/auth/presentation/profile_screen.dart';
+import '../../features/notes/presentation/screens/secret_notes_screen.dart';
 import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
@@ -99,6 +101,16 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/secret-notes',
+        name: 'secret-notes',
+        builder: (context, state) => const SecretNotesScreen(),
       ),
       GoRoute(
         path: '/add-memory',

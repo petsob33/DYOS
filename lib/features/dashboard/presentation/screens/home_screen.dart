@@ -4,6 +4,8 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
@@ -63,12 +65,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
 
     }
+
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
       appBar: AppBar(
         backgroundColor: AppTheme.colors.background,
         elevation: 0,
         automaticallyImplyLeading: false,
+        leading: currentUserAsync.when(
+          data: (user) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: () {
+                  context.push('/profile');
+                },
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppTheme.colors.primary.withOpacity(0.1),
+                  backgroundImage: user?.photoUrl != null
+                      ? CachedNetworkImageProvider(user!.photoUrl!)
+                      : null,
+                  child: user?.photoUrl == null
+                      ? Icon(
+                          PhosphorIconsBold.user,
+                          size: 20,
+                          color: AppTheme.colors.primary,
+                        )
+                      : null,
+                ),
+              ),
+            );
+          },
+          loading: () => const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 36,
+              height: 36,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          error: (_, __) => Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Icon(
+                PhosphorIconsBold.user,
+                color: AppTheme.colors.textSecondary,
+              ),
+              onPressed: () {
+                context.push('/profile');
+              },
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(
