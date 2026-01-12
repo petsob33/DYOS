@@ -19,29 +19,48 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  @override
+   @override
   Widget build(BuildContext context) {
-    // Watch pairing status - router will handle redirects automatically
-    // We just need to watch it to trigger rebuilds when status changes
+    // 1. Načtení providerů
     final isPairedAsync = ref.watch(isUserPairedProvider);
-    
-    // If user is not paired, show loading or let router handle redirect
-    // Don't navigate directly here to avoid key conflicts
+    final currentUserAsync = ref.watch(currentUserDataProvider);
+    final coupleAsync = ref.watch(currentCoupleProvider);
+    final partnerAsync = ref.watch(partnerProvider);
+
+    // 2. Debug výpis STAVU všech providerů
+    debugPrint('=== HOME SCREEN DEBUG ===');
+    debugPrint('isPaired: isLoading=${isPairedAsync.isLoading}, hasValue=${isPairedAsync.hasValue}, value=${isPairedAsync.value}');
+    debugPrint('currentUser: isLoading=${currentUserAsync.isLoading}, hasValue=${currentUserAsync.hasValue}, hasError=${currentUserAsync.hasError}');
+    if (currentUserAsync.hasValue) {
+      debugPrint('currentUser data: ${currentUserAsync.value?.displayName ?? 'null'} (${currentUserAsync.value?.uid ?? 'no uid'})');
+    }
+    debugPrint('couple: isLoading=${coupleAsync.isLoading}, hasValue=${coupleAsync.hasValue}, hasError=${coupleAsync.hasError}');
+    debugPrint('partner: isLoading=${partnerAsync.isLoading}, hasValue=${partnerAsync.hasValue}, hasError=${partnerAsync.hasError}');
+    if (partnerAsync.hasValue) {
+      debugPrint('partner data: ${partnerAsync.value?.displayName ?? 'null'} (${partnerAsync.value?.uid ?? 'no uid'})');
+    }
+    if (partnerAsync.hasError) {
+      debugPrint('partner error: ${partnerAsync.error}');
+    }
+    debugPrint('========================');
+
+    // 3. Logika pro přesměrování (pokud není spárován)
     if (isPairedAsync.hasValue && isPairedAsync.value == false) {
-      // Router will handle the redirect, just show loading state
+       return Scaffold(body: const Center(child: CircularProgressIndicator()));
+    }
+
+    // --- OPRAVA: Čekání na klíčová data ---
+    // Pokud se načítá uživatel NEBO pár, zobrazíme loading celé obrazovky.
+    // Tím zajistíme, že zbytek kódu už bude mít data k dispozici.
+    if (currentUserAsync.isLoading || coupleAsync.isLoading) {
       return Scaffold(
         backgroundColor: AppTheme.colors.background,
         body: const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(), 
         ),
       );
-    }
 
-    // Get couple data and partner data
-    final coupleAsync = ref.watch(currentCoupleProvider);
-    final partnerAsync = ref.watch(partnerProvider);
-    final currentUserAsync = ref.watch(currentUserDataProvider);
-    
+    }
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
       appBar: AppBar(

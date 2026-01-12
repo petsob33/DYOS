@@ -33,7 +33,9 @@ class CoupleModel with _$CoupleModel {
   /// Create CoupleModel from Firestore document
   factory CoupleModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return CoupleModel.fromJson(data).copyWith(id: doc.id);
+    // Add id to data since it's required by fromJson but not stored in Firestore
+    final dataWithId = {...data, 'id': doc.id};
+    return CoupleModel.fromJson(dataWithId);
   }
 }
 

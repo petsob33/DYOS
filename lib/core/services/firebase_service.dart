@@ -24,13 +24,25 @@ class FirebaseService {
   // Check if user exists and has a couple
   Future<UserModel?> getUserData() async {
     final user = currentUser;
-    if (user == null) return null;
+    if (user == null) {
+      print('DEBUG getUserData: No current user');
+      return null;
+    }
 
     try {
+      print('DEBUG getUserData: Loading user data for UID: ${user.uid}');
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      if (!doc.exists) return null;
-      return UserModel.fromFirestore(doc);
-    } catch (e) {
+      print('DEBUG getUserData: Document exists: ${doc.exists}');
+      if (!doc.exists) {
+        print('DEBUG getUserData: User document does not exist');
+        return null;
+      }
+      final userModel = UserModel.fromFirestore(doc);
+      print('DEBUG getUserData: User loaded - displayName: ${userModel.displayName}, email: ${userModel.email}, coupleId: ${userModel.coupleId}');
+      return userModel;
+    } catch (e, stackTrace) {
+      print('ERROR in getUserData: $e');
+      print('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -170,40 +182,15 @@ final partnerUserDoc = results[1];
       status: statusMap,
     );
 
-    // Debugging print - před .set()
-    final myId = FirebaseAuth.instance.currentUser?.uid;
-    final membersList = [currentUserId, partnerUserId];
-    
-    print("=== DEBUGGING FIRESTORE WRITE ===");
-    print("My ID (from currentUser): $myId");
-    print("Current User ID (param): $currentUserId");
-    print("Partner ID (param): $partnerUserId");
-    print("Members List: $membersList");
-    print("Members Length: ${membersList.length}");
-    print("Couple ID: $coupleId");
-    
-    if (currentUserId == null || currentUserId.isEmpty) {
-      print("ERROR! Current User ID is null or empty!");
-      throw Exception("Current user ID is missing");
-    }
-    
-    if (partnerUserId == null || partnerUserId.isEmpty) {
-      print("ERROR! Partner User ID is null or empty!");
-      throw Exception("Partner user ID is missing");
-    }
-    
-    if (membersList.length != 2) {
-      print("ERROR! Members list must contain exactly 2 users, got ${membersList.length}");
-      throw Exception("Invalid members list size");
-    }
-    
-    final coupleData = couple.toJson();
-    print("Couple data keys: ${coupleData.keys.join(", ")}");
-    print("Members in couple data: ${coupleData['members']}");
-    print("Members type: ${coupleData['members'].runtimeType}");
-    
+    // Debug: print what we're saving
+    final coupleJson = couple.toJson();
+    print('DEBUG pairUsers: Saving couple - ID: $coupleId');
+    print('DEBUG pairUsers: Members in couple object: ${couple.members}');
+    print('DEBUG pairUsers: Members in JSON: ${coupleJson['members']}');
+    print('DEBUG pairUsers: JSON keys: ${coupleJson.keys.join(", ")}');
+
     // Set the couple document
-    batch.set(coupleRef, coupleData);
+    batch.set(coupleRef, coupleJson);
 
     // Update both users with coupleId
     final currentUserRef = _firestore.collection('users').doc(currentUserId);
@@ -220,10 +207,24 @@ final partnerUserDoc = results[1];
   // Get couple data
   Future<CoupleModel?> getCoupleData(String coupleId) async {
     try {
+      print('DEBUG getCoupleData: Loading couple with ID: $coupleId');
       final doc = await _firestore.collection('couples').doc(coupleId).get();
-      if (!doc.exists) return null;
-      return CoupleModel.fromJson(doc.data()!);
-    } catch (e) {
+      if (!doc.exists) {
+        print('DEBUG getCoupleData: Document does not exist');
+        return null;
+      }
+      final data = doc.data()!;
+      print('DEBUG getCoupleData: Document data keys: ${data.keys.join(", ")}');
+      print('DEBUG getCoupleData: Members in data: ${data['members']}');
+      print('DEBUG getCoupleData: Members type: ${data['members']?.runtimeType}');
+      
+      // Use fromFirestore to properly set the id field
+      final couple = CoupleModel.fromFirestore(doc);
+      print('DEBUG getCoupleData: Couple loaded - id: ${couple.id}, members: ${couple.members}, members count: ${couple.members.length}');
+      return couple;
+    } catch (e, stackTrace) {
+      print('ERROR in getCoupleData: $e');
+      print('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -241,19 +242,30 @@ final partnerUserDoc = results[1];
   /// 
   /// Returns: UserModel of the partner, or null if not found
   Future<UserModel?> getPartner() async {
+    print('DEBUG getPartner: Starting...');
     final user = currentUser;
-    if (user == null) return null;
+    if (user == null) {
+      print('DEBUG getPartner: No current user');
+      return null;
+    }
+    print('DEBUG getPartner: Current user UID: ${user.uid}');
 
     try {
       // Get current user's data to find coupleId
       final userData = await getUserData();
+      print('DEBUG getPartner: User data loaded - coupleId: ${userData?.coupleId ?? 'null'}');
       if (userData?.coupleId == null || userData!.coupleId!.isEmpty) {
+        print('DEBUG getPartner: User is not paired');
         return null; // User is not paired
       }
 
       // Get couple data
       final couple = await getCoupleData(userData.coupleId!);
-      if (couple == null) return null;
+      print('DEBUG getPartner: Couple data loaded - members: ${couple?.members ?? 'null'}');
+      if (couple == null) {
+        print('DEBUG getPartner: Couple not found');
+        return null;
+      }
 
       // Find partner's UID (the other member, not the current user)
       final partnerUid = couple.members.firstWhere(
@@ -261,14 +273,26 @@ final partnerUserDoc = results[1];
         orElse: () => '',
       );
 
-      if (partnerUid.isEmpty) return null;
+      print('DEBUG getPartner: Partner UID found: $partnerUid');
+      if (partnerUid.isEmpty) {
+        print('DEBUG getPartner: Partner UID is empty. Members: ${couple.members}, Current user: ${user.uid}');
+        return null;
+      }
 
       // Get partner's user document
       final partnerDoc = await _firestore.collection('users').doc(partnerUid).get();
-      if (!partnerDoc.exists) return null;
+      print('DEBUG getPartner: Partner document exists: ${partnerDoc.exists}');
+      if (!partnerDoc.exists) {
+        print('DEBUG getPartner: Partner document does not exist for UID: $partnerUid');
+        return null;
+      }
 
-      return UserModel.fromFirestore(partnerDoc);
-    } catch (e) {
+      final partner = UserModel.fromFirestore(partnerDoc);
+      print('DEBUG getPartner: Partner loaded successfully - UID: ${partner.uid}, displayName: ${partner.displayName}, email: ${partner.email}');
+      return partner;
+    } catch (e, stackTrace) {
+      print('ERROR in getPartner: $e');
+      print('Stack trace: $stackTrace');
       return null;
     }
   }
