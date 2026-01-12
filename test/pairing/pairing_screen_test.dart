@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../lib/src/features/pairing/presentation/pairing_screen.dart';
-import '../../lib/src/core/data/services/firebase_service.dart';
-import '../../lib/src/core/data/models/user_model.dart';
+import 'package:dyos_app/features/auth/presentation/pairing_screen.dart';
+import 'package:dyos_app/core/services/firebase_service.dart';
+import 'package:dyos_app/features/auth/domain/user_model.dart';
 
 void main() {
   group('PairingScreen Widget Tests', () {

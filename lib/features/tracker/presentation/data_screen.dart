@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
+import 'widgets/intimacy_history_list.dart';
 
 class DataScreen extends StatelessWidget {
   const DataScreen({super.key});
@@ -14,86 +15,110 @@ class DataScreen extends StatelessWidget {
       backgroundColor: AppTheme.colors.background,
       appBar: AppBar(title: const Text('Data & Analytics')),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              sliver: SliverToBoxAdapter(
+        child: Column(
+          children: [
+            // Top section with stats (scrollable)
+            Expanded(
+              flex: 1,
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Relationship Insights',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.colors.text,
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Relationship Insights',
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.colors.text,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Track patterns and trends in your relationship',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.colors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Track patterns and trends in your relationship',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.colors.textSecondary,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                      child: _IntimacyChart(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: AppSpacing.lg,
+                        mainAxisSpacing: AppSpacing.lg,
+                        childAspectRatio: 1.2,
+                        children: [
+                          _StatCard(
+                            icon: PhosphorIconsBold.heart,
+                            title: 'This Month',
+                            value: '12',
+                            subtitle: 'Intimate moments',
+                            color: AppTheme.colors.love,
+                          ),
+                          _StatCard(
+                            icon: PhosphorIconsBold.calendar,
+                            title: 'Cycle Sync',
+                            value: '85%',
+                            subtitle: 'Aligned this week',
+                            color: AppTheme.colors.primary,
+                          ),
+                          _StatCard(
+                            icon: PhosphorIconsBold.smiley,
+                            title: 'Avg Mood',
+                            value: '8.2',
+                            subtitle: 'Out of 10',
+                            color: AppTheme.colors.success,
+                          ),
+                          _StatCard(
+                            icon: PhosphorIconsBold.chartLine,
+                            title: 'Trend',
+                            value: '+15%',
+                            subtitle: 'vs last month',
+                            color: AppTheme.colors.warning,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                      child: _WeeklyPattern(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: AppSpacing.xl,
+                        left: AppSpacing.lg,
+                        right: AppSpacing.lg,
+                        bottom: AppSpacing.md,
+                      ),
+                      child: Text(
+                        'History',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.colors.text,
+                            ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              sliver: SliverToBoxAdapter(
-                child: _IntimacyChart(),
-              ),
+            // Bottom section with history list
+            Expanded(
+              flex: 1,
+              child: const IntimacyHistoryList(),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: AppSpacing.lg,
-                  mainAxisSpacing: AppSpacing.lg,
-                  childAspectRatio: 1.2,
-                ),
-                delegate: SliverChildListDelegate([
-                  _StatCard(
-                    icon: PhosphorIconsBold.heart,
-                    title: 'This Month',
-                    value: '12',
-                    subtitle: 'Intimate moments',
-                    color: AppTheme.colors.love,
-                  ),
-                  _StatCard(
-                    icon: PhosphorIconsBold.calendar,
-                    title: 'Cycle Sync',
-                    value: '85%',
-                    subtitle: 'Aligned this week',
-                    color: AppTheme.colors.primary,
-                  ),
-                  _StatCard(
-                    icon: PhosphorIconsBold.smiley,
-                    title: 'Avg Mood',
-                    value: '8.2',
-                    subtitle: 'Out of 10',
-                    color: AppTheme.colors.success,
-                  ),
-                  _StatCard(
-                    icon: PhosphorIconsBold.chartLine,
-                    title: 'Trend',
-                    value: '+15%',
-                    subtitle: 'vs last month',
-                    color: AppTheme.colors.warning,
-                  ),
-                ]),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              sliver: SliverToBoxAdapter(
-                child: _WeeklyPattern(),
-              ),
-            ),
-            const SliverPadding(padding: EdgeInsets.only(bottom: AppSpacing.xl)),
           ],
         ),
       ),

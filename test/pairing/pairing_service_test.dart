@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 
-import '../../lib/src/core/data/models/user_model.dart';
-import '../../lib/src/core/data/models/couple_model.dart';
+import 'package:dyos_app/features/auth/domain/user_model.dart';
+import 'package:dyos_app/features/auth/domain/couple_model.dart';
 
 void main() {
   group('FirebaseService Pairing Tests', () {

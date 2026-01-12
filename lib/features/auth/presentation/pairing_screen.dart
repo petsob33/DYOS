@@ -8,6 +8,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../../core/services/firebase_service.dart';
+import '../../../core/services/pairing_exceptions.dart';
 import '../domain/user_model.dart';
 import 'auth_providers.dart';
 
@@ -175,21 +176,11 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
       // Get the entered code and normalize it (uppercase)
       final partnerCode = _codeController.text.trim().toUpperCase();
 
-      // Safety check: prevent pairing with yourself
-      if (partnerCode == _userCode) {
-        throw Exception('Nemůžete se spárovat sami se sebou');
-      }
-
       // Find partner user by their invite code
       final partnerUser = await firebaseService.findUserByInviteCode(partnerCode);
 
       if (partnerUser == null) {
-        throw Exception('Uživatel s tímto kódem nebyl nalezen');
-      }
-
-      // Safety check: verify partner is not already paired
-      if (partnerUser.coupleId != null && partnerUser.coupleId!.isNotEmpty) {
-        throw Exception('Tento uživatel je již spárovaný');
+        throw PartnerNotFoundException();
       }
 
       // Create the pair - this will create the couple document and update both users
@@ -218,26 +209,37 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
         // The router will now see that the user is paired and allow navigation
         context.go('/home');
       }
-    } catch (e) {
-      // Handle errors and show user-friendly message
+    } on PairingException catch (e) {
+      // Handle specific pairing errors and show user-friendly message
       if (mounted) {
         setState(() {
-          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+          _errorMessage = e.message;
           _isSubmitting = false;
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_errorMessage ?? 'Chyba při spárování'),
-            backgroundColor: AppTheme.colors.love,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            duration: const Duration(seconds: 3),
-          ),
-        );
       }
+    } catch (e) {
+      // Handle other generic errors
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Chyba při spárování. Zkuste to prosím znovu.';
+          _isSubmitting = false;
+        });
+      }
+    }
+
+    // Show a snackbar with the error message if there is one
+    if (_errorMessage != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_errorMessage!),
+          backgroundColor: AppTheme.colors.love,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 

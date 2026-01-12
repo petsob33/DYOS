@@ -21,6 +21,7 @@ CoupleModel _$CoupleModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CoupleModel {
+  @JsonKey(includeFromJson: true, includeToJson: false)
   String get id => throw _privateConstructorUsedError;
   List<String> get members =>
       throw _privateConstructorUsedError; // Array of user UIDs (important for Security Rules!)
@@ -54,7 +55,7 @@ abstract class $CoupleModelCopyWith<$Res> {
   ) = _$CoupleModelCopyWithImpl<$Res, CoupleModel>;
   @useResult
   $Res call({
-    String id,
+    @JsonKey(includeFromJson: true, includeToJson: false) String id,
     List<String> members,
     DateTime? anniversaryDate,
     @TimestampConverter() DateTime? createdAt,
@@ -133,7 +134,7 @@ abstract class _$$CoupleModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
+    @JsonKey(includeFromJson: true, includeToJson: false) String id,
     List<String> members,
     DateTime? anniversaryDate,
     @TimestampConverter() DateTime? createdAt,
@@ -205,7 +206,7 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
 @JsonSerializable(explicitToJson: true)
 class _$CoupleModelImpl implements _CoupleModel {
   const _$CoupleModelImpl({
-    required this.id,
+    @JsonKey(includeFromJson: true, includeToJson: false) required this.id,
     required final List<String> members,
     this.anniversaryDate,
     @TimestampConverter() this.createdAt,
@@ -219,6 +220,7 @@ class _$CoupleModelImpl implements _CoupleModel {
       _$$CoupleModelImplFromJson(json);
 
   @override
+  @JsonKey(includeFromJson: true, includeToJson: false)
   final String id;
   final List<String> _members;
   @override
@@ -311,6 +313,7 @@ class _$CoupleModelImpl implements _CoupleModel {
 
 abstract class _CoupleModel implements CoupleModel {
   const factory _CoupleModel({
+    @JsonKey(includeFromJson: true, includeToJson: false)
     required final String id,
     required final List<String> members,
     final DateTime? anniversaryDate,
@@ -324,6 +327,7 @@ abstract class _CoupleModel implements CoupleModel {
       _$CoupleModelImpl.fromJson;
 
   @override
+  @JsonKey(includeFromJson: true, includeToJson: false)
   String get id;
   @override
   List<String> get members; // Array of user UIDs (important for Security Rules!)

@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/auth/domain/user_model.dart';
 import '../../features/auth/domain/couple_model.dart';
+import 'pairing_exceptions.dart';
 
 part 'firebase_service.g.dart';
 
@@ -108,18 +109,23 @@ class FirebaseService {
   Future<CoupleModel> pairUsers(String currentUserId, String partnerUserId) async {
     // Safety check: prevent pairing with yourself
     if (currentUserId == partnerUserId) {
-      throw Exception('Cannot pair user with themselves');
+      throw SelfPairingException();
     }
 
     // Safety check: verify both users exist
-    final currentUserDoc = await _firestore.collection('users').doc(currentUserId).get();
-    final partnerUserDoc = await _firestore.collection('users').doc(partnerUserId).get();
-    
+// Stáhne oba naráz
+final results = await Future.wait([
+  _firestore.collection('users').doc(currentUserId).get(),
+  _firestore.collection('users').doc(partnerUserId).get(),
+]);
+
+final currentUserDoc = results[0];
+final partnerUserDoc = results[1];    
     if (!currentUserDoc.exists) {
-      throw Exception('Current user not found');
+      throw UserNotFoundException();
     }
     if (!partnerUserDoc.exists) {
-      throw Exception('Partner user not found');
+      throw PartnerNotFoundException();
     }
 
     // Safety check: verify neither user is already paired
@@ -127,10 +133,10 @@ class FirebaseService {
     final partnerUser = UserModel.fromFirestore(partnerUserDoc);
     
     if (currentUser.coupleId != null && currentUser.coupleId!.isNotEmpty) {
-      throw Exception('Current user is already paired');
+      throw UserAlreadyPairedException();
     }
     if (partnerUser.coupleId != null && partnerUser.coupleId!.isNotEmpty) {
-      throw Exception('Partner user is already paired');
+      throw PartnerAlreadyPairedException();
     }
 
     final batch = _firestore.batch();
@@ -164,8 +170,40 @@ class FirebaseService {
       status: statusMap,
     );
 
+    // Debugging print - před .set()
+    final myId = FirebaseAuth.instance.currentUser?.uid;
+    final membersList = [currentUserId, partnerUserId];
+    
+    print("=== DEBUGGING FIRESTORE WRITE ===");
+    print("My ID (from currentUser): $myId");
+    print("Current User ID (param): $currentUserId");
+    print("Partner ID (param): $partnerUserId");
+    print("Members List: $membersList");
+    print("Members Length: ${membersList.length}");
+    print("Couple ID: $coupleId");
+    
+    if (currentUserId == null || currentUserId.isEmpty) {
+      print("ERROR! Current User ID is null or empty!");
+      throw Exception("Current user ID is missing");
+    }
+    
+    if (partnerUserId == null || partnerUserId.isEmpty) {
+      print("ERROR! Partner User ID is null or empty!");
+      throw Exception("Partner user ID is missing");
+    }
+    
+    if (membersList.length != 2) {
+      print("ERROR! Members list must contain exactly 2 users, got ${membersList.length}");
+      throw Exception("Invalid members list size");
+    }
+    
+    final coupleData = couple.toJson();
+    print("Couple data keys: ${coupleData.keys.join(", ")}");
+    print("Members in couple data: ${coupleData['members']}");
+    print("Members type: ${coupleData['members'].runtimeType}");
+    
     // Set the couple document
-    batch.set(coupleRef, couple.toJson());
+    batch.set(coupleRef, coupleData);
 
     // Update both users with coupleId
     final currentUserRef = _firestore.collection('users').doc(currentUserId);

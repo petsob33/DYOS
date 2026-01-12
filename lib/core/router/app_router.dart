@@ -14,6 +14,7 @@ import '../../features/dashboard/presentation/screens/home_screen.dart';
 import '../../features/timeline/presentation/screens/timeline_screen.dart';
 import '../../features/timeline/presentation/screens/add_memory_screen.dart';
 import '../../features/tracker/presentation/data_screen.dart';
+import '../../features/tracker/presentation/widgets/add_intimacy_sheet.dart';
 import '../../features/lists/lists_screen.dart';
 import '../../features/lists/settings_screen.dart';
 
@@ -347,7 +348,7 @@ class _QuickAddSheet extends StatelessWidget {
                 icon: PhosphorIconsBold.heart,
                 label: 'Log intimacy',
                 onTap: () {
-                  // TODO: Implement log intimacy
+                  AddIntimacySheet.show(context);
                 },
               ),
               _QuickActionChip(

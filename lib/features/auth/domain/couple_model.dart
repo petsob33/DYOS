@@ -13,7 +13,7 @@ part 'couple_model.g.dart';
 class CoupleModel with _$CoupleModel {
   @JsonSerializable(explicitToJson: true)
   const factory CoupleModel({
-    required String id,
+    @JsonKey(includeFromJson: true, includeToJson: false) required String id,
     required List<String> members, // Array of user UIDs (important for Security Rules!)
     DateTime? anniversaryDate, // For counting days together
     @TimestampConverter() DateTime? createdAt,

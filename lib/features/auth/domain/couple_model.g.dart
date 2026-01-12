@@ -27,7 +27,6 @@ _$CoupleModelImpl _$$CoupleModelImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$CoupleModelImplToJson(_$CoupleModelImpl instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'members': instance.members,
       'anniversaryDate': instance.anniversaryDate?.toIso8601String(),
       'createdAt': const TimestampConverter().toJson(instance.createdAt),

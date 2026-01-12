@@ -9,6 +9,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
+import '../widgets/memory_detail_dialog.dart';
 
 /// Timeline screen displaying all memories in chronological order
 class TimelineScreen extends ConsumerWidget {
@@ -362,27 +363,36 @@ class _MemoryCardState extends State<MemoryCard> {
               ),
               child: Stack(
                 children: [
-                  SizedBox(
-                    height: 300,
-                    width: double.infinity,
-                    child: hasMultipleImages
-                        ? PageView.builder(
-                            controller: _pageController,
-                            onPageChanged: (index) {
-                              setState(() {
-                                _currentPage = index;
-                              });
-                            },
-                            itemCount: widget.memory.mediaUrls.length,
-                            itemBuilder: (context, index) {
-                              return _MemoryImage(
-                                imageUrl: widget.memory.mediaUrls[index],
-                              );
-                            },
-                          )
-                        : _MemoryImage(
-                            imageUrl: widget.memory.mediaUrls.first,
-                          ),
+                  GestureDetector(
+                    onTap: () {
+                      MemoryDetailDialog.show(
+                        context,
+                        memory: widget.memory,
+                        initialImageIndex: _currentPage,
+                      );
+                    },
+                    child: SizedBox(
+                      height: 300,
+                      width: double.infinity,
+                      child: hasMultipleImages
+                          ? PageView.builder(
+                              controller: _pageController,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _currentPage = index;
+                                });
+                              },
+                              itemCount: widget.memory.mediaUrls.length,
+                              itemBuilder: (context, index) {
+                                return _MemoryImage(
+                                  imageUrl: widget.memory.mediaUrls[index],
+                                );
+                              },
+                            )
+                          : _MemoryImage(
+                              imageUrl: widget.memory.mediaUrls.first,
+                            ),
+                    ),
                   ),
                   // Location badge (if available)
                   if (locationName != null)

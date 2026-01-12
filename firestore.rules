@@ -4,128 +4,118 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // ============================================
-    // USERS COLLECTION
+    // USERS
     // ============================================
-    // Users can read/write their own document
-    // Users can query by inviteCode (for pairing)
-    // Users can read other users' basic info (for pairing)
     match /users/{userId} {
-      // Users can read and write their own document.
-      allow read, write: if request.auth.uid == userId;
+      allow read: if request.auth != null;
+      
+      // Povolit zápis, pokud:
+      // 1. Jsem vlastník účtu (klasika)
+      // 2. NEBO pokud měním jen pole 'coupleId' (to je ten hack pro párování)
+      allow write: if request.auth.uid == userId 
+                   || (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coupleId']));
     }
     
     // ============================================
-    // COUPLES COLLECTION
+    // COUPLES
     // ============================================
-    // Users can read/write couple documents where they are a member
     match /couples/{coupleId} {
-      // Helper function to check if user is a member of this couple
+      // Pomocné funkce
       function isMember() {
         return request.auth != null && 
+               resource.data.members != null &&
                request.auth.uid in resource.data.members;
       }
-      
-      // Helper function to check if user will be a member after write
       function willBeMember() {
         return request.auth != null && 
+               request.resource.data.members != null &&
                request.auth.uid in request.resource.data.members;
       }
       
-      // Allow reading if user is a member
+      // Číst mohou jen členové páru
       allow read: if isMember();
       
-      // Allow creating couple if user is in the members array
-      // Only allow pairs of exactly 2 users
-      allow create: if willBeMember() && 
+      // Vytvořit lze jen pár o 2 lidech, kde jsem členem
+      allow create: if request.auth != null &&
+                       request.resource.data.members != null &&
+                       request.auth.uid in request.resource.data.members &&
                        request.resource.data.members.size() == 2;
       
-      // Allow updating if user is a member
-      // Users can update their own status within the couple document
-      allow update: if isMember() && willBeMember();
+      // Update: Jen členové, musí zůstat členy a počet členů musí zůstat 2 (bezpečnostní fix)
+      allow update: if isMember() && willBeMember() && request.resource.data.members.size() == 2;
       
-      // Don't allow deletion (couples should persist)
+      // Mazání párů zakázáno
       allow delete: if false;
       
-      // ============================================
-      // MEMORIES SUBCOLLECTION
-      // ============================================
-      // Members of a couple can create, read, update memories
-      // Only the author can update/delete their own memories
+      // --------------------------------------------
+      // MEMORIES (Subcollection)
+      // --------------------------------------------
       match /memories/{memoryId} {
-        // Helper function to check if user is authenticated
-        function isAuthenticated() {
-          return request.auth != null;
-        }
-        
-        // Helper function to check if couple document exists
-        function coupleExists() {
-          return exists(/databases/$(database)/documents/couples/$(coupleId));
-        }
-        
-        // Helper function to check if user is a member of the couple
-        // Check if couple exists first to avoid errors, then check membership
+        // Kontrola existence páru a členství (vyžaduje extra read)
         function isCoupleMember() {
-          return isAuthenticated() && 
-                 coupleExists() &&
-                 request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
         }
-        
-        // Helper function to check if user is the author of the memory
-        // Only works for existing documents (update/delete operations)
         function isAuthor() {
-          return isAuthenticated() && 
-                 resource != null &&
-                 resource.data.authorId == request.auth.uid;
+          return resource.data.authorId == request.auth.uid;
         }
-        
-        // Allow reading (list and get) if user is authenticated and couple member
-        // This allows both list() queries and get() operations
-        // Explicitly allow both list and get for better clarity
+
+        // Čtení a listování pro členy páru
         allow list, get: if isCoupleMember();
         
-        // Allow creating if user is a couple member and sets themselves as author
-        // Also validate that pairId matches the coupleId in the path
+        // Vytvoření: Člen páru + autor jsem já + pairId sedí
         allow create: if isCoupleMember() && 
-                        request.resource.data.authorId == request.auth.uid &&
-                        request.resource.data.pairId == coupleId;
-        
-        // Allow updating if user is a couple member
-        // For now, allow any couple member to update (can be restricted later)
+                         request.resource.data.authorId == request.auth.uid &&
+                         request.resource.data.pairId == coupleId;
+                         
+        // Update: Kterýkoliv člen páru
         allow update: if isCoupleMember();
         
-        // Allow deletion if user is a couple member and is the author
+        // Smazat může jen autor
         allow delete: if isCoupleMember() && isAuthor();
+      }
+      
+      // --------------------------------------------
+      // INTIMACY LOGS (Subcollection)
+      // --------------------------------------------
+      match /intimacy_logs/{logId} {
+        // Znovu funkce pro členství (scope je lokální)
+        function isCoupleMember() {
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+
+        allow list, get: if isCoupleMember();
+        
+        // Vytvořit: Člen páru + initiatorId je jeden z členů
+        allow create: if isCoupleMember() &&
+                         request.resource.data.initiatorId in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        
+        allow delete: if isCoupleMember();
+        
+        // Historie se nesmí měnit
+        allow update: if false;
       }
     }
     
     // ============================================
-    // WAITLIST COLLECTION
+    // WAITLIST
     // ============================================
-    // Public write access for waitlist signups (no auth required)
-    // Allow read only for checking if email already exists (single document get)
-    // List queries are not allowed (privacy)
     match /waitlist/{emailId} {
-      // Allow anyone to create a waitlist entry
-      // Only validate that email field exists and is a string
-      // Note: Email validation and case normalization is handled in client code
+      // Vytvořit: Kdokoliv, pokud email sedí s ID dokumentu
       allow create: if request.resource.data.email is string &&
                        request.resource.data.email == emailId;
       
-      // Allow reading single document to check if email already exists
-      // This allows get() but not list() queries
+      // Kontrola existence (get), ale zákaz hromadného výpisu (list)
       allow get: if true;
-      
-      // Don't allow list queries (privacy - prevents listing all emails)
-      allow list: if false;
-      
-      // Don't allow updates or deletes from client
-      allow update, delete: if false;
+      allow list, update, delete: if false;
     }
     
     // ============================================
     // DEFAULT DENY
     // ============================================
-    // Deny all other operations by default
     match /{document=**} {
       allow read, write: if false;
     }
