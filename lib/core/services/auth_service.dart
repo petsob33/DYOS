@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/data/user_repository.dart';
 import '../../features/auth/domain/user_model.dart';
@@ -33,6 +34,9 @@ class AuthService {
   /// Firebase Auth instance - handles all authentication operations
   /// This is a singleton provided by Firebase SDK
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  
+  /// Google Sign-In instance
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   
   /// Lazy getter for UserRepository - only accessed when needed
   /// This follows dependency injection pattern through Riverpod
@@ -152,14 +156,93 @@ class AuthService {
     }
   }
 
+  /// Sign in with Google
+  /// 
+  /// Authenticates a user using their Google account.
+  /// 
+  /// Process:
+  /// 1. Signs in with Google (opens Google sign-in flow)
+  /// 2. Gets authentication credentials from Google
+  /// 3. Signs in to Firebase with Google credentials
+  /// 4. Creates or updates user document in Firestore
+  /// 5. Returns UserCredential on success
+  /// 
+  /// Returns: UserCredential containing user info and auth tokens
+  /// Throws: String with user-friendly error message
+  Future<UserCredential> signInWithGoogle() async {
+    try {
+      // Step 1: Trigger the Google Sign-In flow
+      // This opens a dialog/web page for user to select Google account
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      
+      // User cancelled the sign-in
+      if (googleUser == null) {
+        throw 'Sign in cancelled';
+      }
+
+      // Step 2: Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Step 3: Create a new credential for Firebase Auth
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Step 4: Sign in to Firebase with the Google credential
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      // Step 5: Check if user document exists in Firestore
+      // If not, create it (for new users)
+      if (userCredential.user != null) {
+        final existingUser = await _userRepository.getUserById(userCredential.user!.uid);
+        
+        if (existingUser == null) {
+          // New user - create Firestore document
+          final displayName = userCredential.user!.displayName ?? 
+                              googleUser.displayName ?? 
+                              'User';
+          final inviteCode = _generateInviteCode(displayName);
+          
+          final userModel = UserModel(
+            uid: userCredential.user!.uid,
+            email: userCredential.user!.email ?? '',
+            displayName: displayName,
+            photoUrl: userCredential.user!.photoURL,
+            inviteCode: inviteCode,
+            createdAt: DateTime.now(),
+          );
+          
+          await _userRepository.createUser(userModel);
+        } else {
+          // Existing user - update photo URL if it changed
+          if (userCredential.user!.photoURL != null && 
+              existingUser.photoUrl != userCredential.user!.photoURL) {
+            await _userRepository.updateUser(
+              existingUser.copyWith(photoUrl: userCredential.user!.photoURL),
+            );
+          }
+        }
+      }
+
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      // Handle other errors (e.g., sign-in cancelled, network errors)
+      throw e.toString();
+    }
+  }
+
   /// Sign out the current user
   /// 
   /// Ends the current user session and clears authentication state.
   /// After this, authStateChanges stream will emit null.
   /// 
-  /// Note: This only signs out from Firebase Auth.
+  /// Note: This signs out from both Firebase Auth and Google Sign-In.
   /// Firestore data remains (user document is not deleted).
   Future<void> signOut() async {
+    await _googleSignIn.signOut();
     await _auth.signOut();
   }
 

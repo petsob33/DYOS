@@ -9,6 +9,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
+import '../../../../models/note_item.dart';
 import '../../../../models/notes_provider.dart';
 import '../../../../widgets/home/quick_note_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
@@ -205,6 +206,7 @@ final _cards = <Widget>[
   const _QuickNoteCard(),
   const _IntimacySparkCard(),
   const _AnalyticsCard(),
+  const _ListsCard(),
 ];
 
 class _StatusHeader extends StatelessWidget {
@@ -653,6 +655,182 @@ class _IntimacySparkCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ListsCard extends ConsumerWidget {
+  const _ListsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bucketListNotesAsync = ref.watch(
+      coupleNotesProvider(type: NoteType.bucketList),
+    );
+
+    return bucketListNotesAsync.when(
+      data: (notes) {
+        final noteCount = notes.length;
+        return BentoCard(
+          child: InkWell(
+            onTap: () {
+              context.push('/lists');
+            },
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: AppTheme.colors.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      PhosphorIconsBold.listChecks,
+                      color: AppTheme.colors.primary,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Lists',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: AppTheme.colors.text,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          noteCount == 0
+                              ? 'No items yet'
+                              : '$noteCount ${noteCount == 1 ? 'item' : 'items'}',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppTheme.colors.textSecondary,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    PhosphorIconsBold.caretRight,
+                    color: AppTheme.colors.textSecondary,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      loading: () => BentoCard(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppTheme.colors.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  PhosphorIconsBold.listChecks,
+                  color: AppTheme.colors.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Lists',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: AppTheme.colors.text,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Loading...',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.colors.textSecondary,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      error: (error, stackTrace) {
+        debugPrint('Error loading lists: $error');
+        return BentoCard(
+          child: InkWell(
+            onTap: () {
+              context.push('/lists');
+            },
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: AppTheme.colors.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      PhosphorIconsBold.listChecks,
+                      color: AppTheme.colors.primary,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Lists',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: AppTheme.colors.text,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Tap to open',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppTheme.colors.textSecondary,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    PhosphorIconsBold.caretRight,
+                    color: AppTheme.colors.textSecondary,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

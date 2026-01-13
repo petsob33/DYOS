@@ -103,6 +103,40 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  /// Handle Google Sign-In
+  /// 
+  /// Process:
+  /// 1. Set loading state to true, clear any previous errors
+  /// 2. Call AuthService to sign in with Google
+  /// 3. On success: Navigate to home screen
+  /// 4. On error: Display error message to user
+  /// 5. Always: Reset loading state
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.signInWithGoogle();
+      
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   /// Handle registration form submission
   /// 
   /// Process:
@@ -584,6 +618,62 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                
+                // Divider with "OR"
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      child: Text(
+                        'OR',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppTheme.colors.textSecondary,
+                            ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                
+                // Google Sign-In Button
+                OutlinedButton.icon(
+                  onPressed: _isLoading ? null : _handleGoogleSignIn,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.colors.text,
+                    side: BorderSide(
+                      color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  icon: Icon(
+                    PhosphorIconsBold.googleLogo,
+                    size: 20,
+                    color: AppTheme.colors.text,
+                  ),
+                  label: Text(
+                    'Continue with Google',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppTheme.colors.text,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 

@@ -20,6 +20,7 @@ import '../../features/lists/settings_screen.dart';
 import '../../features/notes/presentation/screens/add_note_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/notes/presentation/screens/secret_notes_screen.dart';
+import '../../features/cycle/presentation/cycle_tracking_screen.dart';
 import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
@@ -135,6 +136,11 @@ GoRouter appRouter(AppRouterRef ref) {
           return AddNoteScreen(initialType: initialType);
         },
       ),
+      GoRoute(
+        path: '/lists',
+        name: 'lists',
+        builder: (context, state) => const ListsScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             RootShell(navigationShell: navigationShell),
@@ -169,9 +175,9 @@ GoRouter appRouter(AppRouterRef ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/lists',
-                name: 'lists',
-                builder: (context, state) => const ListsScreen(),
+                path: '/cycle',
+                name: 'cycle',
+                builder: (context, state) => const CycleTrackingScreen(),
               ),
             ],
           ),
@@ -200,7 +206,7 @@ class RootShell extends StatelessWidget {
       _NavItem('Home', PhosphorIconsBold.house),
       _NavItem('Memory', PhosphorIconsBold.clockCounterClockwise),
       _NavItem('Data', PhosphorIconsBold.chartPieSlice),
-      _NavItem('Lists', PhosphorIconsBold.listChecks),
+      _NavItem('Cycle', PhosphorIconsBold.calendar),
     ];
 
     return Scaffold(
@@ -262,7 +268,7 @@ class RootShell extends StatelessWidget {
                       ),
                     )
                   else
-                    // Render the nav item for Home/Memory/Data/Lists (skip slot 2 for add btn)
+                    // Render the nav item (skip slot 2 for add btn)
                     Expanded(
                       child: _BottomNavItem(
                         item: items[i > 2 ? i - 1 : i],

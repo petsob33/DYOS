@@ -128,6 +128,57 @@ service cloud.firestore {
         // Smazat může jen autor
         allow delete: if isCoupleMember() && isAuthor();
       }
+      
+      // --------------------------------------------
+      // CYCLE LOGS (Subcollection)
+      // --------------------------------------------
+      match /cycle_logs/{logId} {
+        // Funkce pro členství v páru
+        function isCoupleMember() {
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+
+        // Čtení a listování pro členy páru
+        allow list, get: if isCoupleMember();
+        
+        // Vytvoření: Člen páru
+        allow create: if isCoupleMember();
+        
+        // Update: Člen páru (může upravit logy)
+        allow update: if isCoupleMember();
+        
+        // Smazat může člen páru
+        allow delete: if isCoupleMember();
+      }
+      
+      // --------------------------------------------
+      // CYCLE SETTINGS (Subcollection)
+      // --------------------------------------------
+      match /cycle_settings/{settingsId} {
+        // Funkce pro členství v páru
+        function isCoupleMember() {
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+
+        // Čtení pro členy páru
+        allow get: if isCoupleMember();
+        
+        // Listování pro členy páru
+        allow list: if isCoupleMember();
+        
+        // Vytvoření: Člen páru
+        allow create: if isCoupleMember();
+        
+        // Update: Člen páru (může upravit nastavení)
+        allow update: if isCoupleMember();
+        
+        // Smazání zakázáno (settings by se neměly mazat)
+        allow delete: if false;
+      }
     }
     
     // ============================================
