@@ -93,10 +93,11 @@ service cloud.firestore {
         allow create: if isCoupleMember() &&
                          request.resource.data.initiatorId in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
         
-        allow delete: if isCoupleMember();
+        // Update: Člen páru může upravit logy
+        allow update: if isCoupleMember() &&
+                         request.resource.data.initiatorId in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
         
-        // Historie se nesmí měnit
-        allow update: if false;
+        allow delete: if isCoupleMember();
       }
       
       // --------------------------------------------

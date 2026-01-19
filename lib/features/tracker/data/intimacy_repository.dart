@@ -101,6 +101,40 @@ class IntimacyRepository {
     });
   }
 
+  /// Update an existing intimacy log
+  /// 
+  /// Updates the intimacy log in Firestore.
+  /// 
+  /// [log] - The IntimacyLog object with updated data (must have valid id)
+  /// [coupleId] - The ID of the couple this log belongs to
+  /// 
+  /// Returns: The updated IntimacyLog object
+  /// 
+  /// Throws: Exception if update fails
+  Future<IntimacyLog> updateLog(IntimacyLog log, String coupleId) async {
+    try {
+      if (coupleId.isEmpty) {
+        throw Exception('coupleId cannot be empty');
+      }
+      if (log.id.isEmpty) {
+        throw Exception('log id cannot be empty');
+      }
+
+      // Convert log to JSON and update
+      final logJson = log.toJson();
+      await _firestore
+          .collection('couples')
+          .doc(coupleId)
+          .collection('intimacy_logs')
+          .doc(log.id)
+          .update(logJson);
+
+      return log;
+    } catch (e) {
+      throw Exception('Failed to update intimacy log: ${e.toString()}');
+    }
+  }
+
   /// Delete an intimacy log
   /// 
   /// Permanently removes the log from Firestore.

@@ -25,7 +25,7 @@ final List<String> availableTags = [
   'Tender',
 ];
 
-/// Modal bottom sheet for adding a new intimacy log
+/// Modal bottom sheet for adding or editing an intimacy log
 /// 
 /// Features:
 /// - Date picker (defaults to now)
@@ -35,10 +35,15 @@ final List<String> availableTags = [
 /// - Protection switch
 /// - Submit button
 class AddIntimacySheet extends ConsumerStatefulWidget {
-  const AddIntimacySheet({super.key});
+  const AddIntimacySheet({
+    super.key,
+    this.logToEdit,
+  });
+
+  final IntimacyLog? logToEdit;
 
   /// Show the add intimacy sheet
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(BuildContext context, {IntimacyLog? logToEdit}) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -48,7 +53,7 @@ class AddIntimacySheet extends ConsumerStatefulWidget {
           top: Radius.circular(24),
         ),
       ),
-      builder: (context) => const AddIntimacySheet(),
+      builder: (context) => AddIntimacySheet(logToEdit: logToEdit),
     );
   }
 
@@ -69,6 +74,30 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
   final TextEditingController _locationController = TextEditingController();
   bool _isSubmitting = false;
   bool _initiatorInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // If editing, populate fields with existing log data
+    if (widget.logToEdit != null) {
+      final log = widget.logToEdit!;
+      _selectedDate = log.date;
+      _rating = log.rating;
+      _initiatorId = log.initiatorId;
+      _selectedTags.addAll(log.tags);
+      _protectionUsed = log.protectionUsed;
+      _noteController.text = log.note ?? '';
+      _orgasmsMe = log.orgasmsMe;
+      _orgasmsPartner = log.orgasmsPartner;
+      if (log.durationMinutes != null) {
+        _durationController.text = log.durationMinutes.toString();
+      }
+      if (log.location != null) {
+        _locationController.text = log.location!;
+      }
+      _initiatorInitialized = true;
+    }
+  }
 
   @override
   void dispose() {
@@ -203,8 +232,9 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
             ? null
             : int.tryParse(_durationController.text.trim());
 
+        final isEditing = widget.logToEdit != null;
         final log = IntimacyLog(
-          id: '',
+          id: isEditing ? widget.logToEdit!.id : '',
           date: _selectedDate,
           initiatorId: _initiatorId!,
           rating: _rating,
@@ -221,12 +251,18 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
               : _locationController.text.trim(),
         );
 
-        await repository.addLog(log, userData.coupleId!);
+        if (isEditing) {
+          await repository.updateLog(log, userData.coupleId!);
+        } else {
+          await repository.addLog(log, userData.coupleId!);
+        }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Intimacy log added successfully!'),
+              content: Text(isEditing
+                  ? 'Intimacy log updated successfully!'
+                  : 'Intimacy log added successfully!'),
               backgroundColor: AppTheme.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -309,7 +345,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
               child: Row(
                 children: [
                   Text(
-                    'Add Intimacy Log',
+                    widget.logToEdit != null ? 'Edit Intimacy Log' : 'Add Intimacy Log',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppTheme.colors.text,
@@ -492,9 +528,9 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                 ),
                               )
-                            : const Text(
-                                'Add Log',
-                                style: TextStyle(
+                            : Text(
+                                widget.logToEdit != null ? 'Update Log' : 'Add Log',
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                 ),

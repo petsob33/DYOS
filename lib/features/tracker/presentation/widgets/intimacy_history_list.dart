@@ -4,12 +4,15 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:go_router/go_router.dart';
+
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../domain/intimacy_log_model.dart';
 import '../intimacy_provider.dart';
+import 'intimacy_log_detail_sheet.dart';
 
 /// Widget that displays a list of intimacy logs grouped by month
 /// 
@@ -17,8 +20,19 @@ import '../intimacy_provider.dart';
 /// - Groups logs by month (e.g., "January 2026")
 /// - Shows date, tags, rating, and initiator for each log
 /// - Handles loading, error, and empty states
+/// - Can limit the number of logs displayed
 class IntimacyHistoryList extends ConsumerWidget {
-  const IntimacyHistoryList({super.key});
+  const IntimacyHistoryList({
+    super.key,
+    this.limit,
+    this.showViewAllButton = false,
+  });
+
+  /// Maximum number of logs to display. If null, shows all logs.
+  final int? limit;
+  
+  /// Whether to show "View All" button if there are more logs than limit
+  final bool showViewAllButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,9 +47,15 @@ class IntimacyHistoryList extends ConsumerWidget {
           return const _EmptyState();
         }
 
+        // Limit logs if specified
+        final limitedLogs = limit != null && logs.length > limit!
+            ? logs.take(limit!).toList()
+            : logs;
+        final hasMoreLogs = limit != null && logs.length > limit!;
+
         // Group logs by month
         final groupedLogs = <String, List<IntimacyLog>>{};
-        for (final log in logs) {
+        for (final log in limitedLogs) {
           final monthKey = _formatMonthYear(log.date);
           groupedLogs.putIfAbsent(monthKey, () => []).add(log);
         }
@@ -49,58 +69,75 @@ class IntimacyHistoryList extends ConsumerWidget {
             return bDate.compareTo(aDate);
           });
 
+        // Helper widget to build the list with optional "View All" button
+        Widget buildListView({
+          required String? currentUserPhotoUrl,
+          required String? partnerPhotoUrl,
+        }) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ...sortedMonths.map((monthKey) {
+                final monthLogs = groupedLogs[monthKey]!;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: _IntimacyMonthSection(
+                    month: monthKey,
+                    logs: monthLogs,
+                    currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
+                    currentUserPhotoUrl: currentUserPhotoUrl,
+                    partnerPhotoUrl: partnerPhotoUrl,
+                  ),
+                );
+              }),
+              if (hasMoreLogs && showViewAllButton)
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        context.push('/intimacy-history');
+                      },
+                      icon: const Icon(PhosphorIconsBold.arrowRight),
+                      label: const Text('View All'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.colors.primary,
+                        side: BorderSide(
+                          color: AppTheme.colors.primary,
+                          width: 2,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.md,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        }
+
         return currentUserDataAsync.when(
           data: (currentUserData) => partnerAsync.when(
-            data: (partnerData) => ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              itemCount: sortedMonths.length,
-              itemBuilder: (context, index) {
-                final monthKey = sortedMonths[index];
-                final monthLogs = groupedLogs[monthKey]!;
-
-                return _IntimacyMonthSection(
-                  month: monthKey,
-                  logs: monthLogs,
-                  currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
-                  currentUserPhotoUrl: currentUserData?.photoUrl,
-                  partnerPhotoUrl: partnerData?.photoUrl,
-                );
-              },
+            data: (partnerData) => buildListView(
+              currentUserPhotoUrl: currentUserData?.photoUrl,
+              partnerPhotoUrl: partnerData?.photoUrl,
             ),
             loading: () => const _LoadingState(),
-            error: (_, __) => ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              itemCount: sortedMonths.length,
-              itemBuilder: (context, index) {
-                final monthKey = sortedMonths[index];
-                final monthLogs = groupedLogs[monthKey]!;
-
-                return _IntimacyMonthSection(
-                  month: monthKey,
-                  logs: monthLogs,
-                  currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
-                  currentUserPhotoUrl: currentUserData?.photoUrl,
-                  partnerPhotoUrl: null,
-                );
-              },
+            error: (_, _) => buildListView(
+              currentUserPhotoUrl: currentUserData?.photoUrl,
+              partnerPhotoUrl: null,
             ),
           ),
           loading: () => const _LoadingState(),
-          error: (_, __) => ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            itemCount: sortedMonths.length,
-            itemBuilder: (context, index) {
-              final monthKey = sortedMonths[index];
-              final monthLogs = groupedLogs[monthKey]!;
-
-              return _IntimacyMonthSection(
-                month: monthKey,
-                logs: monthLogs,
-                currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
-                currentUserPhotoUrl: null,
-                partnerPhotoUrl: null,
-              );
-            },
+          error: (_, __) => buildListView(
+            currentUserPhotoUrl: null,
+            partnerPhotoUrl: null,
           ),
         );
       },
@@ -188,16 +225,19 @@ class _IntimacyMonthSection extends StatelessWidget {
                 ),
           ),
         ),
-        ...logs.map((log) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-              child: _IntimacyLogCard(
-                log: log,
-                isCurrentUser: log.initiatorId == currentUserId,
-                photoUrl: log.initiatorId == currentUserId
-                    ? currentUserPhotoUrl
-                    : partnerPhotoUrl,
-              ),
-            )),
+        ...logs.map((log) {
+          final isCurrentUser = log.initiatorId == currentUserId;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: _IntimacyLogCard(
+              log: log,
+              isCurrentUser: isCurrentUser,
+              photoUrl: isCurrentUser ? currentUserPhotoUrl : partnerPhotoUrl,
+              currentUserPhotoUrl: currentUserPhotoUrl,
+              partnerPhotoUrl: partnerPhotoUrl,
+            ),
+          );
+        }),
       ],
     );
   }
@@ -209,17 +249,30 @@ class _IntimacyLogCard extends StatelessWidget {
     required this.log,
     required this.isCurrentUser,
     this.photoUrl,
+    this.currentUserPhotoUrl,
+    this.partnerPhotoUrl,
   });
 
   final IntimacyLog log;
   final bool isCurrentUser;
   final String? photoUrl;
+  final String? currentUserPhotoUrl;
+  final String? partnerPhotoUrl;
 
   @override
   Widget build(BuildContext context) {
-    return BentoCard(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
+    return GestureDetector(
+      onTap: () {
+        IntimacyLogDetailSheet.show(
+          context,
+          log: log,
+          currentUserPhotoUrl: currentUserPhotoUrl,
+          partnerPhotoUrl: partnerPhotoUrl,
+        );
+      },
+      child: BentoCard(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -263,6 +316,7 @@ class _IntimacyLogCard extends StatelessWidget {
               ),
             ),
         ],
+      ),
       ),
     );
   }
