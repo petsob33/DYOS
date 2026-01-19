@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,12 +63,18 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
   final Set<String> _selectedTags = {};
   bool _protectionUsed = false;
   final TextEditingController _noteController = TextEditingController();
+  int _orgasmsMe = 0;
+  int _orgasmsPartner = 0;
+  final TextEditingController _durationController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   bool _isSubmitting = false;
   bool _initiatorInitialized = false;
 
   @override
   void dispose() {
     _noteController.dispose();
+    _durationController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -192,6 +199,10 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
       try {
         final repository = ref.read(intimacyRepositoryProvider);
         
+        final durationMinutes = _durationController.text.trim().isEmpty
+            ? null
+            : int.tryParse(_durationController.text.trim());
+
         final log = IntimacyLog(
           id: '',
           date: _selectedDate,
@@ -202,6 +213,12 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           note: _noteController.text.trim().isEmpty 
               ? null 
               : _noteController.text.trim(),
+          orgasmsMe: _orgasmsMe,
+          orgasmsPartner: _orgasmsPartner,
+          durationMinutes: durationMinutes,
+          location: _locationController.text.trim().isEmpty
+              ? null
+              : _locationController.text.trim(),
         );
 
         await repository.addLog(log, userData.coupleId!);
@@ -337,6 +354,8 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                           selectedId: _initiatorId,
                           currentUserDisplayName: userData?.displayName ?? 'Me',
                           partnerDisplayName: partnerData?.displayName ?? 'Partner',
+                          currentUserPhotoUrl: userData?.photoUrl,
+                          partnerPhotoUrl: partnerData?.photoUrl,
                           onSelected: (id) {
                             HapticFeedback.selectionClick();
                             setState(() {
@@ -368,6 +387,47 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                           _protectionUsed = value;
                         });
                       },
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Orgasms section
+                    userDataAsync.when(
+                      data: (userData) => partnerAsync.when(
+                        data: (partnerData) => _OrgasmsSection(
+                          currentUserDisplayName: userData?.displayName ?? 'Me',
+                          partnerDisplayName: partnerData?.displayName ?? 'Partner',
+                          orgasmsMe: _orgasmsMe,
+                          orgasmsPartner: _orgasmsPartner,
+                          onOrgasmsMeChanged: (value) {
+                            HapticFeedback.selectionClick();
+                            setState(() {
+                              _orgasmsMe = value;
+                            });
+                          },
+                          onOrgasmsPartnerChanged: (value) {
+                            HapticFeedback.selectionClick();
+                            setState(() {
+                              _orgasmsPartner = value;
+                            });
+                          },
+                        ),
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Duration section
+                    _DurationSection(
+                      controller: _durationController,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Location section
+                    _LocationSection(
+                      controller: _locationController,
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
@@ -618,6 +678,8 @@ class _InitiatorSection extends StatelessWidget {
     required this.selectedId,
     required this.currentUserDisplayName,
     required this.partnerDisplayName,
+    this.currentUserPhotoUrl,
+    this.partnerPhotoUrl,
     required this.onSelected,
   });
 
@@ -626,6 +688,8 @@ class _InitiatorSection extends StatelessWidget {
   final String? selectedId;
   final String currentUserDisplayName;
   final String partnerDisplayName;
+  final String? currentUserPhotoUrl;
+  final String? partnerPhotoUrl;
   final ValueChanged<String> onSelected;
 
   @override
@@ -647,6 +711,7 @@ class _InitiatorSection extends StatelessWidget {
               child: _InitiatorOption(
                 label: currentUserDisplayName,
                 isSelected: selectedId == currentUserId,
+                photoUrl: currentUserPhotoUrl,
                 onTap: () => onSelected(currentUserId),
               ),
             ),
@@ -655,6 +720,7 @@ class _InitiatorSection extends StatelessWidget {
               child: _InitiatorOption(
                 label: partnerDisplayName,
                 isSelected: selectedId == partnerId,
+                photoUrl: partnerPhotoUrl,
                 onTap: () => onSelected(partnerId),
               ),
             ),
@@ -670,11 +736,13 @@ class _InitiatorOption extends StatelessWidget {
   const _InitiatorOption({
     required this.label,
     required this.isSelected,
+    this.photoUrl,
     required this.onTap,
   });
 
   final String label;
   final bool isSelected;
+  final String? photoUrl;
   final VoidCallback onTap;
 
   @override
@@ -703,20 +771,23 @@ class _InitiatorOption extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected
-                      ? AppTheme.colors.primary
-                      : AppTheme.colors.textSecondary.withValues(alpha: 0.1),
-                ),
-                child: Icon(
-                  PhosphorIconsBold.user,
-                  color: isSelected ? Colors.white : AppTheme.colors.textSecondary,
-                  size: 28,
-                ),
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: isSelected
+                    ? AppTheme.colors.primary
+                    : AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
+                    ? CachedNetworkImageProvider(photoUrl!)
+                    : null,
+                child: photoUrl == null || photoUrl!.isEmpty
+                    ? Icon(
+                        PhosphorIconsBold.user,
+                        color: isSelected
+                            ? Colors.white
+                            : AppTheme.colors.textSecondary,
+                        size: 28,
+                      )
+                    : null,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
@@ -835,6 +906,285 @@ class _ProtectionSwitch extends StatelessWidget {
           vertical: AppSpacing.xs,
         ),
       ),
+    );
+  }
+}
+
+/// Orgasms section with counters for both partners
+class _OrgasmsSection extends StatelessWidget {
+  const _OrgasmsSection({
+    required this.currentUserDisplayName,
+    required this.partnerDisplayName,
+    required this.orgasmsMe,
+    required this.orgasmsPartner,
+    required this.onOrgasmsMeChanged,
+    required this.onOrgasmsPartnerChanged,
+  });
+
+  final String currentUserDisplayName;
+  final String partnerDisplayName;
+  final int orgasmsMe;
+  final int orgasmsPartner;
+  final ValueChanged<int> onOrgasmsMeChanged;
+  final ValueChanged<int> onOrgasmsPartnerChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Orgasms',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.colors.text,
+              ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          children: [
+            Expanded(
+              child: _OrgasmCounter(
+                label: currentUserDisplayName,
+                count: orgasmsMe,
+                onChanged: onOrgasmsMeChanged,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: _OrgasmCounter(
+                label: partnerDisplayName,
+                count: orgasmsPartner,
+                onChanged: onOrgasmsPartnerChanged,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Single orgasm counter widget
+class _OrgasmCounter extends StatelessWidget {
+  const _OrgasmCounter({
+    required this.label,
+    required this.count,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int count;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.colors.card,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.colors.text,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: count > 0 ? () => onChanged(count - 1) : null,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: count > 0
+                          ? AppTheme.colors.primary.withValues(alpha: 0.1)
+                          : AppTheme.colors.textSecondary.withValues(alpha: 0.05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      PhosphorIconsBold.minus,
+                      size: 18,
+                      color: count > 0
+                          ? AppTheme.colors.primary
+                          : AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Text(
+                  count.toString(),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.colors.text,
+                      ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                InkWell(
+                  onTap: () => onChanged(count + 1),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      PhosphorIconsBold.plus,
+                      size: 18,
+                      color: AppTheme.colors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Duration section
+class _DurationSection extends StatelessWidget {
+  const _DurationSection({
+    required this.controller,
+  });
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Duration',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.colors.text,
+              ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+          ],
+          decoration: InputDecoration(
+            labelText: 'Duration (minutes)',
+            hintText: 'e.g., 30',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: AppTheme.colors.primary,
+                width: 2,
+              ),
+            ),
+            filled: true,
+            fillColor: AppTheme.colors.card,
+            contentPadding: const EdgeInsets.all(AppSpacing.md),
+            prefixIcon: Icon(
+              PhosphorIconsBold.clock,
+              color: AppTheme.colors.primary,
+            ),
+          ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppTheme.colors.text,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Location section
+class _LocationSection extends StatelessWidget {
+  const _LocationSection({
+    required this.controller,
+  });
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Location',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.colors.text,
+              ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: 'Location (optional)',
+            hintText: 'e.g., Home, Hotel, Beach...',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(
+                color: AppTheme.colors.primary,
+                width: 2,
+              ),
+            ),
+            filled: true,
+            fillColor: AppTheme.colors.card,
+            contentPadding: const EdgeInsets.all(AppSpacing.md),
+            prefixIcon: Icon(
+              PhosphorIconsBold.mapPin,
+              color: AppTheme.colors.primary,
+            ),
+          ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppTheme.colors.text,
+              ),
+        ),
+      ],
     );
   }
 }

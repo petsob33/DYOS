@@ -19,6 +19,7 @@ import '../../features/lists/lists_screen.dart';
 import '../../features/lists/settings_screen.dart';
 import '../../features/notes/presentation/screens/add_note_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
+import '../../features/auth/presentation/edit_profile_picture_screen.dart';
 import '../../features/notes/presentation/screens/secret_notes_screen.dart';
 import '../../features/cycle/presentation/cycle_tracking_screen.dart';
 import '../../models/note_item.dart';
@@ -107,6 +108,11 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/profile',
         name: 'profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/edit-profile-picture',
+        name: 'edit-profile-picture',
+        builder: (context, state) => const EditProfilePictureScreen(),
       ),
       GoRoute(
         path: '/secret-notes',

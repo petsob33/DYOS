@@ -83,7 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 },
                 child: CircleAvatar(
                   radius: 18,
-                  backgroundColor: AppTheme.colors.primary.withOpacity(0.1),
+                  backgroundColor: AppTheme.colors.primary.withValues(alpha: 0.1),
                   backgroundImage: user?.photoUrl != null
                       ? CachedNetworkImageProvider(user!.photoUrl!)
                       : null,
@@ -271,13 +271,14 @@ class _StatusHeader extends StatelessWidget {
                           name: currentUser?.displayName ?? 'You',
                           emoji: currentUserStatus?.emoji ?? '😊',
                           status: currentUserStatus?.text ?? 'Ready',
+                          photoUrl: currentUser?.photoUrl,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Container(
                         width: 1,
                         height: 40,
-                        color: AppTheme.colors.textSecondary.withOpacity(0.1),
+                        color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
@@ -285,6 +286,7 @@ class _StatusHeader extends StatelessWidget {
                           name: partner?.displayName ?? 'Partner',
                           emoji: partnerStatus?.emoji ?? '😊',
                           status: partnerStatus?.text ?? 'Ready',
+                          photoUrl: partner?.photoUrl,
                         ),
                       ),
                     ],
@@ -306,7 +308,7 @@ class _StatusHeader extends StatelessWidget {
                     Container(
                       width: 1,
                       height: 40,
-                      color: AppTheme.colors.textSecondary.withOpacity(0.1),
+                      color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     const Expanded(
@@ -337,7 +339,7 @@ class _StatusHeader extends StatelessWidget {
                       Container(
                         width: 1,
                         height: 40,
-                        color: AppTheme.colors.textSecondary.withOpacity(0.1),
+                        color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       const Expanded(
@@ -388,11 +390,13 @@ class _AvatarStatus extends StatelessWidget {
     required this.name,
     required this.emoji,
     required this.status,
+    this.photoUrl,
   });
 
   final String name;
   final String emoji;
   final String status;
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -402,7 +406,12 @@ class _AvatarStatus extends StatelessWidget {
         CircleAvatar(
           radius: 20,
           backgroundColor: AppTheme.colors.background,
-          child: Text(emoji, style: const TextStyle(fontSize: 20)),
+          backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
+              ? CachedNetworkImageProvider(photoUrl!)
+              : null,
+          child: photoUrl == null || photoUrl!.isEmpty
+              ? Text(emoji, style: const TextStyle(fontSize: 20))
+              : null,
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
@@ -670,7 +679,9 @@ class _ListsCard extends ConsumerWidget {
 
     return bucketListNotesAsync.when(
       data: (notes) {
-        final noteCount = notes.length;
+        final totalCount = notes.length;
+        final hasItems = totalCount > 0;
+        
         return BentoCard(
           child: InkWell(
             onTap: () {
@@ -678,51 +689,56 @@ class _ListsCard extends ConsumerWidget {
             },
             borderRadius: BorderRadius.circular(24),
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: AppTheme.colors.primary.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      PhosphorIconsBold.listChecks,
-                      color: AppTheme.colors.primary,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Lists',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppTheme.colors.text,
-                                fontWeight: FontWeight.w700,
-                              ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppTheme.colors.primary.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          noteCount == 0
-                              ? 'No items yet'
-                              : '$noteCount ${noteCount == 1 ? 'item' : 'items'}',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppTheme.colors.textSecondary,
-                              ),
+                        child: Icon(
+                          PhosphorIconsBold.listChecks,
+                          color: AppTheme.colors.primary,
+                          size: 24,
                         ),
-                      ],
+                      ),
+                      const Spacer(),
+                      Icon(
+                        PhosphorIconsBold.caretRight,
+                        color: AppTheme.colors.textSecondary,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Bucket List',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppTheme.colors.text,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  if (hasItems)
+                    Text(
+                      '$totalCount ${totalCount == 1 ? 'dream' : 'dreams'} to achieve',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.colors.textSecondary,
+                          ),
+                    )
+                  else
+                    Text(
+                      'Start adding your dreams together',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.colors.textSecondary,
+                          ),
                     ),
-                  ),
-                  Icon(
-                    PhosphorIconsBold.caretRight,
-                    color: AppTheme.colors.textSecondary,
-                    size: 20,
-                  ),
                 ],
               ),
             ),
@@ -731,43 +747,47 @@ class _ListsCard extends ConsumerWidget {
       },
       loading: () => BentoCard(
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Row(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: AppTheme.colors.primary.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  PhosphorIconsBold.listChecks,
-                  color: AppTheme.colors.primary,
-                  size: 28,
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppTheme.colors.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      PhosphorIconsBold.listChecks,
+                      color: AppTheme.colors.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    PhosphorIconsBold.caretRight,
+                    color: AppTheme.colors.textSecondary,
+                    size: 20,
+                  ),
+                ],
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Lists',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w700,
-                          ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Bucket List',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppTheme.colors.text,
+                      fontWeight: FontWeight.w700,
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'Loading...',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
-                          ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Loading...',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.colors.textSecondary,
                     ),
-                  ],
-                ),
               ),
             ],
           ),
@@ -782,48 +802,47 @@ class _ListsCard extends ConsumerWidget {
             },
             borderRadius: BorderRadius.circular(24),
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: AppTheme.colors.primary.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      PhosphorIconsBold.listChecks,
-                      color: AppTheme.colors.primary,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Lists',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppTheme.colors.text,
-                                fontWeight: FontWeight.w700,
-                              ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppTheme.colors.primary.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'Tap to open',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppTheme.colors.textSecondary,
-                              ),
+                        child: Icon(
+                          PhosphorIconsBold.listChecks,
+                          color: AppTheme.colors.primary,
+                          size: 24,
                         ),
-                      ],
-                    ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        PhosphorIconsBold.caretRight,
+                        color: AppTheme.colors.textSecondary,
+                        size: 20,
+                      ),
+                    ],
                   ),
-                  Icon(
-                    PhosphorIconsBold.caretRight,
-                    color: AppTheme.colors.textSecondary,
-                    size: 20,
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Bucket List',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppTheme.colors.text,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Tap to open',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.colors.textSecondary,
+                        ),
                   ),
                 ],
               ),

@@ -44,19 +44,24 @@ class ProfileScreen extends ConsumerWidget {
                           child: Row(
                             children: [
                               // Avatar
-                              CircleAvatar(
-                                radius: 40,
-                                backgroundColor: AppTheme.colors.primary.withOpacity(0.1),
-                                    backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
-                                        ? CachedNetworkImageProvider(user.photoUrl!)
-                                        : null,
-                                child: user.photoUrl == null
-                                    ? Icon(
-                                        PhosphorIconsBold.user,
-                                        size: 40,
-                                        color: AppTheme.colors.primary,
-                                      )
-                                    : null,
+                              GestureDetector(
+                                onTap: () {
+                                  context.push('/edit-profile-picture');
+                                },
+                                child: CircleAvatar(
+                                  radius: 40,
+                                  backgroundColor: AppTheme.colors.primary.withValues(alpha: 0.1),
+                                      backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
+                                          ? CachedNetworkImageProvider(user.photoUrl!)
+                                          : null,
+                                  child: user.photoUrl == null
+                                      ? Icon(
+                                          PhosphorIconsBold.user,
+                                          size: 40,
+                                          color: AppTheme.colors.primary,
+                                        )
+                                      : null,
+                                ),
                               ),
                               const SizedBox(width: AppSpacing.md),
                               // User Info

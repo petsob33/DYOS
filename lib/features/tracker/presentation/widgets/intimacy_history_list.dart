@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
@@ -22,6 +24,8 @@ class IntimacyHistoryList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final logsAsync = ref.watch(intimacyLogsStreamProvider);
     final currentUserAsync = ref.watch(userProvider);
+    final currentUserDataAsync = ref.watch(currentUserDataProvider);
+    final partnerAsync = ref.watch(partnerProvider);
 
     return logsAsync.when(
       data: (logs) {
@@ -45,19 +49,59 @@ class IntimacyHistoryList extends ConsumerWidget {
             return bDate.compareTo(aDate);
           });
 
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          itemCount: sortedMonths.length,
-          itemBuilder: (context, index) {
-            final monthKey = sortedMonths[index];
-            final monthLogs = groupedLogs[monthKey]!;
+        return currentUserDataAsync.when(
+          data: (currentUserData) => partnerAsync.when(
+            data: (partnerData) => ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              itemCount: sortedMonths.length,
+              itemBuilder: (context, index) {
+                final monthKey = sortedMonths[index];
+                final monthLogs = groupedLogs[monthKey]!;
 
-            return _IntimacyMonthSection(
-              month: monthKey,
-              logs: monthLogs,
-              currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
-            );
-          },
+                return _IntimacyMonthSection(
+                  month: monthKey,
+                  logs: monthLogs,
+                  currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
+                  currentUserPhotoUrl: currentUserData?.photoUrl,
+                  partnerPhotoUrl: partnerData?.photoUrl,
+                );
+              },
+            ),
+            loading: () => const _LoadingState(),
+            error: (_, __) => ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              itemCount: sortedMonths.length,
+              itemBuilder: (context, index) {
+                final monthKey = sortedMonths[index];
+                final monthLogs = groupedLogs[monthKey]!;
+
+                return _IntimacyMonthSection(
+                  month: monthKey,
+                  logs: monthLogs,
+                  currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
+                  currentUserPhotoUrl: currentUserData?.photoUrl,
+                  partnerPhotoUrl: null,
+                );
+              },
+            ),
+          ),
+          loading: () => const _LoadingState(),
+          error: (_, __) => ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            itemCount: sortedMonths.length,
+            itemBuilder: (context, index) {
+              final monthKey = sortedMonths[index];
+              final monthLogs = groupedLogs[monthKey]!;
+
+              return _IntimacyMonthSection(
+                month: monthKey,
+                logs: monthLogs,
+                currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
+                currentUserPhotoUrl: null,
+                partnerPhotoUrl: null,
+              );
+            },
+          ),
         );
       },
       loading: () => const _LoadingState(),
@@ -116,11 +160,15 @@ class _IntimacyMonthSection extends StatelessWidget {
     required this.month,
     required this.logs,
     required this.currentUserId,
+    this.currentUserPhotoUrl,
+    this.partnerPhotoUrl,
   });
 
   final String month;
   final List<IntimacyLog> logs;
   final String currentUserId;
+  final String? currentUserPhotoUrl;
+  final String? partnerPhotoUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +193,9 @@ class _IntimacyMonthSection extends StatelessWidget {
               child: _IntimacyLogCard(
                 log: log,
                 isCurrentUser: log.initiatorId == currentUserId,
+                photoUrl: log.initiatorId == currentUserId
+                    ? currentUserPhotoUrl
+                    : partnerPhotoUrl,
               ),
             )),
       ],
@@ -157,30 +208,60 @@ class _IntimacyLogCard extends StatelessWidget {
   const _IntimacyLogCard({
     required this.log,
     required this.isCurrentUser,
+    this.photoUrl,
   });
 
   final IntimacyLog log;
   final bool isCurrentUser;
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) {
     return BentoCard(
       padding: const EdgeInsets.all(AppSpacing.md),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left: Date
-          _DateSection(date: log.date),
-          const SizedBox(width: AppSpacing.md),
-          // Center: Tags and Rating
-          Expanded(
-            child: _TagsAndRatingSection(
-              tags: log.tags,
-              rating: log.rating,
-            ),
+          Row(
+            children: [
+              // Left: Date
+              _DateSection(date: log.date),
+              const SizedBox(width: AppSpacing.md),
+              // Center: Tags and Rating
+              Expanded(
+                child: _TagsAndRatingSection(
+                  tags: log.tags,
+                  rating: log.rating,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              // Right: Initiator indicator
+              _InitiatorIndicator(
+                isCurrentUser: isCurrentUser,
+                photoUrl: photoUrl,
+              ),
+            ],
           ),
-          const SizedBox(width: AppSpacing.sm),
-          // Right: Initiator indicator
-          _InitiatorIndicator(isCurrentUser: isCurrentUser),
+          // Orgasms, Duration and Location row
+          if (log.orgasmsMe > 0 || log.orgasmsPartner > 0 || log.durationMinutes != null || (log.location != null && log.location!.isNotEmpty))
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Wrap(
+                spacing: AppSpacing.md,
+                runSpacing: AppSpacing.xs,
+                children: [
+                  if (log.orgasmsMe > 0 || log.orgasmsPartner > 0)
+                    _OrgasmsDisplay(
+                      orgasmsMe: log.orgasmsMe,
+                      orgasmsPartner: log.orgasmsPartner,
+                    ),
+                  if (log.durationMinutes != null)
+                    _DurationDisplay(durationMinutes: log.durationMinutes!),
+                  if (log.location != null && log.location!.isNotEmpty)
+                    _LocationDisplay(location: log.location!),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -305,28 +386,124 @@ class _TagsAndRatingSection extends StatelessWidget {
 
 /// Initiator indicator (mini avatar or icon)
 class _InitiatorIndicator extends StatelessWidget {
-  const _InitiatorIndicator({required this.isCurrentUser});
+  const _InitiatorIndicator({
+    required this.isCurrentUser,
+    this.photoUrl,
+  });
 
   final bool isCurrentUser;
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isCurrentUser
-            ? AppTheme.colors.primary.withValues(alpha: 0.12)
-            : AppTheme.colors.textSecondary.withValues(alpha: 0.1),
-      ),
-      child: Icon(
-        PhosphorIconsBold.user,
-        size: 18,
-        color: isCurrentUser
-            ? AppTheme.colors.primary
-            : AppTheme.colors.textSecondary,
-      ),
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: isCurrentUser
+          ? AppTheme.colors.primary.withValues(alpha: 0.12)
+          : AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+      backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
+          ? CachedNetworkImageProvider(photoUrl!)
+          : null,
+      child: photoUrl == null || photoUrl!.isEmpty
+          ? Icon(
+              PhosphorIconsBold.user,
+              size: 18,
+              color: isCurrentUser
+                  ? AppTheme.colors.primary
+                  : AppTheme.colors.textSecondary,
+            )
+          : null,
+    );
+  }
+}
+
+/// Orgasms display widget
+class _OrgasmsDisplay extends StatelessWidget {
+  const _OrgasmsDisplay({
+    required this.orgasmsMe,
+    required this.orgasmsPartner,
+  });
+
+  final int orgasmsMe;
+  final int orgasmsPartner;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          PhosphorIconsBold.sparkle,
+          size: 14,
+          color: AppTheme.colors.love,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$orgasmsMe / $orgasmsPartner',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.colors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Duration display widget
+class _DurationDisplay extends StatelessWidget {
+  const _DurationDisplay({required this.durationMinutes});
+
+  final int durationMinutes;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          PhosphorIconsBold.clock,
+          size: 14,
+          color: AppTheme.colors.textSecondary,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$durationMinutes min',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.colors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Location display widget
+class _LocationDisplay extends StatelessWidget {
+  const _LocationDisplay({required this.location});
+
+  final String location;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          PhosphorIconsBold.mapPin,
+          size: 14,
+          color: AppTheme.colors.textSecondary,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          location,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.colors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ],
     );
   }
 }
