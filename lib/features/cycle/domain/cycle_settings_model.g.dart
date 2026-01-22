@@ -14,6 +14,7 @@ _$CycleSettingsImpl _$$CycleSettingsImplFromJson(Map<String, dynamic> json) =>
       lastPeriodDate: const TimestampConverter().fromJson(
         json['lastPeriodDate'],
       ),
+      isTryingToConceive: json['isTryingToConceive'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$CycleSettingsImplToJson(
@@ -23,4 +24,5 @@ Map<String, dynamic> _$$CycleSettingsImplToJson(
   'averageCycleLength': instance.averageCycleLength,
   'periodLength': instance.periodLength,
   'lastPeriodDate': const TimestampConverter().toJson(instance.lastPeriodDate),
+  'isTryingToConceive': instance.isTryingToConceive,
 };

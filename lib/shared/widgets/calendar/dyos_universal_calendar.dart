@@ -23,6 +23,7 @@ class DyosUniversalCalendar extends StatelessWidget {
     this.onDaySelected,
     this.markerBuilder,
     this.eventLoader,
+    this.calendarBuilders,
     this.calendarStyle,
     this.selectedDayColor,
     this.todayColor,
@@ -58,6 +59,11 @@ class DyosUniversalCalendar extends StatelessWidget {
   /// 
   /// Used in conjunction with markerBuilder to determine what markers to show
   final List<dynamic> Function(DateTime)? eventLoader;
+
+  /// Custom calendar builders for custom day rendering
+  /// 
+  /// This allows customization of individual days, including background colors
+  final CalendarBuilders? calendarBuilders;
 
   /// Custom calendar style for additional styling options
   /// 
@@ -212,11 +218,11 @@ class DyosUniversalCalendar extends StatelessWidget {
         calendarFormat: calendarFormat,
         onPageChanged: onPageChanged,
         startingDayOfWeek: startingDayOfWeek,
-        calendarBuilders: markerBuilder != null
+        calendarBuilders: calendarBuilders ?? (markerBuilder != null
             ? CalendarBuilders(
                 markerBuilder: markerBuilder,
               )
-            : const CalendarBuilders(),
+            : const CalendarBuilders()),
       ),
     );
   }

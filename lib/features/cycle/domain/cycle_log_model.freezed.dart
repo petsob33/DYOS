@@ -26,7 +26,7 @@ mixin _$CycleLog {
   DateTime get date => throw _privateConstructorUsedError;
   FlowIntensity get flowIntensity => throw _privateConstructorUsedError;
   Mood get mood => throw _privateConstructorUsedError;
-  List<String> get symptoms => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
 
   /// Serializes this CycleLog to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,7 +48,7 @@ abstract class $CycleLogCopyWith<$Res> {
     @RequiredTimestampConverter() DateTime date,
     FlowIntensity flowIntensity,
     Mood mood,
-    List<String> symptoms,
+    String? notes,
   });
 }
 
@@ -71,7 +71,7 @@ class _$CycleLogCopyWithImpl<$Res, $Val extends CycleLog>
     Object? date = null,
     Object? flowIntensity = null,
     Object? mood = null,
-    Object? symptoms = null,
+    Object? notes = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -91,10 +91,10 @@ class _$CycleLogCopyWithImpl<$Res, $Val extends CycleLog>
                 ? _value.mood
                 : mood // ignore: cast_nullable_to_non_nullable
                       as Mood,
-            symptoms: null == symptoms
-                ? _value.symptoms
-                : symptoms // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
+            notes: freezed == notes
+                ? _value.notes
+                : notes // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -115,7 +115,7 @@ abstract class _$$CycleLogImplCopyWith<$Res>
     @RequiredTimestampConverter() DateTime date,
     FlowIntensity flowIntensity,
     Mood mood,
-    List<String> symptoms,
+    String? notes,
   });
 }
 
@@ -137,7 +137,7 @@ class __$$CycleLogImplCopyWithImpl<$Res>
     Object? date = null,
     Object? flowIntensity = null,
     Object? mood = null,
-    Object? symptoms = null,
+    Object? notes = freezed,
   }) {
     return _then(
       _$CycleLogImpl(
@@ -157,10 +157,10 @@ class __$$CycleLogImplCopyWithImpl<$Res>
             ? _value.mood
             : mood // ignore: cast_nullable_to_non_nullable
                   as Mood,
-        symptoms: null == symptoms
-            ? _value._symptoms
-            : symptoms // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
+        notes: freezed == notes
+            ? _value.notes
+            : notes // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -175,8 +175,8 @@ class _$CycleLogImpl implements _CycleLog {
     @RequiredTimestampConverter() required this.date,
     required this.flowIntensity,
     required this.mood,
-    final List<String> symptoms = const [],
-  }) : _symptoms = symptoms;
+    this.notes,
+  });
 
   factory _$CycleLogImpl.fromJson(Map<String, dynamic> json) =>
       _$$CycleLogImplFromJson(json);
@@ -190,18 +190,12 @@ class _$CycleLogImpl implements _CycleLog {
   final FlowIntensity flowIntensity;
   @override
   final Mood mood;
-  final List<String> _symptoms;
   @override
-  @JsonKey()
-  List<String> get symptoms {
-    if (_symptoms is EqualUnmodifiableListView) return _symptoms;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_symptoms);
-  }
+  final String? notes;
 
   @override
   String toString() {
-    return 'CycleLog(id: $id, date: $date, flowIntensity: $flowIntensity, mood: $mood, symptoms: $symptoms)';
+    return 'CycleLog(id: $id, date: $date, flowIntensity: $flowIntensity, mood: $mood, notes: $notes)';
   }
 
   @override
@@ -214,19 +208,13 @@ class _$CycleLogImpl implements _CycleLog {
             (identical(other.flowIntensity, flowIntensity) ||
                 other.flowIntensity == flowIntensity) &&
             (identical(other.mood, mood) || other.mood == mood) &&
-            const DeepCollectionEquality().equals(other._symptoms, _symptoms));
+            (identical(other.notes, notes) || other.notes == notes));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    id,
-    date,
-    flowIntensity,
-    mood,
-    const DeepCollectionEquality().hash(_symptoms),
-  );
+  int get hashCode =>
+      Object.hash(runtimeType, id, date, flowIntensity, mood, notes);
 
   /// Create a copy of CycleLog
   /// with the given fields replaced by the non-null parameter values.
@@ -248,7 +236,7 @@ abstract class _CycleLog implements CycleLog {
     @RequiredTimestampConverter() required final DateTime date,
     required final FlowIntensity flowIntensity,
     required final Mood mood,
-    final List<String> symptoms,
+    final String? notes,
   }) = _$CycleLogImpl;
 
   factory _CycleLog.fromJson(Map<String, dynamic> json) =
@@ -264,7 +252,7 @@ abstract class _CycleLog implements CycleLog {
   @override
   Mood get mood;
   @override
-  List<String> get symptoms;
+  String? get notes;
 
   /// Create a copy of CycleLog
   /// with the given fields replaced by the non-null parameter values.

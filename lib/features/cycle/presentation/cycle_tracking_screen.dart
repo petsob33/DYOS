@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/calendar/dyos_universal_calendar.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../data/cycle_repository.dart';
+import '../domain/cycle_calculator.dart';
 import '../domain/cycle_log_model.dart';
 import '../models/cycle_log.dart' as cycle_models;
 import '../models/cycle_provider.dart' as cycle_providers;
 import 'cycle_provider.dart';
 import 'cycle_settings_sheet.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 /// Screen for tracking menstrual cycle
 /// 
@@ -28,12 +31,19 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
+  // Phase colors
+  static const Color _menstruationColor = Color(0xFFFF375F); // Red
+  static const Color _fertileColor = Color(0xFF34C759); // Green
+  static const Color _lutealColor = Color(0xFFFF9F0A); // Orange
+  static const Color _follicularColor = Color(0xFF5E5CE6); // Indigo/Brand
+
   @override
   Widget build(BuildContext context) {
     final logsAsync = ref.watch(cycle_providers.cycleLogsProvider);
     final predictedPeriods = ref.watch(cycle_providers.predictedPeriodDaysProvider);
     final fertileDays = ref.watch(cycle_providers.fertileWindowProvider);
     final ovulationDay = ref.watch(cycle_providers.ovulationDayProvider);
+    final settingsAsync = ref.watch(cycleSettingsStreamProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
@@ -69,17 +79,44 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: logsAsync.when(
-                    data: (logs) => DyosUniversalCalendar(
-                      focusedDay: _focusedDay,
-                      selectedDay: _selectedDay,
-                      onDaySelected: (selectedDay, focusedDay) {
-                        setState(() {
-                          _selectedDay = selectedDay;
-                          _focusedDay = focusedDay;
-                        });
-                        _showCycleLogSheet(context, selectedDay, logs);
-                      },
-                      eventLoader: (date) {
+                    data: (logs) {
+                      final settings = settingsAsync.valueOrNull;
+                      return Column(
+                        children: [
+                          DyosUniversalCalendar(
+                            focusedDay: _focusedDay,
+                            selectedDay: _selectedDay,
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                              });
+                              _showCycleLogSheet(context, selectedDay, logs);
+                            },
+                            calendarStyle: CalendarStyle(
+                              defaultDecoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              weekendDecoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              outsideDecoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              selectedDecoration: BoxDecoration(
+                                color: AppTheme.colors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              todayDecoration: BoxDecoration(
+                                color: AppTheme.colors.primary.withValues(alpha: 0.3),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppTheme.colors.primary,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            eventLoader: (date) {
                         // Return markers for this date
                         final normalizedDate = DateTime(
                           date.year,
@@ -223,7 +260,121 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                         
                         return const SizedBox.shrink();
                       },
-                    ),
+                      calendarBuilders: settings != null
+                          ? CalendarBuilders(
+                              defaultBuilder: (context, date, _) {
+                                final status = CycleCalculator.calculateStatus(
+                                  settings: settings,
+                                  targetDate: date,
+                                );
+                                
+                                Color? backgroundColor;
+                                switch (status.phase) {
+                                  case CyclePhase.menstruation:
+                                    backgroundColor = _menstruationColor.withValues(alpha: 0.15);
+                                    break;
+                                  case CyclePhase.follicular:
+                                    backgroundColor = _follicularColor.withValues(alpha: 0.15);
+                                    break;
+                                  case CyclePhase.ovulation:
+                                    backgroundColor = _fertileColor.withValues(alpha: 0.2);
+                                    break;
+                                  case CyclePhase.luteal:
+                                    backgroundColor = _lutealColor.withValues(alpha: 0.15);
+                                    break;
+                                }
+                                
+                                if (backgroundColor == null) return null;
+                                
+                                return Container(
+                                  margin: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: backgroundColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${date.day}',
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: AppTheme.colors.text,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              markerBuilder: (context, date, events) {
+                                // Use existing marker builder logic
+                                if (events.contains('recorded_period')) {
+                                  return Positioned(
+                                    bottom: 2,
+                                    child: Container(
+                                      width: 6,
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.colors.love,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (events.contains('predicted_period')) {
+                                  return Positioned(
+                                    bottom: 2,
+                                    child: Container(
+                                      width: 6,
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.colors.love.withValues(alpha: 0.5),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppTheme.colors.love,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (events.contains('ovulation')) {
+                                  return Positioned(
+                                    bottom: 2,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppTheme.colors.success,
+                                          width: 2,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (events.contains('fertile')) {
+                                  return Positioned(
+                                    bottom: 2,
+                                    child: Container(
+                                      width: 4,
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.colors.success,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            )
+                          : null,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        // Legend
+                        _CycleLegend(),
+                      ],
+                    );
+                    },
                     loading: () => const Center(child: CircularProgressIndicator()),
                     error: (_, __) => const SizedBox.shrink(),
                   ),
@@ -295,6 +446,95 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
   }
 }
 
+/// Legend widget showing cycle phase colors
+class _CycleLegend extends StatelessWidget {
+  const _CycleLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppTheme.colors.card,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Legend',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppTheme.colors.text,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Wrap(
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.sm,
+            children: [
+              _LegendItem(
+                color: const Color(0xFFFF375F),
+                label: 'Menstruation',
+              ),
+              _LegendItem(
+                color: const Color(0xFF5E5CE6),
+                label: 'Follicular',
+              ),
+              _LegendItem(
+                color: const Color(0xFF34C759),
+                label: 'Ovulation/Fertile',
+              ),
+              _LegendItem(
+                color: const Color(0xFFFF9F0A),
+                label: 'Luteal/PMS',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({
+    required this.color,
+    required this.label,
+  });
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.3),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: color,
+              width: 2,
+            ),
+          ),
+        ),
+        SizedBox(width: AppSpacing.xs),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AppTheme.colors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Bottom sheet for adding/editing cycle log
 class _CycleLogSheet extends ConsumerStatefulWidget {
   const _CycleLogSheet({
@@ -354,7 +594,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
         date: widget.date,
         flowIntensity: _flowIntensity,
         mood: _mood,
-        symptoms: [], // Empty for now
+        notes: null, // Optional notes
       );
 
       await repository.addOrUpdateLog(domainLog, user.coupleId!);

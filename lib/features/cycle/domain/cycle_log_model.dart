@@ -27,25 +27,35 @@ class RequiredTimestampConverter implements JsonConverter<DateTime, dynamic> {
 }
 
 /// Enum representing flow intensity levels
+@JsonEnum()
 enum FlowIntensity {
+  @JsonValue('light')
   light,
+  @JsonValue('medium')
   medium,
+  @JsonValue('heavy')
   heavy,
+  @JsonValue('spotting')
   spotting,
 }
 
 /// Enum representing mood states
+@JsonEnum()
 enum Mood {
+  @JsonValue('happy')
   happy,
+  @JsonValue('sensitive')
   sensitive,
+  @JsonValue('energetic')
   energetic,
+  @JsonValue('irritable')
   irritable,
 }
 
 /// Model representing a menstrual cycle log entry
 /// 
 /// This model stores information about a day in the menstrual cycle,
-/// including flow intensity, mood, and symptoms.
+/// including flow intensity, mood, and notes.
 @freezed
 class CycleLog with _$CycleLog {
   @JsonSerializable(explicitToJson: true)
@@ -54,7 +64,7 @@ class CycleLog with _$CycleLog {
     @RequiredTimestampConverter() required DateTime date,
     required FlowIntensity flowIntensity,
     required Mood mood,
-    @Default([]) List<String> symptoms,
+    String? notes, // Optional notes
   }) = _CycleLog;
 
   factory CycleLog.fromJson(Map<String, dynamic> json) =>

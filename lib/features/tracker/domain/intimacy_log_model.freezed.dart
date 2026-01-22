@@ -29,6 +29,16 @@ mixin _$IntimacyLog {
   int get rating => throw _privateConstructorUsedError; // 1-5 rating
   List<String> get tags =>
       throw _privateConstructorUsedError; // e.g., "Romantic", "Quickie", "Morning", "Experiment"
+  List<String> get positions =>
+      throw _privateConstructorUsedError; // e.g., "Missionary", "Doggy", "Cowgirl"
+  int get userOrgasmCount =>
+      throw _privateConstructorUsedError; // Number of orgasms for the user
+  int get partnerOrgasmCount =>
+      throw _privateConstructorUsedError; // Number of orgasms for the partner
+  int? get duration =>
+      throw _privateConstructorUsedError; // Duration in minutes (optional)
+  String? get location =>
+      throw _privateConstructorUsedError; // Optional location where intimacy occurred
   bool get protectionUsed => throw _privateConstructorUsedError;
   String? get note => throw _privateConstructorUsedError; // Optional note
   int get orgasmsMe =>
@@ -62,6 +72,11 @@ abstract class $IntimacyLogCopyWith<$Res> {
     String initiatorId,
     int rating,
     List<String> tags,
+    List<String> positions,
+    int userOrgasmCount,
+    int partnerOrgasmCount,
+    int? duration,
+    String? location,
     bool protectionUsed,
     String? note,
     int orgasmsMe,
@@ -91,6 +106,11 @@ class _$IntimacyLogCopyWithImpl<$Res, $Val extends IntimacyLog>
     Object? initiatorId = null,
     Object? rating = null,
     Object? tags = null,
+    Object? positions = null,
+    Object? userOrgasmCount = null,
+    Object? partnerOrgasmCount = null,
+    Object? duration = freezed,
+    Object? location = freezed,
     Object? protectionUsed = null,
     Object? note = freezed,
     Object? orgasmsMe = null,
@@ -120,6 +140,26 @@ class _$IntimacyLogCopyWithImpl<$Res, $Val extends IntimacyLog>
                 ? _value.tags
                 : tags // ignore: cast_nullable_to_non_nullable
                       as List<String>,
+            positions: null == positions
+                ? _value.positions
+                : positions // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            userOrgasmCount: null == userOrgasmCount
+                ? _value.userOrgasmCount
+                : userOrgasmCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            partnerOrgasmCount: null == partnerOrgasmCount
+                ? _value.partnerOrgasmCount
+                : partnerOrgasmCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            duration: freezed == duration
+                ? _value.duration
+                : duration // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            location: freezed == location
+                ? _value.location
+                : location // ignore: cast_nullable_to_non_nullable
+                      as String?,
             protectionUsed: null == protectionUsed
                 ? _value.protectionUsed
                 : protectionUsed // ignore: cast_nullable_to_non_nullable
@@ -165,6 +205,11 @@ abstract class _$$IntimacyLogImplCopyWith<$Res>
     String initiatorId,
     int rating,
     List<String> tags,
+    List<String> positions,
+    int userOrgasmCount,
+    int partnerOrgasmCount,
+    int? duration,
+    String? location,
     bool protectionUsed,
     String? note,
     int orgasmsMe,
@@ -193,6 +238,11 @@ class __$$IntimacyLogImplCopyWithImpl<$Res>
     Object? initiatorId = null,
     Object? rating = null,
     Object? tags = null,
+    Object? positions = null,
+    Object? userOrgasmCount = null,
+    Object? partnerOrgasmCount = null,
+    Object? duration = freezed,
+    Object? location = freezed,
     Object? protectionUsed = null,
     Object? note = freezed,
     Object? orgasmsMe = null,
@@ -222,6 +272,26 @@ class __$$IntimacyLogImplCopyWithImpl<$Res>
             ? _value._tags
             : tags // ignore: cast_nullable_to_non_nullable
                   as List<String>,
+        positions: null == positions
+            ? _value._positions
+            : positions // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        userOrgasmCount: null == userOrgasmCount
+            ? _value.userOrgasmCount
+            : userOrgasmCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        partnerOrgasmCount: null == partnerOrgasmCount
+            ? _value.partnerOrgasmCount
+            : partnerOrgasmCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        duration: freezed == duration
+            ? _value.duration
+            : duration // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        location: freezed == location
+            ? _value.location
+            : location // ignore: cast_nullable_to_non_nullable
+                  as String?,
         protectionUsed: null == protectionUsed
             ? _value.protectionUsed
             : protectionUsed // ignore: cast_nullable_to_non_nullable
@@ -261,13 +331,19 @@ class _$IntimacyLogImpl implements _IntimacyLog {
     required this.initiatorId,
     required this.rating,
     final List<String> tags = const [],
+    final List<String> positions = const [],
+    this.userOrgasmCount = 0,
+    this.partnerOrgasmCount = 0,
+    this.duration,
+    this.location,
     required this.protectionUsed,
     this.note,
     this.orgasmsMe = 0,
     this.orgasmsPartner = 0,
     this.durationMinutes,
     this.location,
-  }) : _tags = tags;
+  }) : _tags = tags,
+       _positions = positions;
 
   factory _$IntimacyLogImpl.fromJson(Map<String, dynamic> json) =>
       _$$IntimacyLogImplFromJson(json);
@@ -294,6 +370,31 @@ class _$IntimacyLogImpl implements _IntimacyLog {
   }
 
   // e.g., "Romantic", "Quickie", "Morning", "Experiment"
+  final List<String> _positions;
+  // e.g., "Romantic", "Quickie", "Morning", "Experiment"
+  @override
+  @JsonKey()
+  List<String> get positions {
+    if (_positions is EqualUnmodifiableListView) return _positions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_positions);
+  }
+
+  // e.g., "Missionary", "Doggy", "Cowgirl"
+  @override
+  @JsonKey()
+  final int userOrgasmCount;
+  // Number of orgasms for the user
+  @override
+  @JsonKey()
+  final int partnerOrgasmCount;
+  // Number of orgasms for the partner
+  @override
+  final int? duration;
+  // Duration in minutes (optional)
+  @override
+  final String? location;
+  // Optional location where intimacy occurred
   @override
   final bool protectionUsed;
   @override
@@ -315,7 +416,7 @@ class _$IntimacyLogImpl implements _IntimacyLog {
 
   @override
   String toString() {
-    return 'IntimacyLog(id: $id, date: $date, initiatorId: $initiatorId, rating: $rating, tags: $tags, protectionUsed: $protectionUsed, note: $note, orgasmsMe: $orgasmsMe, orgasmsPartner: $orgasmsPartner, durationMinutes: $durationMinutes, location: $location)';
+    return 'IntimacyLog(id: $id, date: $date, initiatorId: $initiatorId, rating: $rating, tags: $tags, positions: $positions, userOrgasmCount: $userOrgasmCount, partnerOrgasmCount: $partnerOrgasmCount, duration: $duration, location: $location, protectionUsed: $protectionUsed, note: $note, orgasmsMe: $orgasmsMe, orgasmsPartner: $orgasmsPartner, durationMinutes: $durationMinutes, location: $location)';
   }
 
   @override
@@ -329,6 +430,18 @@ class _$IntimacyLogImpl implements _IntimacyLog {
                 other.initiatorId == initiatorId) &&
             (identical(other.rating, rating) || other.rating == rating) &&
             const DeepCollectionEquality().equals(other._tags, _tags) &&
+            const DeepCollectionEquality().equals(
+              other._positions,
+              _positions,
+            ) &&
+            (identical(other.userOrgasmCount, userOrgasmCount) ||
+                other.userOrgasmCount == userOrgasmCount) &&
+            (identical(other.partnerOrgasmCount, partnerOrgasmCount) ||
+                other.partnerOrgasmCount == partnerOrgasmCount) &&
+            (identical(other.duration, duration) ||
+                other.duration == duration) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
             (identical(other.protectionUsed, protectionUsed) ||
                 other.protectionUsed == protectionUsed) &&
             (identical(other.note, note) || other.note == note) &&
@@ -351,6 +464,11 @@ class _$IntimacyLogImpl implements _IntimacyLog {
     initiatorId,
     rating,
     const DeepCollectionEquality().hash(_tags),
+    const DeepCollectionEquality().hash(_positions),
+    userOrgasmCount,
+    partnerOrgasmCount,
+    duration,
+    location,
     protectionUsed,
     note,
     orgasmsMe,
@@ -380,6 +498,11 @@ abstract class _IntimacyLog implements IntimacyLog {
     required final String initiatorId,
     required final int rating,
     final List<String> tags,
+    final List<String> positions,
+    final int userOrgasmCount,
+    final int partnerOrgasmCount,
+    final int? duration,
+    final String? location,
     required final bool protectionUsed,
     final String? note,
     final int orgasmsMe,
@@ -402,6 +525,16 @@ abstract class _IntimacyLog implements IntimacyLog {
   int get rating; // 1-5 rating
   @override
   List<String> get tags; // e.g., "Romantic", "Quickie", "Morning", "Experiment"
+  @override
+  List<String> get positions; // e.g., "Missionary", "Doggy", "Cowgirl"
+  @override
+  int get userOrgasmCount; // Number of orgasms for the user
+  @override
+  int get partnerOrgasmCount; // Number of orgasms for the partner
+  @override
+  int? get duration; // Duration in minutes (optional)
+  @override
+  String? get location; // Optional location where intimacy occurred
   @override
   bool get protectionUsed;
   @override

@@ -15,6 +15,15 @@ _$IntimacyLogImpl _$$IntimacyLogImplFromJson(Map<String, dynamic> json) =>
       tags:
           (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
           const [],
+      positions:
+          (json['positions'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      userOrgasmCount: (json['userOrgasmCount'] as num?)?.toInt() ?? 0,
+      partnerOrgasmCount: (json['partnerOrgasmCount'] as num?)?.toInt() ?? 0,
+      duration: (json['duration'] as num?)?.toInt(),
+      location: json['location'] as String?,
       protectionUsed: json['protectionUsed'] as bool,
       note: json['note'] as String?,
       orgasmsMe: (json['orgasmsMe'] as num?)?.toInt() ?? 0,
@@ -30,6 +39,10 @@ Map<String, dynamic> _$$IntimacyLogImplToJson(_$IntimacyLogImpl instance) =>
       'initiatorId': instance.initiatorId,
       'rating': instance.rating,
       'tags': instance.tags,
+      'positions': instance.positions,
+      'userOrgasmCount': instance.userOrgasmCount,
+      'partnerOrgasmCount': instance.partnerOrgasmCount,
+      'duration': instance.duration,
       'protectionUsed': instance.protectionUsed,
       'note': instance.note,
       'orgasmsMe': instance.orgasmsMe,

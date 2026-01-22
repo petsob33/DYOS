@@ -5,6 +5,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../data/cycle_repository.dart';
+import '../domain/cycle_calculator.dart';
 import '../domain/cycle_settings_model.dart';
 import 'cycle_provider.dart';
 
@@ -177,25 +178,28 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: settingsAsync.when(
-                  data: (settings) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Last Period Date',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.colors.text,
+                  data: (settings) {
+                    // Calculate day in cycle for today
+                    int? dayInCycle;
+                    if (settings != null) {
+                      final status = CycleCalculator.calculateStatus(
+                        settings: settings,
+                        targetDate: DateTime.now(),
+                      );
+                      dayInCycle = status.dayInCycle > 0 ? status.dayInCycle : null;
+                    }
+                    
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Day in Cycle
+                        if (dayInCycle != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            decoration: BoxDecoration(
+                              color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                      ),
-                      const SizedBox(height: 12),
-                      Material(
-                        color: AppTheme.colors.card,
-                        borderRadius: BorderRadius.circular(16),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: _isLoading ? null : _selectLastPeriodDate,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
                             child: Row(
                               children: [
                                 Icon(
@@ -209,78 +213,128 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        settings?.lastPeriodDate != null
-                                            ? _formatDate(settings!.lastPeriodDate!)
-                                            : 'Not set',
-                                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                              color: settings?.lastPeriodDate != null
-                                                  ? AppTheme.colors.text
-                                                  : AppTheme.colors.textSecondary,
+                                        'Day in Cycle',
+                                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                              color: AppTheme.colors.textSecondary,
                                             ),
                                       ),
-                                      if (settings?.lastPeriodDate != null)
-                                        const SizedBox(height: 2),
-                                      if (settings?.lastPeriodDate != null)
-                                        Text(
-                                          'Tap to change',
-                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                color: AppTheme.colors.textSecondary,
-                                              ),
-                                        ),
+                                      Text(
+                                        'Day $dayInCycle',
+                                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                              fontWeight: FontWeight.w800,
+                                              color: AppTheme.colors.primary,
+                                            ),
+                                      ),
                                     ],
                                   ),
                                 ),
-                                if (_isLoading)
-                                  const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                else
-                                  Icon(
-                                    Icons.chevron_right,
-                                    color: AppTheme.colors.textSecondary,
-                                  ),
                               ],
                             ),
                           ),
+                          const SizedBox(height: AppSpacing.lg),
+                        ],
+                        Text(
+                          'Last Period Date',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.colors.text,
+                              ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Average Cycle Length',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.colors.text,
+                        const SizedBox(height: 12),
+                        Material(
+                          color: AppTheme.colors.card,
+                          borderRadius: BorderRadius.circular(16),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: _isLoading ? null : _selectLastPeriodDate,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    color: AppTheme.colors.primary,
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          settings?.lastPeriodDate != null
+                                              ? _formatDate(settings!.lastPeriodDate!)
+                                              : 'Not set',
+                                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                                color: settings?.lastPeriodDate != null
+                                                    ? AppTheme.colors.text
+                                                    : AppTheme.colors.textSecondary,
+                                              ),
+                                        ),
+                                        if (settings?.lastPeriodDate != null)
+                                          const SizedBox(height: 2),
+                                        if (settings?.lastPeriodDate != null)
+                                          Text(
+                                            'Tap to change',
+                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                  color: AppTheme.colors.textSecondary,
+                                                ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (_isLoading)
+                                    const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  else
+                                    Icon(
+                                      Icons.chevron_right,
+                                      color: AppTheme.colors.textSecondary,
+                                    ),
+                                ],
+                              ),
                             ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${settings?.averageCycleLength ?? 28} days',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppTheme.colors.textSecondary,
-                            ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Period Length',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.colors.text,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${settings?.periodLength ?? 5} days',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppTheme.colors.textSecondary,
-                            ),
-                      ),
-                      SizedBox(
-                          height: MediaQuery.of(context).viewInsets.bottom + 16),
-                    ],
-                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Average Cycle Length',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.colors.text,
+                              ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${settings?.averageCycleLength ?? 28} days',
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: AppTheme.colors.textSecondary,
+                              ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Period Length',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.colors.text,
+                              ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${settings?.periodLength ?? 5} days',
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: AppTheme.colors.textSecondary,
+                              ),
+                        ),
+                        SizedBox(
+                            height: MediaQuery.of(context).viewInsets.bottom + 16),
+                      ],
+                    );
+                  },
                   loading: () => const Center(
                     child: Padding(
                       padding: EdgeInsets.all(32.0),

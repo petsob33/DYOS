@@ -15,6 +15,8 @@ import '../../../../widgets/home/quick_note_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../auth/domain/couple_model.dart';
 import '../../../auth/domain/user_model.dart';
+import '../../../events/presentation/add_event_sheet.dart';
+import '../../../events/presentation/event_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -154,7 +156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Widgety pro váš život',
+                      'Widgets for your life',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppTheme.colors.textSecondary,
                       ),
@@ -202,10 +204,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 final _cards = <Widget>[  
   const _DaysTogetherCard(),
-  const _CountdownCard(),
   const _QuickNoteCard(),
-  const _IntimacySparkCard(),
-  const _AnalyticsCard(),
+  const _EventsCard(),
   const _ListsCard(),
 ];
 
@@ -230,7 +230,7 @@ class _StatusHeader extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Center(
               child: Text(
-                'Spárujte se s partnerem pro zobrazení statusu',
+                'Pair with your partner to view status',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppTheme.colors.textSecondary,
                     ),
@@ -550,45 +550,6 @@ class _DaysTogetherCard extends ConsumerWidget {
   }
 }
 
-class _CountdownCard extends StatelessWidget {
-  const _CountdownCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return BentoCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Next event',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: AppTheme.colors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            '14 days',
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: AppTheme.colors.primary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Anniversary dinner',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.colors.text,
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _QuickNoteCard extends ConsumerWidget {
   const _QuickNoteCard();
 
@@ -622,48 +583,185 @@ class _QuickNoteCard extends ConsumerWidget {
   }
 }
 
-class _IntimacySparkCard extends StatelessWidget {
-  const _IntimacySparkCard();
+class _EventsCard extends ConsumerWidget {
+  const _EventsCard();
 
   @override
-  Widget build(BuildContext context) {
-    return BentoCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppTheme.colors.love.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              Icons.local_fire_department_rounded,
-              color: AppTheme.colors.love,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-               const SizedBox(height: AppSpacing.xs),
-                Text(
-                  'Last sync: 2 days ago 🔥',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppTheme.colors.text,
-                    fontWeight: FontWeight.w700,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final eventsAsync = ref.watch(eventsStreamProvider);
+
+    return eventsAsync.when(
+      data: (events) {
+        final upcomingEvents = events.where((event) {
+          final today = DateTime.now();
+          final eventDate = DateTime(event.date.year, event.date.month, event.date.day);
+          final todayDate = DateTime(today.year, today.month, today.day);
+          return eventDate.isAfter(todayDate) || eventDate.isAtSameMomentAs(todayDate);
+        }).toList();
+        
+        final totalCount = events.length;
+        final upcomingCount = upcomingEvents.length;
+        
+        return BentoCard(
+          child: InkWell(
+            onTap: () {
+              AddEventSheet.show(context);
+            },
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppTheme.colors.primary.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          PhosphorIconsBold.calendarPlus,
+                          color: AppTheme.colors.primary,
+                          size: 24,
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        PhosphorIconsBold.plus,
+                        color: AppTheme.colors.primary,
+                        size: 20,
+                      ),
+                    ],
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppSpacing.xs),               
-              ],
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Add Event',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppTheme.colors.text,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Create a new event',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.colors.textSecondary,
+                        ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
+        );
+      },
+      loading: () => BentoCard(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppTheme.colors.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      PhosphorIconsBold.calendarPlus,
+                      color: AppTheme.colors.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    PhosphorIconsBold.plus,
+                    color: AppTheme.colors.primary,
+                    size: 20,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Add Event',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppTheme.colors.text,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Loading...',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.colors.textSecondary,
+                    ),
+              ),
+            ],
+          ),
+        ),
       ),
+      error: (error, stackTrace) {
+        debugPrint('Error loading events: $error');
+        return BentoCard(
+          child: InkWell(
+            onTap: () {
+              AddEventSheet.show(context);
+            },
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppTheme.colors.primary.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          PhosphorIconsBold.calendarPlus,
+                          color: AppTheme.colors.primary,
+                          size: 24,
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        PhosphorIconsBold.plus,
+                        color: AppTheme.colors.primary,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Add Event',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppTheme.colors.text,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Create a new event',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.colors.textSecondary,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -854,103 +952,4 @@ class _ListsCard extends ConsumerWidget {
   }
 }
 
-class _AnalyticsCard extends StatelessWidget {
-  const _AnalyticsCard();
 
-  @override
-  Widget build(BuildContext context) {
-    return BentoCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'DYOS Analytics',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: AppTheme.colors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Expanded(
-                child: _Chip(
-                  label: 'Peak day',
-                  value: 'Tuesday',
-                  color: AppTheme.colors.success,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _Chip(
-                  label: 'Mood',
-                  value: 'Stay gentle 💚',
-                  color: AppTheme.colors.warning,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          LinearProgressIndicator(
-            value: 0.72,
-            minHeight: 10,
-            borderRadius: BorderRadius.circular(8),
-            backgroundColor: AppTheme.colors.background,
-            color: AppTheme.colors.primary,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            '72% aligned',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.colors.textSecondary,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Chip extends StatelessWidget {
-  const _Chip({required this.label, required this.value, required this.color});
-
-  final String label;
-  final String value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: AppTheme.colors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppTheme.colors.text,
-              fontWeight: FontWeight.w700,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}

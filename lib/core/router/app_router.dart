@@ -23,6 +23,7 @@ import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/auth/presentation/edit_profile_picture_screen.dart';
 import '../../features/notes/presentation/screens/secret_notes_screen.dart';
 import '../../features/cycle/presentation/cycle_tracking_screen.dart';
+import '../../features/events/presentation/add_event_sheet.dart';
 import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
@@ -400,10 +401,10 @@ class _QuickAddSheet extends StatelessWidget {
                 },
               ),
               _QuickActionChip(
-                icon: PhosphorIconsBold.shoppingCartSimple,
-                label: 'List item',
+                icon: PhosphorIconsBold.calendarPlus,
+                label: 'Add event',
                 onTap: () {
-                  // TODO: Implement add list item
+                  AddEventSheet.show(context);
                 },
               ),
             ],

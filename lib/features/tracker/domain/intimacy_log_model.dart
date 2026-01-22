@@ -39,6 +39,11 @@ class IntimacyLog with _$IntimacyLog {
     required String initiatorId, // userId who initiated
     required int rating, // 1-5 rating
     @Default([]) List<String> tags, // e.g., "Romantic", "Quickie", "Morning", "Experiment"
+    @Default([]) List<String> positions, // e.g., "Missionary", "Doggy", "Cowgirl"
+    @Default(0) int userOrgasmCount, // Number of orgasms for the user
+    @Default(0) int partnerOrgasmCount, // Number of orgasms for the partner
+    int? duration, // Duration in minutes (optional)
+    String? location, // Optional location where intimacy occurred
     required bool protectionUsed,
     String? note, // Optional note
     @Default(0) int orgasmsMe, // Orgasm count for the user who created the log

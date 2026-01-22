@@ -12,11 +12,7 @@ _$CycleLogImpl _$$CycleLogImplFromJson(Map<String, dynamic> json) =>
       date: const RequiredTimestampConverter().fromJson(json['date']),
       flowIntensity: $enumDecode(_$FlowIntensityEnumMap, json['flowIntensity']),
       mood: $enumDecode(_$MoodEnumMap, json['mood']),
-      symptoms:
-          (json['symptoms'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
+      notes: json['notes'] as String?,
     );
 
 Map<String, dynamic> _$$CycleLogImplToJson(_$CycleLogImpl instance) =>
@@ -25,7 +21,7 @@ Map<String, dynamic> _$$CycleLogImplToJson(_$CycleLogImpl instance) =>
       'date': const RequiredTimestampConverter().toJson(instance.date),
       'flowIntensity': _$FlowIntensityEnumMap[instance.flowIntensity]!,
       'mood': _$MoodEnumMap[instance.mood]!,
-      'symptoms': instance.symptoms,
+      'notes': instance.notes,
     };
 
 const _$FlowIntensityEnumMap = {

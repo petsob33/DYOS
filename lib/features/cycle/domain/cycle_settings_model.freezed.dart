@@ -22,10 +22,12 @@ CycleSettings _$CycleSettingsFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$CycleSettings {
   String get id => throw _privateConstructorUsedError;
-  int get averageCycleLength => throw _privateConstructorUsedError;
+  int get averageCycleLength =>
+      throw _privateConstructorUsedError; // CRITICAL: This must be editable
   int get periodLength => throw _privateConstructorUsedError;
   @TimestampConverter()
   DateTime? get lastPeriodDate => throw _privateConstructorUsedError;
+  bool get isTryingToConceive => throw _privateConstructorUsedError;
 
   /// Serializes this CycleSettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -49,6 +51,7 @@ abstract class $CycleSettingsCopyWith<$Res> {
     int averageCycleLength,
     int periodLength,
     @TimestampConverter() DateTime? lastPeriodDate,
+    bool isTryingToConceive,
   });
 }
 
@@ -71,6 +74,7 @@ class _$CycleSettingsCopyWithImpl<$Res, $Val extends CycleSettings>
     Object? averageCycleLength = null,
     Object? periodLength = null,
     Object? lastPeriodDate = freezed,
+    Object? isTryingToConceive = null,
   }) {
     return _then(
       _value.copyWith(
@@ -90,6 +94,10 @@ class _$CycleSettingsCopyWithImpl<$Res, $Val extends CycleSettings>
                 ? _value.lastPeriodDate
                 : lastPeriodDate // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            isTryingToConceive: null == isTryingToConceive
+                ? _value.isTryingToConceive
+                : isTryingToConceive // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -110,6 +118,7 @@ abstract class _$$CycleSettingsImplCopyWith<$Res>
     int averageCycleLength,
     int periodLength,
     @TimestampConverter() DateTime? lastPeriodDate,
+    bool isTryingToConceive,
   });
 }
 
@@ -131,6 +140,7 @@ class __$$CycleSettingsImplCopyWithImpl<$Res>
     Object? averageCycleLength = null,
     Object? periodLength = null,
     Object? lastPeriodDate = freezed,
+    Object? isTryingToConceive = null,
   }) {
     return _then(
       _$CycleSettingsImpl(
@@ -150,6 +160,10 @@ class __$$CycleSettingsImplCopyWithImpl<$Res>
             ? _value.lastPeriodDate
             : lastPeriodDate // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        isTryingToConceive: null == isTryingToConceive
+            ? _value.isTryingToConceive
+            : isTryingToConceive // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -164,6 +178,7 @@ class _$CycleSettingsImpl implements _CycleSettings {
     this.averageCycleLength = 28,
     this.periodLength = 5,
     @TimestampConverter() this.lastPeriodDate,
+    this.isTryingToConceive = false,
   });
 
   factory _$CycleSettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -174,16 +189,20 @@ class _$CycleSettingsImpl implements _CycleSettings {
   @override
   @JsonKey()
   final int averageCycleLength;
+  // CRITICAL: This must be editable
   @override
   @JsonKey()
   final int periodLength;
   @override
   @TimestampConverter()
   final DateTime? lastPeriodDate;
+  @override
+  @JsonKey()
+  final bool isTryingToConceive;
 
   @override
   String toString() {
-    return 'CycleSettings(id: $id, averageCycleLength: $averageCycleLength, periodLength: $periodLength, lastPeriodDate: $lastPeriodDate)';
+    return 'CycleSettings(id: $id, averageCycleLength: $averageCycleLength, periodLength: $periodLength, lastPeriodDate: $lastPeriodDate, isTryingToConceive: $isTryingToConceive)';
   }
 
   @override
@@ -197,7 +216,9 @@ class _$CycleSettingsImpl implements _CycleSettings {
             (identical(other.periodLength, periodLength) ||
                 other.periodLength == periodLength) &&
             (identical(other.lastPeriodDate, lastPeriodDate) ||
-                other.lastPeriodDate == lastPeriodDate));
+                other.lastPeriodDate == lastPeriodDate) &&
+            (identical(other.isTryingToConceive, isTryingToConceive) ||
+                other.isTryingToConceive == isTryingToConceive));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -208,6 +229,7 @@ class _$CycleSettingsImpl implements _CycleSettings {
     averageCycleLength,
     periodLength,
     lastPeriodDate,
+    isTryingToConceive,
   );
 
   /// Create a copy of CycleSettings
@@ -230,6 +252,7 @@ abstract class _CycleSettings implements CycleSettings {
     final int averageCycleLength,
     final int periodLength,
     @TimestampConverter() final DateTime? lastPeriodDate,
+    final bool isTryingToConceive,
   }) = _$CycleSettingsImpl;
 
   factory _CycleSettings.fromJson(Map<String, dynamic> json) =
@@ -238,12 +261,14 @@ abstract class _CycleSettings implements CycleSettings {
   @override
   String get id;
   @override
-  int get averageCycleLength;
+  int get averageCycleLength; // CRITICAL: This must be editable
   @override
   int get periodLength;
   @override
   @TimestampConverter()
   DateTime? get lastPeriodDate;
+  @override
+  bool get isTryingToConceive;
 
   /// Create a copy of CycleSettings
   /// with the given fields replaced by the non-null parameter values.

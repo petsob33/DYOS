@@ -37,9 +37,10 @@ class CycleSettings with _$CycleSettings {
   @JsonSerializable(explicitToJson: true)
   const factory CycleSettings({
     required String id,
-    @Default(28) int averageCycleLength,
+    @Default(28) int averageCycleLength, // CRITICAL: This must be editable
     @Default(5) int periodLength,
     @TimestampConverter() DateTime? lastPeriodDate,
+    @Default(false) bool isTryingToConceive,
   }) = _CycleSettings;
 
   factory CycleSettings.fromJson(Map<String, dynamic> json) =>

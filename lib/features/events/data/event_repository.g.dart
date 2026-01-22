@@ -1,27 +1,29 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'app_router.dart';
+part of 'event_repository.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appRouterHash() => r'c8e8538d69ac0262927ef33fb6d4a1b8318d6eb7';
+String _$eventRepositoryHash() => r'a63944284660a112347d516cdc74a0766499e600';
 
-/// See also [appRouter].
-@ProviderFor(appRouter)
-final appRouterProvider = AutoDisposeProvider<GoRouter>.internal(
-  appRouter,
-  name: r'appRouterProvider',
+/// Riverpod provider that creates a singleton EventRepository instance
+///
+/// Copied from [eventRepository].
+@ProviderFor(eventRepository)
+final eventRepositoryProvider = AutoDisposeProvider<EventRepository>.internal(
+  eventRepository,
+  name: r'eventRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$appRouterHash,
+      : _$eventRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AppRouterRef = AutoDisposeProviderRef<GoRouter>;
+typedef EventRepositoryRef = AutoDisposeProviderRef<EventRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
