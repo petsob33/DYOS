@@ -5,15 +5,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 
-class DYOSRoot extends ConsumerWidget {
-  const DYOSRoot({super.key});
+class OurOSRoot extends ConsumerWidget {
+  const OurOSRoot({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'DYOS',
+      title: 'OurOS',
       themeMode: ThemeMode.light,
       theme: AppTheme.light,
       routerConfig: router,

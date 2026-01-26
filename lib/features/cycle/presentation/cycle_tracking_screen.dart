@@ -83,7 +83,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                       final settings = settingsAsync.valueOrNull;
                       return Column(
                         children: [
-                          DyosUniversalCalendar(
+                          OurOSUniversalCalendar(
                             focusedDay: _focusedDay,
                             selectedDay: _selectedDay,
                             onDaySelected: (selectedDay, focusedDay) {

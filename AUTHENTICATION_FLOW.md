@@ -1,8 +1,8 @@
-# Logika Login a Párování v DYOS App
+# Logika Login a Párování v OurOS App
 
 ## 📋 Přehled
 
-Tento dokument popisuje, jak funguje autentizace a párování uživatelů v aplikaci DYOS.
+Tento dokument popisuje, jak funguje autentizace a párování uživatelů v aplikaci OurOS.
 
 ---
 

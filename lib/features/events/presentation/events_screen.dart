@@ -77,7 +77,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: eventsAsync.when(
-                data: (events) => DyosUniversalCalendar(
+                data: (events) => OurOSUniversalCalendar(
                   focusedDay: _focusedDay,
                   selectedDay: _selectedDay,
                   onDaySelected: (selectedDay, focusedDay) {

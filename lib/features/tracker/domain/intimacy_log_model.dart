@@ -32,7 +32,6 @@ class RequiredTimestampConverter implements JsonConverter<DateTime, dynamic> {
 /// Logs are linked to a couple via coupleId and include date, rating, tags, and optional notes.
 @freezed
 class IntimacyLog with _$IntimacyLog {
-  @JsonSerializable(explicitToJson: true)
   const factory IntimacyLog({
     required String id,
     @RequiredTimestampConverter() required DateTime date,
@@ -46,10 +45,6 @@ class IntimacyLog with _$IntimacyLog {
     String? location, // Optional location where intimacy occurred
     required bool protectionUsed,
     String? note, // Optional note
-    @Default(0) int orgasmsMe, // Orgasm count for the user who created the log
-    @Default(0) int orgasmsPartner, // Orgasm count for the partner
-    int? durationMinutes, // Duration in minutes (optional)
-    String? location, // Location where intimacy occurred (optional)
   }) = _IntimacyLog;
 
   factory IntimacyLog.fromJson(Map<String, dynamic> json) =>

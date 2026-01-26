@@ -1,4 +1,4 @@
-# dyos_app
+# ouros_app
 
 A new Flutter project.
 

@@ -4,7 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../../core/theme/app_theme.dart';
 
-/// A reusable, generic calendar widget that follows the DYOS design system.
+/// A reusable, generic calendar widget that follows the OurOS design system.
 /// 
 /// This widget is domain-agnostic and only handles calendar display and interaction.
 /// The parent widget provides markers and styling through callbacks.
@@ -15,8 +15,8 @@ import '../../../core/theme/app_theme.dart';
 /// - Customizable today styling
 /// - Flexible marker builder for custom day markers
 /// - Custom background colors for specific days
-class DyosUniversalCalendar extends StatelessWidget {
-  const DyosUniversalCalendar({
+class OurOSUniversalCalendar extends StatelessWidget {
+  const OurOSUniversalCalendar({
     super.key,
     required this.focusedDay,
     this.selectedDay,

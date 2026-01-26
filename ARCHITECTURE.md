@@ -1,8 +1,8 @@
-# DYOS - Architektura projektu
+# OurOS - Architektura projektu
 
 ## Přehled
 
-DYOS je Flutter aplikace pro páry postavená na Firebase a Riverpod. Projekt používá feature-based strukturu s jasným oddělením vrstev.
+OurOS je Flutter aplikace pro páry postavená na Firebase a Riverpod. Projekt používá feature-based strukturu s jasným oddělením vrstev.
 
 ## Struktura projektu
 

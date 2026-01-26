@@ -40,14 +40,7 @@ mixin _$IntimacyLog {
   String? get location =>
       throw _privateConstructorUsedError; // Optional location where intimacy occurred
   bool get protectionUsed => throw _privateConstructorUsedError;
-  String? get note => throw _privateConstructorUsedError; // Optional note
-  int get orgasmsMe =>
-      throw _privateConstructorUsedError; // Orgasm count for the user who created the log
-  int get orgasmsPartner =>
-      throw _privateConstructorUsedError; // Orgasm count for the partner
-  int? get durationMinutes =>
-      throw _privateConstructorUsedError; // Duration in minutes (optional)
-  String? get location => throw _privateConstructorUsedError;
+  String? get note => throw _privateConstructorUsedError;
 
   /// Serializes this IntimacyLog to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -79,10 +72,6 @@ abstract class $IntimacyLogCopyWith<$Res> {
     String? location,
     bool protectionUsed,
     String? note,
-    int orgasmsMe,
-    int orgasmsPartner,
-    int? durationMinutes,
-    String? location,
   });
 }
 
@@ -113,10 +102,6 @@ class _$IntimacyLogCopyWithImpl<$Res, $Val extends IntimacyLog>
     Object? location = freezed,
     Object? protectionUsed = null,
     Object? note = freezed,
-    Object? orgasmsMe = null,
-    Object? orgasmsPartner = null,
-    Object? durationMinutes = freezed,
-    Object? location = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -168,22 +153,6 @@ class _$IntimacyLogCopyWithImpl<$Res, $Val extends IntimacyLog>
                 ? _value.note
                 : note // ignore: cast_nullable_to_non_nullable
                       as String?,
-            orgasmsMe: null == orgasmsMe
-                ? _value.orgasmsMe
-                : orgasmsMe // ignore: cast_nullable_to_non_nullable
-                      as int,
-            orgasmsPartner: null == orgasmsPartner
-                ? _value.orgasmsPartner
-                : orgasmsPartner // ignore: cast_nullable_to_non_nullable
-                      as int,
-            durationMinutes: freezed == durationMinutes
-                ? _value.durationMinutes
-                : durationMinutes // ignore: cast_nullable_to_non_nullable
-                      as int?,
-            location: freezed == location
-                ? _value.location
-                : location // ignore: cast_nullable_to_non_nullable
-                      as String?,
           )
           as $Val,
     );
@@ -212,10 +181,6 @@ abstract class _$$IntimacyLogImplCopyWith<$Res>
     String? location,
     bool protectionUsed,
     String? note,
-    int orgasmsMe,
-    int orgasmsPartner,
-    int? durationMinutes,
-    String? location,
   });
 }
 
@@ -245,10 +210,6 @@ class __$$IntimacyLogImplCopyWithImpl<$Res>
     Object? location = freezed,
     Object? protectionUsed = null,
     Object? note = freezed,
-    Object? orgasmsMe = null,
-    Object? orgasmsPartner = null,
-    Object? durationMinutes = freezed,
-    Object? location = freezed,
   }) {
     return _then(
       _$IntimacyLogImpl(
@@ -300,30 +261,13 @@ class __$$IntimacyLogImplCopyWithImpl<$Res>
             ? _value.note
             : note // ignore: cast_nullable_to_non_nullable
                   as String?,
-        orgasmsMe: null == orgasmsMe
-            ? _value.orgasmsMe
-            : orgasmsMe // ignore: cast_nullable_to_non_nullable
-                  as int,
-        orgasmsPartner: null == orgasmsPartner
-            ? _value.orgasmsPartner
-            : orgasmsPartner // ignore: cast_nullable_to_non_nullable
-                  as int,
-        durationMinutes: freezed == durationMinutes
-            ? _value.durationMinutes
-            : durationMinutes // ignore: cast_nullable_to_non_nullable
-                  as int?,
-        location: freezed == location
-            ? _value.location
-            : location // ignore: cast_nullable_to_non_nullable
-                  as String?,
       ),
     );
   }
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$IntimacyLogImpl implements _IntimacyLog {
   const _$IntimacyLogImpl({
     required this.id,
@@ -338,10 +282,6 @@ class _$IntimacyLogImpl implements _IntimacyLog {
     this.location,
     required this.protectionUsed,
     this.note,
-    this.orgasmsMe = 0,
-    this.orgasmsPartner = 0,
-    this.durationMinutes,
-    this.location,
   }) : _tags = tags,
        _positions = positions;
 
@@ -399,24 +339,10 @@ class _$IntimacyLogImpl implements _IntimacyLog {
   final bool protectionUsed;
   @override
   final String? note;
-  // Optional note
-  @override
-  @JsonKey()
-  final int orgasmsMe;
-  // Orgasm count for the user who created the log
-  @override
-  @JsonKey()
-  final int orgasmsPartner;
-  // Orgasm count for the partner
-  @override
-  final int? durationMinutes;
-  // Duration in minutes (optional)
-  @override
-  final String? location;
 
   @override
   String toString() {
-    return 'IntimacyLog(id: $id, date: $date, initiatorId: $initiatorId, rating: $rating, tags: $tags, positions: $positions, userOrgasmCount: $userOrgasmCount, partnerOrgasmCount: $partnerOrgasmCount, duration: $duration, location: $location, protectionUsed: $protectionUsed, note: $note, orgasmsMe: $orgasmsMe, orgasmsPartner: $orgasmsPartner, durationMinutes: $durationMinutes, location: $location)';
+    return 'IntimacyLog(id: $id, date: $date, initiatorId: $initiatorId, rating: $rating, tags: $tags, positions: $positions, userOrgasmCount: $userOrgasmCount, partnerOrgasmCount: $partnerOrgasmCount, duration: $duration, location: $location, protectionUsed: $protectionUsed, note: $note)';
   }
 
   @override
@@ -444,15 +370,7 @@ class _$IntimacyLogImpl implements _IntimacyLog {
                 other.location == location) &&
             (identical(other.protectionUsed, protectionUsed) ||
                 other.protectionUsed == protectionUsed) &&
-            (identical(other.note, note) || other.note == note) &&
-            (identical(other.orgasmsMe, orgasmsMe) ||
-                other.orgasmsMe == orgasmsMe) &&
-            (identical(other.orgasmsPartner, orgasmsPartner) ||
-                other.orgasmsPartner == orgasmsPartner) &&
-            (identical(other.durationMinutes, durationMinutes) ||
-                other.durationMinutes == durationMinutes) &&
-            (identical(other.location, location) ||
-                other.location == location));
+            (identical(other.note, note) || other.note == note));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -471,10 +389,6 @@ class _$IntimacyLogImpl implements _IntimacyLog {
     location,
     protectionUsed,
     note,
-    orgasmsMe,
-    orgasmsPartner,
-    durationMinutes,
-    location,
   );
 
   /// Create a copy of IntimacyLog
@@ -505,10 +419,6 @@ abstract class _IntimacyLog implements IntimacyLog {
     final String? location,
     required final bool protectionUsed,
     final String? note,
-    final int orgasmsMe,
-    final int orgasmsPartner,
-    final int? durationMinutes,
-    final String? location,
   }) = _$IntimacyLogImpl;
 
   factory _IntimacyLog.fromJson(Map<String, dynamic> json) =
@@ -538,15 +448,7 @@ abstract class _IntimacyLog implements IntimacyLog {
   @override
   bool get protectionUsed;
   @override
-  String? get note; // Optional note
-  @override
-  int get orgasmsMe; // Orgasm count for the user who created the log
-  @override
-  int get orgasmsPartner; // Orgasm count for the partner
-  @override
-  int? get durationMinutes; // Duration in minutes (optional)
-  @override
-  String? get location;
+  String? get note;
 
   /// Create a copy of IntimacyLog
   /// with the given fields replaced by the non-null parameter values.

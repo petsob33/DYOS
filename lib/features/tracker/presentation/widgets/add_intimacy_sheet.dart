@@ -87,10 +87,10 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
       _selectedTags.addAll(log.tags);
       _protectionUsed = log.protectionUsed;
       _noteController.text = log.note ?? '';
-      _orgasmsMe = log.orgasmsMe;
-      _orgasmsPartner = log.orgasmsPartner;
-      if (log.durationMinutes != null) {
-        _durationController.text = log.durationMinutes.toString();
+      _orgasmsMe = log.userOrgasmCount;
+      _orgasmsPartner = log.partnerOrgasmCount;
+      if (log.duration != null) {
+        _durationController.text = log.duration.toString();
       }
       if (log.location != null) {
         _locationController.text = log.location!;
@@ -243,9 +243,9 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           note: _noteController.text.trim().isEmpty 
               ? null 
               : _noteController.text.trim(),
-          orgasmsMe: _orgasmsMe,
-          orgasmsPartner: _orgasmsPartner,
-          durationMinutes: durationMinutes,
+          userOrgasmCount: _orgasmsMe,
+          partnerOrgasmCount: _orgasmsPartner,
+          duration: durationMinutes,
           location: _locationController.text.trim().isEmpty
               ? null
               : _locationController.text.trim(),

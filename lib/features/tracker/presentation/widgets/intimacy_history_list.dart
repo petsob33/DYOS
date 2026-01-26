@@ -296,20 +296,20 @@ class _IntimacyLogCard extends StatelessWidget {
             ],
           ),
           // Orgasms, Duration and Location row
-          if (log.orgasmsMe > 0 || log.orgasmsPartner > 0 || log.durationMinutes != null || (log.location != null && log.location!.isNotEmpty))
+          if (log.userOrgasmCount > 0 || log.partnerOrgasmCount > 0 || log.duration != null || (log.location != null && log.location!.isNotEmpty))
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.sm),
               child: Wrap(
                 spacing: AppSpacing.md,
                 runSpacing: AppSpacing.xs,
                 children: [
-                  if (log.orgasmsMe > 0 || log.orgasmsPartner > 0)
+                  if (log.userOrgasmCount > 0 || log.partnerOrgasmCount > 0)
                     _OrgasmsDisplay(
-                      orgasmsMe: log.orgasmsMe,
-                      orgasmsPartner: log.orgasmsPartner,
+                      orgasmsMe: log.userOrgasmCount,
+                      orgasmsPartner: log.partnerOrgasmCount,
                     ),
-                  if (log.durationMinutes != null)
-                    _DurationDisplay(durationMinutes: log.durationMinutes!),
+                  if (log.duration != null)
+                    _DurationDisplay(durationMinutes: log.duration!),
                   if (log.location != null && log.location!.isNotEmpty)
                     _LocationDisplay(location: log.location!),
                 ],

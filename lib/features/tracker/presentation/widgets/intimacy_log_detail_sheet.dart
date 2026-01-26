@@ -255,7 +255,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.md),
 
                     // Orgasms
-                    if (log.orgasmsMe > 0 || log.orgasmsPartner > 0)
+                    if (log.userOrgasmCount > 0 || log.partnerOrgasmCount > 0)
                       currentUserDataAsync.when(
                         data: (currentUserData) => partnerAsync.when(
                           data: (partnerData) {
@@ -277,7 +277,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                             ),
                                       ),
                                       Text(
-                                        '${log.orgasmsMe}',
+                                        '${log.userOrgasmCount}',
                                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                               color: AppTheme.colors.text,
                                               fontWeight: FontWeight.w700,
@@ -295,7 +295,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                             ),
                                       ),
                                       Text(
-                                        '${log.orgasmsPartner}',
+                                        '${log.partnerOrgasmCount}',
                                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                               color: AppTheme.colors.text,
                                               fontWeight: FontWeight.w700,
@@ -313,22 +313,22 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                         loading: () => const SizedBox.shrink(),
                         error: (_, __) => const SizedBox.shrink(),
                       ),
-                    if (log.orgasmsMe > 0 || log.orgasmsPartner > 0)
+                    if (log.userOrgasmCount > 0 || log.partnerOrgasmCount > 0)
                       const SizedBox(height: AppSpacing.md),
 
                     // Duration
-                    if (log.durationMinutes != null)
+                    if (log.duration != null)
                       _DetailSection(
                         icon: PhosphorIconsBold.clock,
                         title: 'Duration',
                         child: Text(
-                          '${log.durationMinutes} minutes',
+                          '${log.duration} minutes',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: AppTheme.colors.text,
                               ),
                         ),
                       ),
-                    if (log.durationMinutes != null) const SizedBox(height: AppSpacing.md),
+                    if (log.duration != null) const SizedBox(height: AppSpacing.md),
 
                     // Location
                     if (log.location != null && log.location!.isNotEmpty)

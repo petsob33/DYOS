@@ -7,5 +7,5 @@ import 'app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const ProviderScope(child: DYOSRoot()));
+  runApp(const ProviderScope(child: OurOSRoot()));
 }
