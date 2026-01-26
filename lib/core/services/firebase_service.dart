@@ -296,4 +296,223 @@ final partnerUserDoc = results[1];
       return null;
     }
   }
+
+  /// Update user's status in the couple document
+  /// 
+  /// Updates the emoji and text status for the current user.
+  /// The status is stored in the couple document for quick access.
+  /// This will trigger a real-time update for the partner.
+  Future<void> updateStatus({
+    required String coupleId,
+    required String userId,
+    required String emoji,
+    required String text,
+  }) async {
+    try {
+      final coupleRef = _firestore.collection('couples').doc(coupleId);
+      
+      // Update the status map in the couple document
+      await coupleRef.update({
+        'status.$userId': {
+          'emoji': emoji,
+          'text': text,
+          'updatedAt': Timestamp.now(),
+        },
+      });
+      
+      print('DEBUG updateStatus: Status updated for user $userId');
+    } catch (e, stackTrace) {
+      print('ERROR in updateStatus: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
+  /// Send haptic touch signal to partner
+  /// 
+  /// Creates a haptic signal document in Firestore that the partner's app
+  /// will listen to and trigger a vibration.
+  Future<void> sendHapticTouch({
+    required String coupleId,
+    required String fromUserId,
+    required int durationMs,
+  }) async {
+    try {
+      final signalsRef = _firestore
+          .collection('couples')
+          .doc(coupleId)
+          .collection('haptic_signals')
+          .doc();
+      
+      await signalsRef.set({
+        'fromUserId': fromUserId,
+        'durationMs': durationMs,
+        'timestamp': Timestamp.now(),
+        'read': false,
+      });
+      
+      print('DEBUG sendHapticTouch: Haptic signal sent');
+    } catch (e, stackTrace) {
+      print('ERROR in sendHapticTouch: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
+  /// Send quick message to partner
+  /// 
+  /// Creates a quick message document in Firestore that will trigger
+  /// a notification for the partner.
+  Future<void> sendQuickMessage({
+    required String coupleId,
+    required String fromUserId,
+    required String message,
+  }) async {
+    try {
+      final messagesRef = _firestore
+          .collection('couples')
+          .doc(coupleId)
+          .collection('quick_messages')
+          .doc();
+      
+      await messagesRef.set({
+        'fromUserId': fromUserId,
+        'message': message,
+        'timestamp': Timestamp.now(),
+        'read': false,
+      });
+      
+      print('DEBUG sendQuickMessage: Quick message sent');
+    } catch (e, stackTrace) {
+      print('ERROR in sendQuickMessage: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
+  /// Delete user account and all associated data
+  /// 
+  /// This is a destructive operation that permanently deletes:
+  /// - User document from Firestore
+  /// - Couple document (if user is paired) and all subcollections
+  /// - Partner's coupleId reference (if paired)
+  /// - Firebase Auth account
+  /// 
+  /// WARNING: This operation cannot be undone!
+  /// 
+  /// Process:
+  /// 1. Get current user data
+  /// 2. If user has coupleId, handle couple deletion:
+  ///    - Get couple data
+  ///    - Find partner
+  ///    - Delete all couple subcollections (memories, intimacy_logs, notes, etc.)
+  ///    - Delete couple document
+  ///    - Remove coupleId from partner's user document
+  /// 3. Delete user document from Firestore
+  /// 4. Delete Firebase Auth account
+  /// 
+  /// Throws: Exception if deletion fails at any step
+  Future<void> deleteAccount() async {
+    final user = currentUser;
+    if (user == null) {
+      throw Exception('No user is currently signed in');
+    }
+
+    try {
+      // Step 1: Get user data
+      final userData = await getUserData();
+      if (userData == null) {
+        throw Exception('User data not found');
+      }
+
+      final batch = _firestore.batch();
+
+      // Step 2: Handle couple deletion if user is paired
+      if (userData.coupleId != null && userData.coupleId!.isNotEmpty) {
+        final couple = await getCoupleData(userData.coupleId!);
+        
+        if (couple != null) {
+          // Find partner
+          final partnerUid = couple.members.firstWhere(
+            (uid) => uid != user.uid,
+            orElse: () => '',
+          );
+
+          // Delete all subcollections
+          // Note: Firestore batch operations have a limit of 500 operations
+          // We delete subcollections in separate batches to handle large amounts of data
+          final subcollections = [
+            'memories',
+            'intimacy_logs',
+            'notes',
+            'cycle_logs',
+            'cycle_settings',
+            'haptic_signals',
+            'quick_messages',
+          ];
+
+          // Delete each subcollection in batches
+          for (final subcollection in subcollections) {
+            final subcollectionRef = _firestore
+                .collection('couples')
+                .doc(userData.coupleId!)
+                .collection(subcollection);
+            
+            // Delete documents in batches of 500 (Firestore batch limit)
+            QuerySnapshot? snapshot;
+            do {
+              snapshot = await subcollectionRef
+                  .limit(500)
+                  .get();
+              
+              if (snapshot.docs.isNotEmpty) {
+                final deleteBatch = _firestore.batch();
+                for (final doc in snapshot.docs) {
+                  deleteBatch.delete(doc.reference);
+                }
+                await deleteBatch.commit();
+              }
+            } while (snapshot.docs.length == 500);
+          }
+
+          // Create final batch for couple and user documents
+          final finalBatch = _firestore.batch();
+
+          // Delete couple document
+          final coupleRef = _firestore.collection('couples').doc(userData.coupleId!);
+          finalBatch.delete(coupleRef);
+
+          // Remove coupleId from partner's user document
+          if (partnerUid.isNotEmpty) {
+            final partnerRef = _firestore.collection('users').doc(partnerUid);
+            finalBatch.update(partnerRef, {'coupleId': FieldValue.delete()});
+          }
+
+          // Delete user document
+          final userRef = _firestore.collection('users').doc(user.uid);
+          finalBatch.delete(userRef);
+
+          // Commit final batch
+          await finalBatch.commit();
+        } else {
+          // User not paired - just delete user document
+          final userRef = _firestore.collection('users').doc(user.uid);
+          await userRef.delete();
+        }
+      } else {
+        // User not paired - just delete user document
+        final userRef = _firestore.collection('users').doc(user.uid);
+        await userRef.delete();
+      }
+
+      // Step 4: Delete Firebase Auth account
+      await user.delete();
+
+      print('DEBUG deleteAccount: Account deleted successfully');
+    } catch (e, stackTrace) {
+      print('ERROR in deleteAccount: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
 }

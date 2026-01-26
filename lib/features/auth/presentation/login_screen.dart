@@ -119,6 +119,118 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  /// Show forgot password dialog
+  /// 
+  /// Displays a dialog where user can enter their email to receive
+  /// a password reset link.
+  Future<void> _showForgotPasswordDialog(BuildContext context) async {
+    final emailController = TextEditingController(text: _emailController.text);
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        title: Text(
+          'Reset Password',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.colors.text,
+              ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Enter your email address and we\'ll send you a link to reset your password.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.colors.textSecondary,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'your@email.com',
+                prefixIcon: Icon(
+                  PhosphorIconsBold.envelope,
+                  color: AppTheme.colors.textSecondary,
+                ),
+                filled: true,
+                fillColor: AppTheme.colors.card,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: AppTheme.colors.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              if (emailController.text.trim().isNotEmpty &&
+                  emailController.text.contains('@')) {
+                Navigator.of(context).pop(true);
+              }
+            },
+            child: Text(
+              'Send',
+              style: TextStyle(
+                color: AppTheme.colors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && emailController.text.trim().isNotEmpty) {
+      try {
+        final authService = ref.read(authServiceProvider);
+        await authService.sendPasswordResetEmail(emailController.text.trim());
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Password reset email sent! Check your inbox.'),
+              backgroundColor: AppTheme.colors.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: AppTheme.colors.love,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
   /// Handle login form submission
   /// 
   /// Process:
@@ -401,6 +513,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     }
                     return null;
                   },
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                
+                // Forgot Password Link
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _isLoading ? null : () => _showForgotPasswordDialog(context),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
+                      ),
+                    ),
+                    child: Text(
+                      'Forgot password?',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppTheme.colors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),

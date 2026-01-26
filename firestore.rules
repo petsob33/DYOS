@@ -180,6 +180,58 @@ service cloud.firestore {
         // Smazání zakázáno (settings by se neměly mazat)
         allow delete: if false;
       }
+      
+      // --------------------------------------------
+      // HAPTIC SIGNALS (Subcollection)
+      // --------------------------------------------
+      match /haptic_signals/{signalId} {
+        // Funkce pro členství v páru
+        function isCoupleMember() {
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+
+        // Čtení pro členy páru
+        allow get, list: if isCoupleMember();
+        
+        // Vytvoření: Člen páru, musí být odesílatel a fromUserId musí být v members
+        allow create: if isCoupleMember() &&
+                         request.resource.data.fromUserId == request.auth.uid &&
+                         request.resource.data.fromUserId in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        
+        // Update: Člen páru (pro označení jako přečtené)
+        allow update: if isCoupleMember();
+        
+        // Smazání: Člen páru
+        allow delete: if isCoupleMember();
+      }
+      
+      // --------------------------------------------
+      // QUICK MESSAGES (Subcollection)
+      // --------------------------------------------
+      match /quick_messages/{messageId} {
+        // Funkce pro členství v páru
+        function isCoupleMember() {
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+
+        // Čtení pro členy páru
+        allow get, list: if isCoupleMember();
+        
+        // Vytvoření: Člen páru, musí být odesílatel a fromUserId musí být v members
+        allow create: if isCoupleMember() &&
+                         request.resource.data.fromUserId == request.auth.uid &&
+                         request.resource.data.fromUserId in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        
+        // Update: Člen páru (pro označení jako přečtené)
+        allow update: if isCoupleMember();
+        
+        // Smazání: Člen páru
+        allow delete: if isCoupleMember();
+      }
     }
     
     // ============================================

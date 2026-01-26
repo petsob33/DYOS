@@ -246,6 +246,22 @@ class AuthService {
     await _auth.signOut();
   }
 
+  /// Send password reset email
+  /// 
+  /// Sends a password reset email to the user's email address.
+  /// The email contains a link that allows the user to reset their password.
+  /// 
+  /// [email] - User's email address
+  /// 
+  /// Throws: String with user-friendly error message
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
+  }
+
   /// Generate unique invite code for user pairing
   /// 
   /// Creates a code in the format "NAME-1234" where:
