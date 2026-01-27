@@ -24,25 +24,13 @@ class FirebaseService {
   // Check if user exists and has a couple
   Future<UserModel?> getUserData() async {
     final user = currentUser;
-    if (user == null) {
-      print('DEBUG getUserData: No current user');
-      return null;
-    }
+    if (user == null) return null;
 
     try {
-      print('DEBUG getUserData: Loading user data for UID: ${user.uid}');
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      print('DEBUG getUserData: Document exists: ${doc.exists}');
-      if (!doc.exists) {
-        print('DEBUG getUserData: User document does not exist');
-        return null;
-      }
-      final userModel = UserModel.fromFirestore(doc);
-      print('DEBUG getUserData: User loaded - displayName: ${userModel.displayName}, email: ${userModel.email}, coupleId: ${userModel.coupleId}');
-      return userModel;
+      if (!doc.exists) return null;
+      return UserModel.fromFirestore(doc);
     } catch (e, stackTrace) {
-      print('ERROR in getUserData: $e');
-      print('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -184,10 +172,6 @@ final partnerUserDoc = results[1];
 
     // Debug: print what we're saving
     final coupleJson = couple.toJson();
-    print('DEBUG pairUsers: Saving couple - ID: $coupleId');
-    print('DEBUG pairUsers: Members in couple object: ${couple.members}');
-    print('DEBUG pairUsers: Members in JSON: ${coupleJson['members']}');
-    print('DEBUG pairUsers: JSON keys: ${coupleJson.keys.join(", ")}');
 
     // Set the couple document
     batch.set(coupleRef, coupleJson);
@@ -204,26 +188,14 @@ final partnerUserDoc = results[1];
     return couple;
   }
 
-  // Get couple data
   Future<CoupleModel?> getCoupleData(String coupleId) async {
     try {
-      print('DEBUG getCoupleData: Loading couple with ID: $coupleId');
       final doc = await _firestore.collection('couples').doc(coupleId).get();
-      if (!doc.exists) {
-        print('DEBUG getCoupleData: Document does not exist');
-        return null;
-      }
-      final data = doc.data()!;
-      print('DEBUG getCoupleData: Document data keys: ${data.keys.join(", ")}');
-      print('DEBUG getCoupleData: Members in data: ${data['members']}');
-      print('DEBUG getCoupleData: Members type: ${data['members']?.runtimeType}');
-      
-      // Use fromFirestore to properly set the id field
-      final couple = CoupleModel.fromFirestore(doc);
-      print('DEBUG getCoupleData: Couple loaded - id: ${couple.id}, members: ${couple.members}, members count: ${couple.members.length}');
-      return couple;
+      if (!doc.exists) return null;
+      return CoupleModel.fromFirestore(doc);
     } catch (e, stackTrace) {
-      print('ERROR in getCoupleData: $e');
+      // Log error for debugging but don't throw to prevent app crashes
+      print('Error loading couple data for coupleId $coupleId: $e');
       print('Stack trace: $stackTrace');
       return null;
     }
@@ -235,64 +207,31 @@ final partnerUserDoc = results[1];
     return userData?.coupleId != null && userData!.coupleId!.isNotEmpty;
   }
 
-  /// Get partner's user data
-  /// 
-  /// Finds the partner user by looking at the couple's members array
-  /// and returning the user that is not the current user.
-  /// 
-  /// Returns: UserModel of the partner, or null if not found
   Future<UserModel?> getPartner() async {
-    print('DEBUG getPartner: Starting...');
     final user = currentUser;
-    if (user == null) {
-      print('DEBUG getPartner: No current user');
-      return null;
-    }
-    print('DEBUG getPartner: Current user UID: ${user.uid}');
+    if (user == null) return null;
 
     try {
-      // Get current user's data to find coupleId
       final userData = await getUserData();
-      print('DEBUG getPartner: User data loaded - coupleId: ${userData?.coupleId ?? 'null'}');
       if (userData?.coupleId == null || userData!.coupleId!.isEmpty) {
-        print('DEBUG getPartner: User is not paired');
-        return null; // User is not paired
-      }
-
-      // Get couple data
-      final couple = await getCoupleData(userData.coupleId!);
-      print('DEBUG getPartner: Couple data loaded - members: ${couple?.members ?? 'null'}');
-      if (couple == null) {
-        print('DEBUG getPartner: Couple not found');
         return null;
       }
 
-      // Find partner's UID (the other member, not the current user)
+      final couple = await getCoupleData(userData.coupleId!);
+      if (couple == null) return null;
+
       final partnerUid = couple.members.firstWhere(
         (uid) => uid != user.uid,
         orElse: () => '',
       );
 
-      print('DEBUG getPartner: Partner UID found: $partnerUid');
-      if (partnerUid.isEmpty) {
-        print('DEBUG getPartner: Partner UID is empty. Members: ${couple.members}, Current user: ${user.uid}');
-        return null;
-      }
+      if (partnerUid.isEmpty) return null;
 
-      // Get partner's user document
       final partnerDoc = await _firestore.collection('users').doc(partnerUid).get();
-      print('DEBUG getPartner: Partner document exists: ${partnerDoc.exists}');
-      if (!partnerDoc.exists) {
-        print('DEBUG getPartner: Partner document does not exist for UID: $partnerUid');
-        return null;
-      }
+      if (!partnerDoc.exists) return null;
 
-      final partner = UserModel.fromFirestore(partnerDoc);
-      print('DEBUG getPartner: Partner loaded successfully - UID: ${partner.uid}, displayName: ${partner.displayName}, email: ${partner.email}');
-      return partner;
+      return UserModel.fromFirestore(partnerDoc);
     } catch (e, stackTrace) {
-      print('ERROR in getPartner: $e');
-      print('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -320,10 +259,7 @@ final partnerUserDoc = results[1];
         },
       });
       
-      print('DEBUG updateStatus: Status updated for user $userId');
     } catch (e, stackTrace) {
-      print('ERROR in updateStatus: $e');
-      print('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -351,10 +287,7 @@ final partnerUserDoc = results[1];
         'read': false,
       });
       
-      print('DEBUG sendHapticTouch: Haptic signal sent');
     } catch (e, stackTrace) {
-      print('ERROR in sendHapticTouch: $e');
-      print('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -382,10 +315,7 @@ final partnerUserDoc = results[1];
         'read': false,
       });
       
-      print('DEBUG sendQuickMessage: Quick message sent');
     } catch (e, stackTrace) {
-      print('ERROR in sendQuickMessage: $e');
-      print('Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -508,10 +438,7 @@ final partnerUserDoc = results[1];
       // Step 4: Delete Firebase Auth account
       await user.delete();
 
-      print('DEBUG deleteAccount: Account deleted successfully');
     } catch (e, stackTrace) {
-      print('ERROR in deleteAccount: $e');
-      print('Stack trace: $stackTrace');
       rethrow;
     }
   }

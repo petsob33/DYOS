@@ -20,6 +20,7 @@ import '../../../events/presentation/event_provider.dart';
 import '../../../tracker/presentation/intimacy_provider.dart';
 import '../../../tracker/domain/intimacy_log_model.dart';
 import '../../../../core/services/firebase_service.dart';
+import '../../../../core/services/notification_service.dart';
 import 'package:flutter/services.dart';
 import '../haptic_listener_provider.dart';
 
@@ -31,79 +32,309 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  ProviderSubscription<AsyncValue<DateTime?>>? _hapticSubscription;
+  ProviderSubscription<AsyncValue<Map<String, dynamic>?>>? _messageSubscription;
+
   @override
   void initState() {
     super.initState();
     // Setup listeners after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeNotifications();
       _setupListeners();
     });
   }
 
-  void _setupListeners() {
-    // Listen for haptic signals
-    ref.listen(hapticSignalsStreamProvider, (previous, next) {
-      next.whenData((timestamp) {
-        if (timestamp != null && mounted) {
-          // Show visual notification for haptic signal
-          _showHapticNotification();
-        }
-      });
-    });
-    
-    // Listen for quick messages
-    ref.listen(quickMessagesStreamProvider, (previous, next) {
-      next.whenData((message) {
-        if (message != null && mounted) {
-          _showQuickMessageNotification(message['message'] as String? ?? '');
-        }
-      });
-    });
+  Future<void> _initializeNotifications() async {
+    try {
+      print('Initializing notifications in home screen...');
+      final notificationService = ref.read(notificationServiceProvider);
+      await notificationService.initialize();
+      final granted = await notificationService.requestPermissions();
+      print('Notification permissions granted: $granted');
+      if (!granted) {
+        print('WARNING: Notification permissions not granted. Notifications may not work.');
+      }
+    } catch (e, stackTrace) {
+      print('Error initializing notifications: $e');
+      print('Stack trace: $stackTrace');
+      print('NOTE: This might be because the app needs a full restart (not hot reload) after adding flutter_local_notifications');
+    }
   }
 
-  void _showHapticNotification() {
-    // Show overlay notification for haptic signal
-    showDialog(
-      context: context,
-      barrierColor: Colors.transparent,
-      barrierDismissible: true,
-      builder: (context) => _HapticNotificationOverlay(),
+  @override
+  void dispose() {
+    _hapticSubscription?.close();
+    _messageSubscription?.close();
+    super.dispose();
+  }
+
+  void _setupListeners() {
+    // Listen for haptic signals using listenManual (can be used outside build)
+    _hapticSubscription = ref.listenManual(
+      hapticSignalsStreamProvider,
+      (previous, next) {
+        print('Haptic signal stream update: ${next.valueOrNull}');
+        next.when(
+          data: (timestamp) {
+            print('Haptic signal received, timestamp: $timestamp, mounted: $mounted');
+            if (timestamp != null && mounted) {
+              // Show visual notification for haptic signal
+              print('Showing haptic notification');
+              _showHapticNotification();
+            } else {
+              print('Not showing haptic notification - timestamp: $timestamp, mounted: $mounted');
+            }
+          },
+          loading: () {
+            print('Haptic signal stream loading');
+          },
+          error: (error, stack) {
+            print('Error in haptic signal stream: $error');
+          },
+        );
+      },
+    );
+    
+    // Listen for quick messages using listenManual
+    _messageSubscription = ref.listenManual(
+      quickMessagesStreamProvider,
+      (previous, next) {
+        print('Quick message stream update: ${next.valueOrNull}');
+        next.when(
+          data: (message) {
+            print('Quick message received: $message, mounted: $mounted');
+            if (message != null && mounted) {
+              final messageText = message['message'] as String? ?? '';
+              print('Showing quick message notification: $messageText');
+              _showQuickMessageNotification(messageText);
+            } else {
+              print('Not showing quick message - message: $message, mounted: $mounted');
+            }
+          },
+          loading: () {
+            print('Quick message stream loading');
+          },
+          error: (error, stack) {
+            print('Error in quick message stream: $error');
+          },
+        );
+      },
     );
   }
 
-  void _showQuickMessageNotification(String message) {
-    // Show prominent notification for quick message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
+  void _showHapticNotification() {
+    print('_showHapticNotification called');
+    
+    // Show system notification
+    try {
+      final notificationService = ref.read(notificationServiceProvider);
+      notificationService.showHapticNotification();
+      print('Haptic system notification shown');
+    } catch (e) {
+      print('Error showing haptic system notification: $e');
+    }
+    
+    // Also show overlay if app is in foreground
+    if (mounted && context.mounted) {
+      try {
+        showDialog(
+          context: context,
+          barrierColor: Colors.transparent,
+          barrierDismissible: true,
+          builder: (dialogContext) {
+            print('Building haptic notification overlay');
+            return _HapticNotificationOverlay();
+          },
+        );
+        print('Haptic notification overlay shown');
+      } catch (e, stackTrace) {
+        print('Error showing haptic notification overlay: $e');
+        print('Stack trace: $stackTrace');
+      }
+    }
+  }
+
+  Future<void> _testNotifications(BuildContext context, WidgetRef ref) async {
+    final firebaseService = ref.read(firebaseServiceProvider);
+    
+    // Get user and couple data - ref.read on FutureProvider returns AsyncValue
+    final userAsync = ref.read(currentUserDataProvider);
+    final coupleAsync = ref.read(currentCoupleProvider);
+    
+    // Get the actual values from AsyncValue
+    final user = userAsync.valueOrNull;
+    final couple = coupleAsync.valueOrNull;
+
+    if (user == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('User not found'),
+            backgroundColor: AppTheme.colors.love,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (couple == null || user.coupleId == null || user.coupleId!.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Not paired. Please pair first.'),
+            backgroundColor: AppTheme.colors.love,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
+    // Capture values for use in dialog closures
+    final userId = user.uid;
+    final coupleId = user.coupleId!;
+
+    // Show dialog to choose test type
+    if (!context.mounted) return;
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Test Notifications'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              PhosphorIconsBold.chatCircle,
-              color: Colors.white,
-              size: 24,
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+                try {
+                  print('Sending haptic touch - coupleId: $coupleId, fromUserId: $userId');
+                  await firebaseService.sendHapticTouch(
+                    coupleId: coupleId,
+                    fromUserId: userId,
+                    durationMs: 200,
+                  );
+                  print('Haptic touch sent successfully');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Haptic signal sent! Check console/logs for details.'),
+                        backgroundColor: AppTheme.colors.success,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                } catch (e, stackTrace) {
+                  print('Error sending haptic touch: $e');
+                  print('Stack trace: $stackTrace');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: $e'),
+                        backgroundColor: AppTheme.colors.love,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 5),
+                      ),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(PhosphorIconsBold.handTap),
+              label: const Text('Test Haptic Signal'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.colors.primary,
+                foregroundColor: Colors.white,
+              ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+            const SizedBox(height: AppSpacing.md),
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+                try {
+                  final testMessage = 'Test zpráva - ${DateTime.now().toString().substring(11, 19)}';
+                  print('Sending quick message - coupleId: $coupleId, fromUserId: $userId, message: $testMessage');
+                  await firebaseService.sendQuickMessage(
+                    coupleId: coupleId,
+                    fromUserId: userId,
+                    message: testMessage,
+                  );
+                  print('Quick message sent successfully');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Quick message sent! Check console/logs for details.'),
+                        backgroundColor: AppTheme.colors.success,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                } catch (e, stackTrace) {
+                  print('Error sending quick message: $e');
+                  print('Stack trace: $stackTrace');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: $e'),
+                        backgroundColor: AppTheme.colors.love,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 5),
+                      ),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(PhosphorIconsBold.chatCircle),
+              label: const Text('Test Quick Message'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.colors.primary,
+                foregroundColor: Colors.white,
               ),
             ),
           ],
         ),
-        backgroundColor: AppTheme.colors.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        margin: const EdgeInsets.all(AppSpacing.md),
-        duration: const Duration(seconds: 4),
-        elevation: 8,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
     );
+  }
+
+  void _showQuickMessageNotification(String message) {
+    print('_showQuickMessageNotification called with message: $message');
+    
+    // Show system notification
+    try {
+      final notificationService = ref.read(notificationServiceProvider);
+      notificationService.showQuickMessageNotification(message);
+      print('Quick message system notification shown');
+    } catch (e) {
+      print('Error showing quick message system notification: $e');
+    }
+    
+    // Also show overlay if app is in foreground
+    if (mounted && context.mounted) {
+      try {
+        showDialog(
+          context: context,
+          barrierColor: Colors.transparent,
+          barrierDismissible: true,
+          builder: (dialogContext) {
+            print('Building quick message notification overlay');
+            return _QuickMessageNotificationOverlay(message: message);
+          },
+        );
+        print('Quick message notification overlay shown');
+      } catch (e, stackTrace) {
+        print('Error showing quick message notification overlay: $e');
+        print('Stack trace: $stackTrace');
+      }
+    }
   }
 
   @override
@@ -112,37 +343,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.watch(hapticSignalsStreamProvider);
     ref.watch(quickMessagesStreamProvider);
 
-    // 1. Načtení providerů
     final isPairedAsync = ref.watch(isUserPairedProvider);
     final currentUserAsync = ref.watch(currentUserDataProvider);
     final coupleAsync = ref.watch(currentCoupleProvider);
     final partnerAsync = ref.watch(partnerProvider);
 
-    // 2. Debug výpis STAVU všech providerů
-    debugPrint('=== HOME SCREEN DEBUG ===');
-    debugPrint('isPaired: isLoading=${isPairedAsync.isLoading}, hasValue=${isPairedAsync.hasValue}, value=${isPairedAsync.value}');
-    debugPrint('currentUser: isLoading=${currentUserAsync.isLoading}, hasValue=${currentUserAsync.hasValue}, hasError=${currentUserAsync.hasError}');
-    if (currentUserAsync.hasValue) {
-      debugPrint('currentUser data: ${currentUserAsync.value?.displayName ?? 'null'} (${currentUserAsync.value?.uid ?? 'no uid'})');
-    }
-    debugPrint('couple: isLoading=${coupleAsync.isLoading}, hasValue=${coupleAsync.hasValue}, hasError=${coupleAsync.hasError}');
-    debugPrint('partner: isLoading=${partnerAsync.isLoading}, hasValue=${partnerAsync.hasValue}, hasError=${partnerAsync.hasError}');
-    if (partnerAsync.hasValue) {
-      debugPrint('partner data: ${partnerAsync.value?.displayName ?? 'null'} (${partnerAsync.value?.uid ?? 'no uid'})');
-    }
-    if (partnerAsync.hasError) {
-      debugPrint('partner error: ${partnerAsync.error}');
-    }
-    debugPrint('========================');
-
-    // 3. Logika pro přesměrování (pokud není spárován)
     if (isPairedAsync.hasValue && isPairedAsync.value == false) {
-       return Scaffold(body: const Center(child: CircularProgressIndicator()));
+      return Scaffold(body: const Center(child: CircularProgressIndicator()));
     }
 
-    // --- OPRAVA: Čekání na klíčová data ---
-    // Pokud se načítá uživatel NEBO pár, zobrazíme loading celé obrazovky.
-    // Tím zajistíme, že zbytek kódu už bude mít data k dispozici.
     if (currentUserAsync.isLoading || coupleAsync.isLoading) {
       return Scaffold(
         backgroundColor: AppTheme.colors.background,
@@ -206,6 +415,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         actions: [
+          // Test notification button (for debugging)
+          IconButton(
+            icon: Icon(
+              PhosphorIconsBold.bell,
+              color: AppTheme.colors.primary,
+            ),
+            onPressed: () => _testNotifications(context, ref),
+            tooltip: 'Test Notifications',
+          ),
           IconButton(
             icon: Icon(
               PhosphorIconsBold.gear,
@@ -345,10 +563,6 @@ class _StatusHeader extends StatelessWidget {
                     ? couple.status![partner.uid]
                     : null;
                 
-                // Debug: print both names to see what we have
-                debugPrint('Current user: ${currentUser?.displayName ?? 'null'} (${currentUser?.uid ?? 'no uid'})');
-                debugPrint('Partner: ${partner?.displayName ?? 'null'} (${partner?.uid ?? 'no uid'})');
-                debugPrint('Couple members: ${couple.members}');
                 
                 return BentoCard(
                   padding: const EdgeInsets.all(AppSpacing.lg),
@@ -416,8 +630,6 @@ class _StatusHeader extends StatelessWidget {
                 ),
               ),
               error: (error, stackTrace) {
-                debugPrint('Partner error: $error');
-                debugPrint('Stack trace: $stackTrace');
                 return BentoCard(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Row(
@@ -810,8 +1022,6 @@ class _QuickNoteCard extends ConsumerWidget {
         content: '',
       ),
       error: (error, stackTrace) {
-        debugPrint('Error loading latest note: $error');
-        debugPrint('Stack trace: $stackTrace');
         return QuickNoteCard(
           content: '',
           onTap: () {
@@ -946,7 +1156,6 @@ class _EventsCard extends ConsumerWidget {
         ),
       ),
       error: (error, stackTrace) {
-        debugPrint('Error loading events: $error');
         return BentoCard(
           child: InkWell(
             onTap: () {
@@ -1813,6 +2022,142 @@ class _HapticNotificationOverlayState extends State<_HapticNotificationOverlay>
   }
 }
 
+class _QuickMessageNotificationOverlay extends StatefulWidget {
+  final String message;
+  
+  const _QuickMessageNotificationOverlay({required this.message});
+
+  @override
+  State<_QuickMessageNotificationOverlay> createState() => _QuickMessageNotificationOverlayState();
+}
+
+class _QuickMessageNotificationOverlayState extends State<_QuickMessageNotificationOverlay>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
+      ),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.5),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    _controller.forward();
+    
+    // Auto-dismiss after 4 seconds
+    Future.delayed(const Duration(milliseconds: 4000), () {
+      if (mounted) {
+        _controller.reverse().then((_) {
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: FadeTransition(
+                opacity: _opacityAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: BentoCard(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          decoration: BoxDecoration(
+                            color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.chatCircle,
+                            color: AppTheme.colors.primary,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Quick Message',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: AppTheme.colors.textSecondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                widget.message,
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: AppTheme.colors.text,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ListsCard extends ConsumerWidget {
   const _ListsCard();
 
@@ -1939,7 +2284,6 @@ class _ListsCard extends ConsumerWidget {
         ),
       ),
       error: (error, stackTrace) {
-        debugPrint('Error loading lists: $error');
         return BentoCard(
           child: InkWell(
             onTap: () {

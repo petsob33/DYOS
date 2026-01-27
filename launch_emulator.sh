@@ -1,55 +1,60 @@
 #!/bin/bash
 
-# Script to launch Android emulator with keyboard support enabled
-# This ensures keyboard input works even if config.ini doesn't have it set
+# Script to launch Android emulator and fix keyboard input
 
-echo "🚀 Launching Android emulator with keyboard support..."
+echo "Launching Android emulator..."
 
-# Check if emulator name is provided
-if [ -z "$1" ]; then
-    echo "Available emulators:"
-    flutter emulators
-    echo ""
-    echo "Usage: $0 <emulator_name>"
-    echo "Example: $0 Pixel_6_Keyboard_Fixed"
+# Check if emulator is already running
+RUNNING=$(adb devices | grep "emulator" | wc -l)
+if [ "$RUNNING" -gt 0 ]; then
+    echo "Emulator is already running. Fixing keyboard..."
+    ./fix_emulator_keyboard.sh
+    exit 0
+fi
+
+# Get list of available emulators
+# Try to get emulator IDs from flutter emulators output
+EMULATOR_LIST=$(flutter emulators 2>/dev/null | tail -n +4 | awk '{print $1}' | grep -v "^$")
+
+if [ -z "$EMULATOR_LIST" ]; then
+    echo "No emulators found. Please create an emulator first."
     exit 1
 fi
 
-EMULATOR_NAME="$1"
+# Use first available emulator or the one specified as argument
+EMULATOR_ID=${1:-$(echo "$EMULATOR_LIST" | head -n1)}
 
-# Check if emulator exists
-if ! flutter emulators | grep -q "$EMULATOR_NAME"; then
-    echo "❌ Emulator '$EMULATOR_NAME' not found"
-    echo ""
-    echo "Available emulators:"
-    flutter emulators
+if [ -z "$EMULATOR_ID" ]; then
+    echo "Could not determine emulator ID. Available emulators:"
+    echo "$EMULATOR_LIST"
     exit 1
 fi
 
-# Get the AVD path
-AVD_DIR="$HOME/.android/avd"
-CONFIG_FILE="$AVD_DIR/${EMULATOR_NAME}.avd/config.ini"
+echo "Launching emulator: $EMULATOR_ID"
+flutter emulators --launch "$EMULATOR_ID" &
 
-# Ensure keyboard is enabled in config
-if [ -f "$CONFIG_FILE" ]; then
-    if grep -q "hw.keyboard" "$CONFIG_FILE"; then
-        sed -i 's/^hw\.keyboard=.*/hw.keyboard=yes/' "$CONFIG_FILE"
-    else
-        echo "hw.keyboard=yes" >> "$CONFIG_FILE"
-    fi
-    
-    if ! grep -q "keyboard.lid" "$CONFIG_FILE"; then
-        echo "keyboard.lid=yes" >> "$CONFIG_FILE"
-    fi
-fi
+# Wait for emulator to boot
+echo "Waiting for emulator to boot..."
+sleep 5
 
-# Launch emulator with explicit keyboard parameter
-echo "Launching $EMULATOR_NAME..."
-flutter emulators --launch "$EMULATOR_NAME"
+# Wait until emulator is fully booted (checking for boot_completed)
+MAX_WAIT=120
+WAITED=0
+while [ $WAITED -lt $MAX_WAIT ]; do
+    BOOT_COMPLETE=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+    if [ "$BOOT_COMPLETE" = "1" ]; then
+        echo "Emulator is ready!"
+        break
+    fi
+    sleep 2
+    WAITED=$((WAITED + 2))
+    echo -n "."
+done
 
 echo ""
-echo "✅ Emulator launched!"
-echo "💡 If keyboard doesn't work:"
-echo "   - Wait for emulator to fully boot"
-echo "   - Try clicking in a text field"
-echo "   - Check Settings > System > Languages & input > Physical keyboard"
+
+# Fix keyboard
+echo "Fixing keyboard input..."
+./fix_emulator_keyboard.sh
+
+echo "Emulator is ready to use with keyboard input fixed!"

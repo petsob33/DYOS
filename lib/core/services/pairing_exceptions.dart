@@ -9,30 +9,30 @@ abstract class PairingException implements Exception {
 
 /// Thrown when a user attempts to pair with themselves.
 class SelfPairingException extends PairingException {
-  SelfPairingException() : super('Nelze se spárovat sám se sebou.');
+  SelfPairingException() : super('You cannot pair with yourself.');
 }
 
 /// Thrown when the current user is not found in the database.
 class UserNotFoundException extends PairingException {
-  UserNotFoundException() : super('Aktuální uživatel nebyl nalezen.');
+  UserNotFoundException() : super('Current user not found.');
 }
 
 /// Thrown when the partner user with the given code is not found.
 class PartnerNotFoundException extends PairingException {
-  PartnerNotFoundException() : super('Uživatel s tímto kódem nebyl nalezen.');
+  PartnerNotFoundException() : super('User with this code was not found.');
 }
 
 /// Thrown when the current user is already paired.
 class UserAlreadyPairedException extends PairingException {
-  UserAlreadyPairedException() : super('Váš účet je již spárován.');
+  UserAlreadyPairedException() : super('Your account is already paired.');
 }
 
 /// Thrown when the partner user is already paired.
 class PartnerAlreadyPairedException extends PairingException {
-  PartnerAlreadyPairedException() : super('Tento uživatel je již spárován.');
+  PartnerAlreadyPairedException() : super('This user is already paired.');
 }
 
 /// Generic pairing exception for unknown errors.
 class GenericPairingException extends PairingException {
-  GenericPairingException([String message = 'Při párování došlo k neznámé chybě.']) : super(message);
+  GenericPairingException([String message = 'An unknown error occurred during pairing.']) : super(message);
 }

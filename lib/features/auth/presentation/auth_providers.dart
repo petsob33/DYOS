@@ -253,26 +253,45 @@ Stream<UserModel?> user(UserRef ref) {
 /// ```
 @riverpod
 Stream<CoupleModel?> couple(CoupleRef ref) {
-  // Watch user provider to get coupleId - this is a StreamProvider
-  return ref.watch(userProvider.stream).asyncExpand((user) {
-    // If no user or no coupleId, return a stream that emits null
-    if (user?.coupleId == null || user!.coupleId!.isEmpty) {
+  // Watch user provider to get coupleId
+  // userProvider is a StreamProvider, so we need to convert AsyncValue to stream
+  return ref.watch(userProvider).when(
+    data: (user) {
+      // If no user or no coupleId, return a stream that emits null
+      if (user?.coupleId == null || user!.coupleId!.isEmpty) {
+        return Stream<CoupleModel?>.value(null);
+      }
+      
+      // Stream the couple document from Firestore
+      final firestore = FirebaseFirestore.instance;
+      return firestore
+          .collection('couples')
+          .doc(user.coupleId!)
+          .snapshots()
+          .map((doc) {
+        // Check if document exists
+        if (!doc.exists) {
+          print('Couple document ${user.coupleId} does not exist');
+          return null;
+        }
+        try {
+          // Convert to CoupleModel using fromFirestore which handles Timestamp conversion
+          final couple = CoupleModel.fromFirestore(doc);
+          print('Successfully loaded couple ${couple.id} with ${couple.members.length} members');
+          return couple;
+        } catch (e, stackTrace) {
+          // Log error for debugging
+          print('Error loading couple data from stream for coupleId ${user.coupleId}: $e');
+          print('Stack trace: $stackTrace');
+          print('Document exists: ${doc.exists}, data: ${doc.data()}');
+          return null;
+        }
+      });
+    },
+    loading: () => Stream<CoupleModel?>.value(null),
+    error: (error, stackTrace) {
+      print('Error in userProvider: $error');
       return Stream<CoupleModel?>.value(null);
-    }
-    
-    // Stream the couple document from Firestore
-    final firestore = FirebaseFirestore.instance;
-    return firestore
-        .collection('couples')
-        .doc(user.coupleId!)
-        .snapshots()
-        .map((doc) {
-      // Check if document exists
-      if (!doc.exists) return null;
-      // Convert to CoupleModel
-      final data = doc.data();
-      if (data == null) return null;
-      return CoupleModel.fromJson(data).copyWith(id: doc.id);
-    });
-  });
+    },
+  );
 }

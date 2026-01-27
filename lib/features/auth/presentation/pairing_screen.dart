@@ -9,7 +9,6 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../../core/services/firebase_service.dart';
 import '../../../core/services/pairing_exceptions.dart';
-import '../domain/user_model.dart';
 import 'auth_providers.dart';
 
 class PairingScreen extends ConsumerStatefulWidget {
@@ -25,14 +24,25 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
   bool _isSubmitting = false;
   bool _isLoading = true;
   String? _userCode;
-  String? _userName;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    // Load user data when screen initializes
     _loadUserData();
+    _checkPairingStatus();
+  }
+
+  void _checkPairingStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.listen(isUserPairedProvider, (previous, next) {
+        next.whenData((isPaired) {
+          if (isPaired == true && mounted) {
+            context.go('/home');
+          }
+        });
+      });
+    });
   }
 
   @override
@@ -41,38 +51,24 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     super.dispose();
   }
 
-  /// Load current user's data to display their invite code
-  /// 
-  /// This fetches the user document from Firestore to get:
-  /// - The user's invite code (to display and share)
-  /// - The user's display name (for personalization)
-  /// 
-  /// If the user doesn't have an inviteCode (e.g., old account),
-  /// it will be automatically generated and saved.
   Future<void> _loadUserData() async {
     try {
       final firebaseService = ref.read(firebaseServiceProvider);
       final currentUser = firebaseService.currentUser;
       
-      // Safety check: ensure user is authenticated
       if (currentUser == null) {
         if (mounted) {
           setState(() {
-            _errorMessage = 'Uživatel není přihlášen';
+            _errorMessage = 'User is not signed in';
             _isLoading = false;
           });
         }
         return;
       }
 
-      // Get user data from Firestore
       var userData = await firebaseService.getUserData();
 
-      // If user document doesn't exist, create it with inviteCode
-      // This can happen if user was created before we added inviteCode generation
       if (userData == null) {
-        // Try to create user document using createOrUpdateUser
-        // This will generate inviteCode automatically
         final displayName = currentUser.displayName ?? 'User';
         userData = await firebaseService.createOrUpdateUser(
           uid: currentUser.uid,
@@ -80,10 +76,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           displayName: displayName,
           photoUrl: currentUser.photoURL,
         );
-      } 
-      // If user exists but doesn't have inviteCode, generate and save it
-      else if (userData.inviteCode == null || userData.inviteCode!.isEmpty) {
-        // Use createOrUpdateUser to generate missing inviteCode
+      } else if (userData.inviteCode == null || userData.inviteCode!.isEmpty) {
         userData = await firebaseService.createOrUpdateUser(
           uid: currentUser.uid,
           email: userData.email,
@@ -92,33 +85,27 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
         );
       }
 
-      // Update UI with user data
       if (mounted) {
         setState(() {
           _userCode = userData?.inviteCode ?? 'N/A';
-          _userName = userData?.displayName ?? 'Uživatel';
           _isLoading = false;
         });
       }
     } catch (e) {
-      // Handle errors gracefully
       if (mounted) {
         setState(() {
-          _errorMessage = 'Chyba při načítání dat: ${e.toString()}';
+          _errorMessage = 'Error loading data: ${e.toString()}';
           _isLoading = false;
         });
       }
     }
   }
 
-  /// Copy the user's invite code to clipboard
-  /// 
-  /// Shows a snackbar confirmation when the code is copied.
   void _copyCode() {
     if (_userCode == null || _userCode == 'N/A') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Kód není k dispozici'),
+          content: const Text('Code is not available'),
           backgroundColor: AppTheme.colors.love,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -132,7 +119,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     Clipboard.setData(ClipboardData(text: _userCode!));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Kód zkopírován'),
+        content: const Text('Code copied'),
         backgroundColor: AppTheme.colors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -143,18 +130,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     );
   }
 
-  /// Submit partner's invite code to create a pair
-  /// 
-  /// This method:
-  /// 1. Validates the input code
-  /// 2. Finds the partner user by their invite code
-  /// 3. Creates a couple document in Firestore
-  /// 4. Updates both users with the coupleId
-  /// 5. Redirects to home page on success
-  /// 
-  /// Shows error messages if pairing fails.
   Future<void> _submitCode() async {
-    // Validate form first
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -168,33 +144,26 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
       final firebaseService = ref.read(firebaseServiceProvider);
       final currentUser = firebaseService.currentUser;
 
-      // Safety check: ensure user is authenticated
       if (currentUser == null) {
-        throw Exception('Uživatel není přihlášen');
+        throw Exception('User is not signed in');
       }
 
-      // Get the entered code and normalize it (uppercase)
       final partnerCode = _codeController.text.trim().toUpperCase();
-
-      // Find partner user by their invite code
       final partnerUser = await firebaseService.findUserByInviteCode(partnerCode);
 
       if (partnerUser == null) {
         throw PartnerNotFoundException();
       }
 
-      // Create the pair - this will create the couple document and update both users
       await firebaseService.pairUsers(currentUser.uid, partnerUser.uid);
 
-      // Refresh the pairing status provider to get updated status
-      // This ensures the router sees the updated pairing status before navigation
-      await ref.refresh(isUserPairedProvider.future);
+      // Wait a bit for Firestore to sync and router to see the change
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // Success! Show success message and redirect to home
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Úspěšně spárováno s ${partnerUser.displayName ?? partnerCode}!'),
+            content: Text('Successfully paired with ${partnerUser.displayName ?? partnerCode}!'),
             backgroundColor: AppTheme.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -204,13 +173,9 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           ),
         );
 
-        // Redirect to home page after successful pairing
-        // Use go() to replace the current route so user can't go back to pairing
-        // The router will now see that the user is paired and allow navigation
         context.go('/home');
       }
     } on PairingException catch (e) {
-      // Handle specific pairing errors and show user-friendly message
       if (mounted) {
         setState(() {
           _errorMessage = e.message;
@@ -218,16 +183,14 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
         });
       }
     } catch (e) {
-      // Handle other generic errors
       if (mounted) {
         setState(() {
-          _errorMessage = 'Chyba při spárování. Zkuste to prosím znovu.';
+          _errorMessage = 'Error pairing. Please try again.';
           _isSubmitting = false;
         });
       }
     }
 
-    // Show a snackbar with the error message if there is one
     if (_errorMessage != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -245,12 +208,11 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Show loading state while fetching user data
     if (_isLoading) {
       return Scaffold(
         backgroundColor: AppTheme.colors.background,
         appBar: AppBar(
-          title: const Text('Spárování'),
+          title: const Text('Pairing'),
         ),
         body: const Center(
           child: CircularProgressIndicator(),
@@ -258,12 +220,11 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
       );
     }
 
-    // Show error state if user data couldn't be loaded
     if (_errorMessage != null && _userCode == null) {
       return Scaffold(
         backgroundColor: AppTheme.colors.background,
         appBar: AppBar(
-          title: const Text('Spárování'),
+          title: const Text('Pairing'),
         ),
         body: Center(
           child: Padding(
@@ -278,7 +239,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  _errorMessage ?? 'Chyba',
+                  _errorMessage ?? 'Error',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: AppTheme.colors.text,
                       ),
@@ -287,7 +248,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 const SizedBox(height: AppSpacing.lg),
                 ElevatedButton(
                   onPressed: _loadUserData,
-                  child: const Text('Zkusit znovu'),
+                  child: const Text('Try again'),
                 ),
               ],
             ),
@@ -299,7 +260,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
       appBar: AppBar(
-        title: const Text('Spárování'),
+        title: const Text('Pairing'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -310,16 +271,14 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSpacing.xl),
-                // Icon
                 Icon(
                   PhosphorIconsBold.heart,
                   size: 80,
                   color: AppTheme.colors.primary,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                // Title
                 Text(
-                  'Propojte se s partnerem',
+                  'Connect with your partner',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppTheme.colors.text,
@@ -328,14 +287,13 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Sdílejte svůj kód nebo zadejte kód partnera',
+                  'Share your code or enter your partner\'s code',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppTheme.colors.textSecondary,
                       ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                // Your code card
                 BentoCard(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
@@ -350,7 +308,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
-                            'Váš kód',
+                            'Your code',
                             style: Theme.of(context)
                                 .textTheme
                                 .labelLarge
@@ -366,7 +324,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              _userCode ?? 'Načítání...',
+                              _userCode ?? 'Loading...',
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineSmall
@@ -381,13 +339,13 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                             icon: const Icon(PhosphorIconsBold.copy),
                             onPressed: _copyCode,
                             color: AppTheme.colors.primary,
-                            tooltip: 'Kopírovat',
+                            tooltip: 'Copy',
                           ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Sdílejte tento kód se svým partnerem',
+                        'Share this code with your partner',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: AppTheme.colors.textSecondary,
                             ),
@@ -398,7 +356,6 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                // Divider with "OR"
                 Row(
                   children: [
                     Expanded(
@@ -411,7 +368,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                         horizontal: AppSpacing.md,
                       ),
                       child: Text(
-                        'nebo',
+                        'or',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppTheme.colors.textSecondary,
                             ),
@@ -425,9 +382,8 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                // Partner code input
                 Text(
-                  'Zadejte kód partnera',
+                  'Enter partner\'s code',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: AppTheme.colors.text,
                         fontWeight: FontWeight.w600,
@@ -437,7 +393,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 TextFormField(
                   controller: _codeController,
                   decoration: InputDecoration(
-                    hintText: 'např. ANNA-1234',
+                    hintText: 'e.g. ANNA-1234',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
@@ -490,23 +446,20 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                   textCapitalization: TextCapitalization.characters,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Zadejte prosím kód';
+                      return 'Please enter a code';
                     }
                     final normalizedValue = value.trim().toUpperCase();
                     if (_userCode != null && normalizedValue == _userCode) {
-                      return 'Nemůžete se spárovat sami se sebou';
+                      return 'You cannot pair with yourself';
                     }
-                    // Basic format validation (LETTERS-NUMBERS)
-                    // Format: NAME-1234 (e.g., PETR-8821, ANNA-1234)
                     final pattern = RegExp(r'^[A-Z]+-\d+$');
                     if (!pattern.hasMatch(normalizedValue)) {
-                      return 'Neplatný formát kódu (např. PETR-8821)';
+                      return 'Invalid code format (e.g. PETR-8821)';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                // Submit button
                 ElevatedButton(
                   onPressed: _isSubmitting ? null : _submitCode,
                   style: ElevatedButton.styleFrom(
@@ -531,7 +484,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                           ),
                         )
                       : Text(
-                          'Spárovat',
+                          'Pair',
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium

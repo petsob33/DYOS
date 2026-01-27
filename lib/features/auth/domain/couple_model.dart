@@ -32,10 +32,56 @@ class CoupleModel with _$CoupleModel {
 
   /// Create CoupleModel from Firestore document
   factory CoupleModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    // Add id to data since it's required by fromJson but not stored in Firestore
-    final dataWithId = {...data, 'id': doc.id};
-    return CoupleModel.fromJson(dataWithId);
+    try {
+      final data = doc.data() as Map<String, dynamic>?;
+      if (data == null) {
+        throw Exception('Document data is null');
+      }
+      
+      // Convert Firestore data to JSON format
+      // Handle anniversaryDate - it might be Timestamp or String
+      final convertedData = <String, dynamic>{...data};
+      
+      // Convert anniversaryDate from Timestamp to ISO string if needed
+      if (convertedData['anniversaryDate'] != null) {
+        final anniversaryValue = convertedData['anniversaryDate'];
+        if (anniversaryValue is Timestamp) {
+          convertedData['anniversaryDate'] = anniversaryValue.toDate().toIso8601String();
+        } else if (anniversaryValue is! String) {
+          // Try to convert to string if it's some other type
+          convertedData['anniversaryDate'] = anniversaryValue.toString();
+        }
+      }
+      
+      // Convert status map values - ensure CoupleStatus objects are properly converted
+      if (convertedData['status'] != null && convertedData['status'] is Map) {
+        final statusMap = convertedData['status'] as Map<String, dynamic>;
+        final convertedStatus = <String, dynamic>{};
+        for (final entry in statusMap.entries) {
+          if (entry.value is Map) {
+            // Ensure updatedAt is properly converted if it's a Timestamp
+            final statusData = Map<String, dynamic>.from(entry.value as Map);
+            if (statusData['updatedAt'] != null && statusData['updatedAt'] is Timestamp) {
+              statusData['updatedAt'] = (statusData['updatedAt'] as Timestamp).toDate();
+            }
+            convertedStatus[entry.key] = statusData;
+          } else {
+            convertedStatus[entry.key] = entry.value;
+          }
+        }
+        convertedData['status'] = convertedStatus;
+      }
+      
+      // Add id to data since it's required by fromJson but not stored in Firestore
+      convertedData['id'] = doc.id;
+      
+      return CoupleModel.fromJson(convertedData);
+    } catch (e, stackTrace) {
+      print('Error in CoupleModel.fromFirestore for doc ${doc.id}: $e');
+      print('Stack trace: $stackTrace');
+      print('Document data: ${doc.data()}');
+      rethrow;
+    }
   }
 }
 

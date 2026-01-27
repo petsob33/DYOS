@@ -276,7 +276,7 @@ final userProvider = AutoDisposeStreamProvider<UserModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UserRef = AutoDisposeStreamProviderRef<UserModel?>;
-String _$coupleHash() => r'6a8b3179e8bc8dfd704c7cf2392764612d351748';
+String _$coupleHash() => r'924cf9d51426de7434a0c7a647d4d60ef85a7cb2';
 
 /// Provider that streams the current user's couple data
 ///

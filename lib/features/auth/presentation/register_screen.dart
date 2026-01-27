@@ -8,24 +8,6 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/auth_service.dart';
 
-/// Register Screen
-/// 
-/// This screen allows new users to create an account.
-/// Users can navigate here from the login screen.
-/// 
-/// Features:
-/// - Name, email, password, and confirm password input fields
-/// - Form validation (email format, password strength, password match)
-/// - Password visibility toggles for both password fields
-/// - Error message display
-/// - Loading state during registration
-/// - Link back to login screen
-/// - Back button to return to login
-/// 
-/// After successful registration:
-/// - Firebase Auth account is created
-/// - User document is created in Firestore
-/// - User is automatically redirected to home screen
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -33,63 +15,21 @@ class RegisterScreen extends ConsumerStatefulWidget {
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-/// State class for RegisterScreen
-/// 
-/// Manages:
-/// - Form state and validation
-/// - Text field controllers (name, email, password, confirm password)
-/// - Loading state
-/// - Password visibility toggles (for both password fields)
-/// - Error messages
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  /// Form key for validation
-  /// Used to trigger form validation and access form state
   final _formKey = GlobalKey<FormState>();
-  
-  /// Controller for name input field
   final _nameController = TextEditingController();
-  
-  /// Controller for email input field
   final _emailController = TextEditingController();
-  
-  /// Controller for password input field
   final _passwordController = TextEditingController();
-  
-  /// Controller for confirm password input field
-  /// Used to verify that user typed password correctly
   final _confirmPasswordController = TextEditingController();
-  
-  /// Focus node for name field
   final _nameFocusNode = FocusNode();
-  
-  /// Focus node for email field
   final _emailFocusNode = FocusNode();
-  
-  /// Focus node for password field
   final _passwordFocusNode = FocusNode();
-  
-  /// Focus node for confirm password field
   final _confirmPasswordFocusNode = FocusNode();
-  
-  /// Loading state flag
-  /// When true, shows loading indicator and disables form submission
   bool _isLoading = false;
-  
-  /// Password visibility toggle for main password field
   bool _obscurePassword = true;
-  
-  /// Password visibility toggle for confirm password field
-  /// Separate toggle allows user to verify password match if needed
   bool _obscureConfirmPassword = true;
-  
-  /// Error message to display to user
-  /// Set when registration fails, cleared when form is submitted again
   String? _errorMessage;
 
-  /// Cleanup method
-  /// 
-  /// Disposes of all text controllers and focus nodes to prevent memory leaks.
-  /// Called automatically when widget is removed from widget tree.
   @override
   void dispose() {
     _nameController.dispose();
@@ -103,14 +43,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  /// Handle Google Sign-In
-  /// 
-  /// Process:
-  /// 1. Set loading state to true, clear any previous errors
-  /// 2. Call AuthService to sign in with Google
-  /// 3. On success: Navigate to home screen
-  /// 4. On error: Display error message to user
-  /// 5. Always: Reset loading state
   Future<void> _handleGoogleSignIn() async {
     setState(() {
       _isLoading = true;
@@ -121,9 +53,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       final authService = ref.read(authServiceProvider);
       await authService.signInWithGoogle();
       
-      if (mounted) {
-        context.go('/home');
-      }
+      // Router will automatically redirect based on pairing status
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -163,45 +93,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// - Uses go_router's context.go() for navigation
   /// - Router will handle redirect if user is already authenticated
   Future<void> _handleRegister() async {
-    // Step 1: Validate form
-    // This triggers all field validators and shows error messages if invalid
     if (!_formKey.currentState!.validate()) return;
 
-    // Step 2: Update UI state
     setState(() {
-      _isLoading = true;        // Show loading indicator
-      _errorMessage = null;     // Clear previous errors
+      _isLoading = true;
+      _errorMessage = null;
     });
 
     try {
-      // Step 3: Get AuthService from Riverpod
       final authService = ref.read(authServiceProvider);
-      
-      // Step 4: Attempt registration
-      // This will:
-      // - Create Firebase Auth account
-      // - Update display name in Auth profile
-      // - Create UserModel document in Firestore
-      // Throws a string error if registration fails
       await authService.registerWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
         displayName: _nameController.text,
       );
       
-      // Step 5: Success - navigate to home
-      // Check mounted to ensure widget is still in tree
-      if (mounted) {
-        context.go('/home');
-      }
+      // Router will automatically redirect based on pairing status
     } catch (e) {
-      // Step 6: Error - display message to user
       setState(() {
         _errorMessage = e.toString();
       });
     } finally {
-      // Step 7: Always reset loading state
-      // Check mounted to prevent setState after dispose
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -210,35 +122,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  /// Build the registration screen UI
-  /// 
-  /// Layout structure:
-  /// - Scaffold with app background color
-  /// - SafeArea to avoid system UI overlap
-  /// - SingleChildScrollView for keyboard handling
-  /// - Form widget for validation
-  /// - Column with all form elements
-  /// 
-  /// UI Components (top to bottom):
-  /// 1. Back button (to return to login)
-  /// 2. App logo/icon (heart icon)
-  /// 3. Title and subtitle
-  /// 4. Name input field
-  /// 5. Email input field
-  /// 6. Password input field (with visibility toggle)
-  /// 7. Confirm password input field (with visibility toggle)
-  /// 8. Error message container (conditional)
-  /// 9. Sign up button (with loading state)
-  /// 10. Link to login screen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
-      // Ensure keyboard can appear
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: GestureDetector(
-          // Dismiss keyboard when tapping outside
           onTap: () {
             FocusScope.of(context).unfocus();
           },
@@ -253,8 +143,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               children: [
                 const SizedBox(height: AppSpacing.xl),
                 
-                // Back Button
-                // Allows user to return to login screen without completing registration
                 Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
@@ -267,7 +155,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 
-                // App Logo/Icon
                 Icon(
                   PhosphorIconsBold.heart,
                   size: 80,
@@ -286,7 +173,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 
-                // Subtitle
                 Text(
                   'Sign up to get started',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -296,8 +182,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.xxl),
                 
-                // Name Input Field
-                // First field in registration form
                 GestureDetector(
                   onTap: () {
                     _nameFocusNode.requestFocus();
@@ -354,8 +238,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 
-                // Email Input Field
-                // Same as login screen - email format validation
                 GestureDetector(
                   onTap: () {
                     _emailFocusNode.requestFocus();
@@ -364,10 +246,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: TextFormField(
                     controller: _emailController,
                     focusNode: _emailFocusNode,
-                    enabled: true,                               // Ensure field is enabled
-                    readOnly: false,                             // Ensure field is not read-only
-                    canRequestFocus: true,                       // Explicitly allow focus requests
-                    enableInteractiveSelection: true,            // Enable text selection
+                    enabled: true,
+                    readOnly: false,
+                    canRequestFocus: true,
+                    enableInteractiveSelection: true,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     onTap: () {
@@ -410,8 +292,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 
-                // Password Input Field
-                // First password field - user enters their chosen password
                 GestureDetector(
                   onTap: () {
                     _passwordFocusNode.requestFocus();
@@ -420,12 +300,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: TextFormField(
                     controller: _passwordController,
                     focusNode: _passwordFocusNode,
-                    enabled: true,                               // Ensure field is enabled
-                    readOnly: false,                             // Ensure field is not read-only
-                    canRequestFocus: true,                       // Explicitly allow focus requests
-                    enableInteractiveSelection: true,            // Enable text selection
+                    enabled: true,
+                    readOnly: false,
+                    canRequestFocus: true,
+                    enableInteractiveSelection: true,
                     obscureText: _obscurePassword,
-                    textInputAction: TextInputAction.next, // "Next" moves to confirm password
+                    textInputAction: TextInputAction.next,
                     onTap: () {
                       _passwordFocusNode.requestFocus();
                       SystemChannels.textInput.invokeMethod('TextInput.show');
@@ -470,7 +350,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a password';
                     }
-                    // Firebase requires minimum 6 characters
                     if (value.length < 6) {
                       return 'Password must be at least 6 characters';
                     }
@@ -480,9 +359,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 
-                // Confirm Password Input Field
-                // Second password field - user re-enters password to verify
-                // Has separate visibility toggle so user can verify match if needed
                 GestureDetector(
                   onTap: () {
                     _confirmPasswordFocusNode.requestFocus();
@@ -491,17 +367,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: TextFormField(
                     controller: _confirmPasswordController,
                     focusNode: _confirmPasswordFocusNode,
-                    enabled: true,                               // Ensure field is enabled
-                    readOnly: false,                             // Ensure field is not read-only
-                    canRequestFocus: true,                       // Explicitly allow focus requests
-                    enableInteractiveSelection: true,            // Enable text selection
+                    enabled: true,
+                    readOnly: false,
+                    canRequestFocus: true,
+                    enableInteractiveSelection: true,
                     obscureText: _obscureConfirmPassword,
-                    textInputAction: TextInputAction.done, // "Done" submits form
+                    textInputAction: TextInputAction.done,
                     onTap: () {
                       _confirmPasswordFocusNode.requestFocus();
                       SystemChannels.textInput.invokeMethod('TextInput.show');
                     },
-                    onFieldSubmitted: (_) => _handleRegister(), // Submit on "Done" press
+                    onFieldSubmitted: (_) => _handleRegister(),
                   decoration: InputDecoration(
                     labelText: 'Confirm password',
                     prefixIcon: Icon(
@@ -536,12 +412,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ),
                   validator: (value) {
-                    // Check if field is empty
                     if (value == null || value.isEmpty) {
                       return 'Please confirm your password';
                     }
-                    // Critical validation: passwords must match
-                    // This prevents typos that would lock user out of account
                     if (value != _passwordController.text) {
                       return 'Passwords do not match';
                     }
@@ -551,8 +424,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 
-                // Error Message Container
-                // Shows registration errors (email already in use, weak password, etc.)
                 if (_errorMessage != null)
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -621,7 +492,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 
-                // Divider with "OR"
                 Row(
                   children: [
                     Expanded(
@@ -647,7 +517,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 
-                // Google Sign-In Button
                 OutlinedButton.icon(
                   onPressed: _isLoading ? null : _handleGoogleSignIn,
                   style: OutlinedButton.styleFrom(
@@ -677,8 +546,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 
-                // Login Link
-                // Allows users to navigate back to login screen
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
