@@ -1058,100 +1058,133 @@ class _EventsCard extends ConsumerWidget {
               AddEventSheet.show(context);
             },
             borderRadius: BorderRadius.circular(24),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppTheme.colors.primary.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(16),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.colors.success.withOpacity(0.1),
+                    AppTheme.colors.success.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.success,
+                                AppTheme.colors.success.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.success.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.calendarPlus,
+                            color: Colors.white,
+                            size: 24,
+                          ),
                         ),
-                        child: Icon(
-                          PhosphorIconsBold.calendarPlus,
-                          color: AppTheme.colors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        PhosphorIconsBold.plus,
-                        color: AppTheme.colors.primary,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Add Event',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.colors.text,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Create a new event',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                        ),
-                  ),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Add Event',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: AppTheme.colors.text,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         );
       },
       loading: () => BentoCard(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppTheme.colors.primary.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.colors.success.withOpacity(0.1),
+                AppTheme.colors.success.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.success,
+                                AppTheme.colors.success.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.success.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.calendarPlus,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
-                    child: Icon(
-                      PhosphorIconsBold.calendarPlus,
-                      color: AppTheme.colors.primary,
-                      size: 24,
+                const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Add Event',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: AppTheme.colors.text,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
                     ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    PhosphorIconsBold.plus,
-                    color: AppTheme.colors.primary,
-                    size: 20,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'Add Event',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppTheme.colors.text,
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Loading...',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.colors.textSecondary,
-                    ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -1162,50 +1195,66 @@ class _EventsCard extends ConsumerWidget {
               AddEventSheet.show(context);
             },
             borderRadius: BorderRadius.circular(24),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppTheme.colors.primary.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(16),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.colors.success.withOpacity(0.1),
+                    AppTheme.colors.success.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.success,
+                                AppTheme.colors.success.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.success.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.calendarPlus,
+                            color: Colors.white,
+                            size: 24,
+                          ),
                         ),
-                        child: Icon(
-                          PhosphorIconsBold.calendarPlus,
-                          color: AppTheme.colors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        PhosphorIconsBold.plus,
-                        color: AppTheme.colors.primary,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Add Event',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.colors.text,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Create a new event',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                        ),
-                  ),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Add Event',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: AppTheme.colors.text,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1346,11 +1395,14 @@ class _IntimacySparkCard extends ConsumerWidget {
                       size: 20,
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    Text(
-                      'Intimacy',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: AppTheme.colors.textSecondary,
-                          ),
+                    Expanded(
+                      child: Text(
+                        'Intimacy',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: AppTheme.colors.textSecondary,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
@@ -1462,11 +1514,14 @@ class _IntimacySparkCard extends ConsumerWidget {
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.xs),
-                Text(
-                  'Intimacy Spark',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppTheme.colors.textSecondary,
-                      ),
+                Expanded(
+                  child: Text(
+                    'Intimacy Spark',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: AppTheme.colors.textSecondary,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -1487,11 +1542,14 @@ class _IntimacySparkCard extends ConsumerWidget {
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.xs),
-                Text(
-                  'Intimacy Spark',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppTheme.colors.textSecondary,
-                      ),
+                Expanded(
+                  child: Text(
+                    'Intimacy Spark',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: AppTheme.colors.textSecondary,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -1676,105 +1734,217 @@ class _QuickMessageCard extends ConsumerWidget {
           child: InkWell(
             onTap: () => _showQuickMessageDialog(context, ref, couple.id, currentUserId),
             borderRadius: BorderRadius.circular(24),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppTheme.colors.primary.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(16),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.colors.primary.withOpacity(0.08),
+                    AppTheme.colors.primary.withOpacity(0.03),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.primary,
+                                AppTheme.colors.primary.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.primary.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.chatCircle,
+                            color: Colors.white,
+                            size: 24,
+                          ),
                         ),
-                        child: Icon(
-                          PhosphorIconsBold.chatCircle,
-                          color: AppTheme.colors.primary,
-                          size: 24,
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Quick',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                color: AppTheme.colors.text,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.3,
+                              ),
+                          maxLines: 1,
                         ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        PhosphorIconsBold.arrowRight,
-                        color: AppTheme.colors.textSecondary,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Quick Message',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.colors.text,
-                          fontWeight: FontWeight.w700,
+                        Text(
+                          'Message',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                color: AppTheme.colors.text,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.3,
+                              ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Send a quick message',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                        ),
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         );
       },
       loading: () => BentoCard(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                PhosphorIconsBold.chatCircle,
-                color: AppTheme.colors.primary,
-                size: 24,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Quick Message',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppTheme.colors.textSecondary,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.colors.primary.withOpacity(0.08),
+                AppTheme.colors.primary.withOpacity(0.03),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.primary,
+                                AppTheme.colors.primary.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.primary.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.chatCircle,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              const Center(child: CircularProgressIndicator()),
-            ],
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  'Quick Message',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppTheme.colors.text,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ],
+            ),
           ),
         ),
       ),
       error: (_, __) => BentoCard(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                PhosphorIconsBold.chatCircle,
-                color: AppTheme.colors.primary,
-                size: 24,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Quick Message',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppTheme.colors.textSecondary,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.colors.primary.withOpacity(0.08),
+                AppTheme.colors.primary.withOpacity(0.03),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.primary,
+                                AppTheme.colors.primary.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.primary.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.chatCircle,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Error',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.colors.textSecondary,
-                    ),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  'Quick Message',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppTheme.colors.text,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -2178,108 +2348,172 @@ class _ListsCard extends ConsumerWidget {
               context.push('/lists');
             },
             borderRadius: BorderRadius.circular(24),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppTheme.colors.primary.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(
-                          PhosphorIconsBold.listChecks,
-                          color: AppTheme.colors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        PhosphorIconsBold.caretRight,
-                        color: AppTheme.colors.textSecondary,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Bucket List',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.colors.text,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  if (hasItems)
-                    Text(
-                      '$totalCount ${totalCount == 1 ? 'dream' : 'dreams'} to achieve',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.colors.warning.withOpacity(0.1),
+                    AppTheme.colors.warning.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.warning,
+                                AppTheme.colors.warning.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.warning.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                    )
-                  else
-                    Text(
-                      'Start adding your dreams together',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                          child: Icon(
+                            PhosphorIconsBold.listChecks,
+                            color: Colors.white,
+                            size: 24,
                           ),
+                        ),
+                      ],
                     ),
-                ],
+                    const SizedBox(height: AppSpacing.lg),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Bucket List',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: AppTheme.colors.text,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.3,
+                                ),
+                          ),
+                        ),
+                        if (hasItems) ...[
+                          const SizedBox(width: AppSpacing.xs),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.colors.warning.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '$totalCount',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: AppTheme.colors.warning,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         );
       },
       loading: () => BentoCard(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppTheme.colors.primary.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.colors.warning.withOpacity(0.1),
+                AppTheme.colors.warning.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppTheme.colors.warning,
+                            AppTheme.colors.warning.withOpacity(0.8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.colors.warning.withOpacity(0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        PhosphorIconsBold.listChecks,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
-                    child: Icon(
-                      PhosphorIconsBold.listChecks,
-                      color: AppTheme.colors.primary,
-                      size: 24,
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        PhosphorIconsBold.caretRight,
+                        color: AppTheme.colors.warning,
+                        size: 18,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    PhosphorIconsBold.caretRight,
-                    color: AppTheme.colors.textSecondary,
-                    size: 20,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'Bucket List',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppTheme.colors.text,
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Loading...',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.colors.textSecondary,
-                    ),
-              ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  'Bucket List',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppTheme.colors.text,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -2290,50 +2524,66 @@ class _ListsCard extends ConsumerWidget {
               context.push('/lists');
             },
             borderRadius: BorderRadius.circular(24),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppTheme.colors.primary.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(16),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.colors.warning.withOpacity(0.1),
+                    AppTheme.colors.warning.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppTheme.colors.warning,
+                                AppTheme.colors.warning.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.colors.warning.withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            PhosphorIconsBold.listChecks,
+                            color: Colors.white,
+                            size: 24,
+                          ),
                         ),
-                        child: Icon(
-                          PhosphorIconsBold.listChecks,
-                          color: AppTheme.colors.primary,
-                          size: 24,
-                        ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        PhosphorIconsBold.caretRight,
-                        color: AppTheme.colors.textSecondary,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Bucket List',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.colors.text,
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Tap to open',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                        ),
-                  ),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Bucket List',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: AppTheme.colors.text,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
