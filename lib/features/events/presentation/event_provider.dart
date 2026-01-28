@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/presentation/auth_providers.dart';
@@ -13,11 +14,16 @@ Stream<List<Event>> eventsStream(EventsStreamRef ref) {
   final user = userAsync.valueOrNull;
 
   if (user == null || user.coupleId == null || user.coupleId!.isEmpty) {
+    debugPrint('EventsStreamProvider: No user or coupleId');
     return Stream.value([]);
   }
 
+  debugPrint('EventsStreamProvider: Watching events for coupleId: ${user.coupleId}');
   final repository = ref.watch(eventRepositoryProvider);
-  return repository.watchEvents(user.coupleId!);
+  return repository.watchEvents(user.coupleId!).map((events) {
+    debugPrint('EventsStreamProvider: Received ${events.length} events');
+    return events;
+  });
 }
 
 /// Provider that gets the next upcoming event

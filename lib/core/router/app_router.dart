@@ -24,6 +24,7 @@ import '../../features/auth/presentation/edit_profile_picture_screen.dart';
 import '../../features/notes/presentation/screens/secret_notes_screen.dart';
 import '../../features/cycle/presentation/cycle_tracking_screen.dart';
 import '../../features/events/presentation/add_event_sheet.dart';
+import '../../features/events/presentation/events_screen.dart';
 import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
@@ -153,6 +154,11 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/lists',
         name: 'lists',
         builder: (context, state) => const ListsScreen(),
+      ),
+      GoRoute(
+        path: '/events',
+        name: 'events',
+        builder: (context, state) => const EventsScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,6 +54,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
         averageCycleLength: currentSettings?.averageCycleLength ?? 28,
         periodLength: currentSettings?.periodLength ?? 5,
         lastPeriodDate: date,
+        hideMenstruation: currentSettings?.hideMenstruation ?? false,
       );
 
       await repository.updateSettings(updatedSettings, user.coupleId!);
@@ -329,6 +331,98 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: AppTheme.colors.textSecondary,
                               ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Hide Menstruation Toggle
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hide Menstruation',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: AppTheme.colors.text,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Hide menstruation tracking and display in calendar',
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          color: AppTheme.colors.textSecondary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch(
+                              value: settings?.hideMenstruation ?? false,
+                              onChanged: (value) async {
+                                if (_isLoading) return;
+                                
+                                setState(() {
+                                  _isLoading = true;
+                                });
+
+                                try {
+                                  final userAsync = ref.read(userProvider);
+                                  final user = userAsync.valueOrNull;
+
+                                  if (user == null || user.coupleId == null || user.coupleId!.isEmpty) {
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: const Text('Please pair with a partner first'),
+                                          backgroundColor: AppTheme.colors.love,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return;
+                                  }
+
+                                  final repository = ref.read(cycleRepositoryProvider);
+                                  final currentSettings = await repository.getSettings(user.coupleId!);
+
+                                  final updatedSettings = CycleSettings(
+                                    id: currentSettings?.id ?? 'settings',
+                                    averageCycleLength: currentSettings?.averageCycleLength ?? 28,
+                                    periodLength: currentSettings?.periodLength ?? 5,
+                                    lastPeriodDate: currentSettings?.lastPeriodDate,
+                                    hideMenstruation: value,
+                                  );
+
+                                  await repository.updateSettings(updatedSettings, user.coupleId!);
+                                  debugPrint('CycleSettingsSheet: hideMenstruation saved as $value');
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Error: ${e.toString()}'),
+                                        backgroundColor: AppTheme.colors.love,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } finally {
+                                  if (mounted) {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  }
+                                }
+                              },
+                              activeColor: AppTheme.colors.primary,
+                            ),
+                          ],
                         ),
                         SizedBox(
                             height: MediaQuery.of(context).viewInsets.bottom + 16),

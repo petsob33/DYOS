@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -77,51 +78,95 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: eventsAsync.when(
-                data: (events) => OurOSUniversalCalendar(
-                  focusedDay: _focusedDay,
-                  selectedDay: _selectedDay,
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                  },
-                  eventLoader: (date) {
-                    // Return event markers for this date
+                data: (events) {
+                  // Debug: print events count
+                  debugPrint('EventsScreen: Loaded ${events.length} events');
+                  
+                  // Create a map of events by date for faster lookup
+                  final eventsByDate = <DateTime, List<Event>>{};
+                  for (final event in events) {
                     final normalizedDate = DateTime(
-                      date.year,
-                      date.month,
-                      date.day,
+                      event.date.year,
+                      event.date.month,
+                      event.date.day,
                     );
-                    
-                    final dayEvents = events.where((event) {
-                      final eventDate = DateTime(
-                        event.date.year,
-                        event.date.month,
-                        event.date.day,
-                      );
-                      return eventDate == normalizedDate;
-                    }).toList();
-                    
-                    return dayEvents.isNotEmpty ? ['event'] : [];
-                  },
-                  markerBuilder: (context, date, events) {
-                    if (events.contains('event')) {
-                      return Positioned(
-                        bottom: 2,
-                        child: Container(
-                          width: 6,
-                          height: 6,
+                    eventsByDate.putIfAbsent(normalizedDate, () => []).add(event);
+                    debugPrint('EventsScreen: Event ${event.title} on ${normalizedDate.toString()}');
+                  }
+                  
+                  return Column(
+                    children: [
+                      // Debug: show events count
+                      if (events.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
-                            color: AppTheme.colors.primary,
-                            shape: BoxShape.circle,
+                            color: AppTheme.colors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Debug: ${events.length} events loaded',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppTheme.colors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ),
+                      OurOSUniversalCalendar(
+                    key: ValueKey('calendar_${events.length}_${events.map((e) => '${e.id}_${e.date.millisecondsSinceEpoch}').join('_')}'),
+                    focusedDay: _focusedDay,
+                    selectedDay: _selectedDay,
+                    onDaySelected: (selectedDay, focusedDay) {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                        _focusedDay = focusedDay;
+                      });
+                    },
+                    onPageChanged: (focusedDay) {
+                      setState(() {
+                        _focusedDay = focusedDay;
+                      });
+                    },
+                    eventLoader: (date) {
+                      // Return event markers for this date
+                      final normalizedDate = DateTime(
+                        date.year,
+                        date.month,
+                        date.day,
                       );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
+                      
+                      final dayEvents = eventsByDate[normalizedDate] ?? [];
+                      final hasEvents = dayEvents.isNotEmpty;
+                      debugPrint('EventsScreen: eventLoader called for ${normalizedDate.toString()}, hasEvents: $hasEvents, eventsByDate keys: ${eventsByDate.keys.map((d) => d.toString()).join(", ")}');
+                      if (hasEvents) {
+                        debugPrint('EventsScreen: eventLoader for ${normalizedDate.toString()} found ${dayEvents.length} events');
+                      }
+                      return hasEvents ? ['event'] : [];
+                    },
+                    calendarBuilders: CalendarBuilders(
+                      markerBuilder: (context, date, events) {
+                        if (events.contains('event')) {
+                          debugPrint('EventsScreen: markerBuilder for ${date.toString()} - showing marker');
+                          return Positioned(
+                            bottom: 2,
+                            child: Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: AppTheme.colors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                      ),
+                    ],
+                  );
+                },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (_, __) => const SizedBox.shrink(),
               ),

@@ -15,7 +15,6 @@ import '../../../../widgets/home/quick_note_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../auth/domain/couple_model.dart';
 import '../../../auth/domain/user_model.dart';
-import '../../../events/presentation/add_event_sheet.dart';
 import '../../../events/presentation/event_provider.dart';
 import '../../../tracker/presentation/intimacy_provider.dart';
 import '../../../tracker/domain/intimacy_log_model.dart';
@@ -1055,7 +1054,7 @@ class _EventsCard extends ConsumerWidget {
         return BentoCard(
           child: InkWell(
             onTap: () {
-              AddEventSheet.show(context);
+              context.push('/events');
             },
             borderRadius: BorderRadius.circular(24),
             child: Container(
@@ -1077,7 +1076,7 @@ class _EventsCard extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           width: 48,
@@ -1101,20 +1100,49 @@ class _EventsCard extends ConsumerWidget {
                             ],
                           ),
                           child: Icon(
-                            PhosphorIconsBold.calendarPlus,
+                            PhosphorIconsBold.calendar,
                             color: Colors.white,
                             size: 24,
                           ),
                         ),
+                        if (upcomingCount > 0)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.colors.success,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '$upcomingCount',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                          ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      'Add Event',
+                      'Events',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: AppTheme.colors.text,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.3,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      upcomingCount > 0
+                          ? '$upcomingCount upcoming event${upcomingCount == 1 ? '' : 's'}'
+                          : totalCount > 0
+                              ? '$totalCount total event${totalCount == 1 ? '' : 's'}'
+                              : 'No events yet',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppTheme.colors.textSecondary,
                           ),
                     ),
                   ],
@@ -1125,65 +1153,79 @@ class _EventsCard extends ConsumerWidget {
         );
       },
       loading: () => BentoCard(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.colors.success.withOpacity(0.1),
-                AppTheme.colors.success.withOpacity(0.05),
-              ],
+        child: InkWell(
+          onTap: () {
+            context.push('/events');
+          },
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppTheme.colors.success.withOpacity(0.1),
+                  AppTheme.colors.success.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(24),
             ),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.success,
-                                AppTheme.colors.success.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.success.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppTheme.colors.success,
+                              AppTheme.colors.success.withOpacity(0.8),
                             ],
                           ),
-                          child: Icon(
-                            PhosphorIconsBold.calendarPlus,
-                            color: Colors.white,
-                            size: 24,
-                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.colors.success.withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      ],
+                        child: Icon(
+                          PhosphorIconsBold.calendar,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    'Events',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppTheme.colors.text,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-                const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'Add Event',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
-                    ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1192,7 +1234,7 @@ class _EventsCard extends ConsumerWidget {
         return BentoCard(
           child: InkWell(
             onTap: () {
-              AddEventSheet.show(context);
+              context.push('/events');
             },
             borderRadius: BorderRadius.circular(24),
             child: Container(
@@ -1237,7 +1279,7 @@ class _EventsCard extends ConsumerWidget {
                             ],
                           ),
                           child: Icon(
-                            PhosphorIconsBold.calendarPlus,
+                            PhosphorIconsBold.calendar,
                             color: Colors.white,
                             size: 24,
                           ),
@@ -1246,11 +1288,18 @@ class _EventsCard extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      'Add Event',
+                      'Events',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: AppTheme.colors.text,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.3,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Error loading events',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppTheme.colors.textSecondary,
                           ),
                     ),
                   ],
@@ -2367,7 +2416,7 @@ class _ListsCard extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           width: 48,
@@ -2396,43 +2445,43 @@ class _ListsCard extends ConsumerWidget {
                             size: 24,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            'Bucket List',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: AppTheme.colors.text,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.3,
-                                ),
-                          ),
-                        ),
-                        if (hasItems) ...[
-                          const SizedBox(width: AppSpacing.xs),
+                        if (hasItems)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.sm,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppTheme.colors.warning.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(8),
+                              color: AppTheme.colors.warning,
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               '$totalCount',
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: AppTheme.colors.warning,
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Colors.white,
                                     fontWeight: FontWeight.w700,
                                   ),
                             ),
                           ),
-                        ],
                       ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Bucket List',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: AppTheme.colors.text,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      hasItems
+                          ? '$totalCount item${totalCount == 1 ? '' : 's'}'
+                          : 'No items yet',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppTheme.colors.textSecondary,
+                          ),
                     ),
                   ],
                 ),
@@ -2442,77 +2491,79 @@ class _ListsCard extends ConsumerWidget {
         );
       },
       loading: () => BentoCard(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.colors.warning.withOpacity(0.1),
-                AppTheme.colors.warning.withOpacity(0.05),
-              ],
+        child: InkWell(
+          onTap: () {
+            context.push('/lists');
+          },
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppTheme.colors.warning.withOpacity(0.1),
+                  AppTheme.colors.warning.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(24),
             ),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppTheme.colors.warning,
-                            AppTheme.colors.warning.withOpacity(0.8),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppTheme.colors.warning,
+                              AppTheme.colors.warning.withOpacity(0.8),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.colors.warning.withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.colors.warning.withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        child: Icon(
+                          PhosphorIconsBold.listChecks,
+                          color: Colors.white,
+                          size: 24,
+                        ),
                       ),
-                      child: Icon(
-                        PhosphorIconsBold.listChecks,
-                        color: Colors.white,
-                        size: 28,
-                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    'Bucket List',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppTheme.colors.text,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        PhosphorIconsBold.caretRight,
-                        color: AppTheme.colors.warning,
-                        size: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  'Bucket List',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppTheme.colors.text,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -2580,6 +2631,13 @@ class _ListsCard extends ConsumerWidget {
                             color: AppTheme.colors.text,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.3,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Error loading bucket list',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppTheme.colors.textSecondary,
                           ),
                     ),
                   ],

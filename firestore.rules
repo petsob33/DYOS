@@ -131,6 +131,30 @@ service cloud.firestore {
       }
       
       // --------------------------------------------
+      // EVENTS (Subcollection)
+      // --------------------------------------------
+      match /events/{eventId} {
+        // Funkce pro členství v páru
+        function isCoupleMember() {
+           return request.auth != null && 
+                  exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+                  request.auth.uid in get(/databases/$(database)/documents/couples/$(coupleId)).data.members;
+        }
+
+        // Čtení a listování pro členy páru
+        allow list, get: if isCoupleMember();
+        
+        // Vytvoření: Člen páru
+        allow create: if isCoupleMember();
+        
+        // Update: Člen páru (může upravit eventy)
+        allow update: if isCoupleMember();
+        
+        // Smazat může člen páru
+        allow delete: if isCoupleMember();
+      }
+      
+      // --------------------------------------------
       // CYCLE LOGS (Subcollection)
       // --------------------------------------------
       match /cycle_logs/{logId} {

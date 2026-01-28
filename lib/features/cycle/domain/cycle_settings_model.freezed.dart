@@ -28,6 +28,7 @@ mixin _$CycleSettings {
   @TimestampConverter()
   DateTime? get lastPeriodDate => throw _privateConstructorUsedError;
   bool get isTryingToConceive => throw _privateConstructorUsedError;
+  bool get hideMenstruation => throw _privateConstructorUsedError;
 
   /// Serializes this CycleSettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,6 +53,7 @@ abstract class $CycleSettingsCopyWith<$Res> {
     int periodLength,
     @TimestampConverter() DateTime? lastPeriodDate,
     bool isTryingToConceive,
+    bool hideMenstruation,
   });
 }
 
@@ -75,6 +77,7 @@ class _$CycleSettingsCopyWithImpl<$Res, $Val extends CycleSettings>
     Object? periodLength = null,
     Object? lastPeriodDate = freezed,
     Object? isTryingToConceive = null,
+    Object? hideMenstruation = null,
   }) {
     return _then(
       _value.copyWith(
@@ -98,6 +101,10 @@ class _$CycleSettingsCopyWithImpl<$Res, $Val extends CycleSettings>
                 ? _value.isTryingToConceive
                 : isTryingToConceive // ignore: cast_nullable_to_non_nullable
                       as bool,
+            hideMenstruation: null == hideMenstruation
+                ? _value.hideMenstruation
+                : hideMenstruation // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -119,6 +126,7 @@ abstract class _$$CycleSettingsImplCopyWith<$Res>
     int periodLength,
     @TimestampConverter() DateTime? lastPeriodDate,
     bool isTryingToConceive,
+    bool hideMenstruation,
   });
 }
 
@@ -141,6 +149,7 @@ class __$$CycleSettingsImplCopyWithImpl<$Res>
     Object? periodLength = null,
     Object? lastPeriodDate = freezed,
     Object? isTryingToConceive = null,
+    Object? hideMenstruation = null,
   }) {
     return _then(
       _$CycleSettingsImpl(
@@ -164,6 +173,10 @@ class __$$CycleSettingsImplCopyWithImpl<$Res>
             ? _value.isTryingToConceive
             : isTryingToConceive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        hideMenstruation: null == hideMenstruation
+            ? _value.hideMenstruation
+            : hideMenstruation // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -179,6 +192,7 @@ class _$CycleSettingsImpl implements _CycleSettings {
     this.periodLength = 5,
     @TimestampConverter() this.lastPeriodDate,
     this.isTryingToConceive = false,
+    this.hideMenstruation = false,
   });
 
   factory _$CycleSettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -199,10 +213,13 @@ class _$CycleSettingsImpl implements _CycleSettings {
   @override
   @JsonKey()
   final bool isTryingToConceive;
+  @override
+  @JsonKey()
+  final bool hideMenstruation;
 
   @override
   String toString() {
-    return 'CycleSettings(id: $id, averageCycleLength: $averageCycleLength, periodLength: $periodLength, lastPeriodDate: $lastPeriodDate, isTryingToConceive: $isTryingToConceive)';
+    return 'CycleSettings(id: $id, averageCycleLength: $averageCycleLength, periodLength: $periodLength, lastPeriodDate: $lastPeriodDate, isTryingToConceive: $isTryingToConceive, hideMenstruation: $hideMenstruation)';
   }
 
   @override
@@ -218,7 +235,9 @@ class _$CycleSettingsImpl implements _CycleSettings {
             (identical(other.lastPeriodDate, lastPeriodDate) ||
                 other.lastPeriodDate == lastPeriodDate) &&
             (identical(other.isTryingToConceive, isTryingToConceive) ||
-                other.isTryingToConceive == isTryingToConceive));
+                other.isTryingToConceive == isTryingToConceive) &&
+            (identical(other.hideMenstruation, hideMenstruation) ||
+                other.hideMenstruation == hideMenstruation));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -230,6 +249,7 @@ class _$CycleSettingsImpl implements _CycleSettings {
     periodLength,
     lastPeriodDate,
     isTryingToConceive,
+    hideMenstruation,
   );
 
   /// Create a copy of CycleSettings
@@ -253,6 +273,7 @@ abstract class _CycleSettings implements CycleSettings {
     final int periodLength,
     @TimestampConverter() final DateTime? lastPeriodDate,
     final bool isTryingToConceive,
+    final bool hideMenstruation,
   }) = _$CycleSettingsImpl;
 
   factory _CycleSettings.fromJson(Map<String, dynamic> json) =
@@ -269,6 +290,8 @@ abstract class _CycleSettings implements CycleSettings {
   DateTime? get lastPeriodDate;
   @override
   bool get isTryingToConceive;
+  @override
+  bool get hideMenstruation;
 
   /// Create a copy of CycleSettings
   /// with the given fields replaced by the non-null parameter values.

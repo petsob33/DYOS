@@ -41,6 +41,7 @@ class CycleSettings with _$CycleSettings {
     @Default(5) int periodLength,
     @TimestampConverter() DateTime? lastPeriodDate,
     @Default(false) bool isTryingToConceive,
+    @Default(false) bool hideMenstruation, // Hide menstruation tracking and display
   }) = _CycleSettings;
 
   factory CycleSettings.fromJson(Map<String, dynamic> json) =>

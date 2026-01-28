@@ -6,7 +6,7 @@ part of 'event_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsStreamHash() => r'9ed3961bcf637706891d51ac876b1f847f1df94a';
+String _$eventsStreamHash() => r'fd81db78b05a990dcc3526ef09f7e35f09e66813';
 
 /// Provider that watches all events for the current couple
 ///
