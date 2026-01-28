@@ -44,6 +44,14 @@ class CycleTrackingScreen extends ConsumerStatefulWidget {
 class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  DateTime? _dayOptionsDate; // Date for which to show day options on page
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default to today
+    _dayOptionsDate = DateTime.now();
+  }
 
   // Phase colors
   static const Color _menstruationColor = Color(0xFFFF375F); // Red
@@ -150,9 +158,16 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                               setState(() {
                                 _selectedDay = selectedDay;
                                 _focusedDay = focusedDay;
+                                // Toggle day options - if same day clicked, hide it
+                                if (_dayOptionsDate != null && 
+                                    _dayOptionsDate!.year == selectedDay.year &&
+                                    _dayOptionsDate!.month == selectedDay.month &&
+                                    _dayOptionsDate!.day == selectedDay.day) {
+                                  _dayOptionsDate = null;
+                                } else {
+                                  _dayOptionsDate = selectedDay;
+                                }
                               });
-                              // Show events and cycle log options
-                              _showDayOptionsSheet(context, selectedDay, logs, eventsByDate, intimacyByDate, memoriesByDate);
                             },
                             calendarStyle: CalendarStyle(
                               defaultDecoration: BoxDecoration(
@@ -498,8 +513,28 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                             ),
                         ),
                         const SizedBox(height: AppSpacing.lg),
-                        // Legend
-                        _CycleLegend(),
+                        // Day Options (shown on page instead of bottom sheet)
+                        if (_dayOptionsDate != null)
+                          _DayOptionsWidget(
+                            selectedDate: _dayOptionsDate!,
+                            logs: logs,
+                            eventsByDate: eventsByDate,
+                            intimacyByDate: intimacyByDate,
+                            memoriesByDate: memoriesByDate,
+                            onClose: () {
+                              setState(() {
+                                _dayOptionsDate = null;
+                              });
+                            },
+                            onShowCycleLogSheet: (date) {
+                              _showCycleLogSheet(context, date, logs);
+                            },
+                          ),
+                        if (_dayOptionsDate == null) ...[
+                          const SizedBox(height: AppSpacing.lg),
+                          // Legend
+                          _CycleLegend(),
+                        ],
                       ],
                     );
                     },
@@ -1004,6 +1039,409 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
       builder: (context) => _CycleLogSheet(
         date: normalizedDate,
         existingLog: existingLog,
+      ),
+    );
+  }
+}
+
+/// Day Options Widget - displays day events and actions directly on the page
+class _DayOptionsWidget extends ConsumerWidget {
+  const _DayOptionsWidget({
+    required this.selectedDate,
+    required this.logs,
+    required this.eventsByDate,
+    required this.intimacyByDate,
+    required this.memoriesByDate,
+    required this.onClose,
+    required this.onShowCycleLogSheet,
+  });
+
+  final DateTime selectedDate;
+  final List<cycle_models.CycleLog> logs;
+  final Map<DateTime, List<Event>> eventsByDate;
+  final Map<DateTime, List<IntimacyLog>> intimacyByDate;
+  final Map<DateTime, List<Memory>> memoriesByDate;
+  final VoidCallback onClose;
+  final void Function(DateTime) onShowCycleLogSheet;
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(date.year, date.month, date.day);
+
+    if (selectedDay == today) {
+      return 'Today';
+    } else if (selectedDay == today.subtract(const Duration(days: 1))) {
+      return 'Yesterday';
+    } else if (selectedDay == today.add(const Duration(days: 1))) {
+      return 'Tomorrow';
+    } else {
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
+      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+    }
+  }
+
+  String _formatTime(DateTime date) {
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final normalizedDate = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+    final dayEvents = eventsByDate[normalizedDate] ?? [];
+    final dayIntimacyLogs = intimacyByDate[normalizedDate] ?? [];
+    final dayMemories = memoriesByDate[normalizedDate] ?? [];
+    
+    return BentoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Row(
+              children: [
+                Text(
+                  _formatDate(selectedDate),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.colors.text,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Content
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Memories section
+                if (dayMemories.isNotEmpty) ...[
+                  Text(
+                    'Memories',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.colors.text,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  ...dayMemories.map((memory) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: BentoCard(
+                      padding: EdgeInsets.zero,
+                      child: InkWell(
+                        onTap: () {
+                          MemoryDetailDialog.show(
+                            context,
+                            memory: memory,
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(24),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Row(
+                            children: [
+                              Text(
+                                memory.category.emoji,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      memory.caption,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppTheme.colors.text,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      memory.category.displayName,
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: AppTheme.colors.textSecondary,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                PhosphorIconsBold.caretRight,
+                                color: AppTheme.colors.textSecondary,
+                                size: 16,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
+                
+                // Intimacy logs section
+                if (dayIntimacyLogs.isNotEmpty) ...[
+                  Text(
+                    'Intimacy',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.colors.text,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  ...dayIntimacyLogs.map((log) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: BentoCard(
+                      padding: EdgeInsets.zero,
+                      child: InkWell(
+                        onTap: () {
+                          IntimacyLogDetailSheet.show(
+                            context,
+                            log: log,
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(24),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Row(
+                            children: [
+                              Icon(
+                                PhosphorIconsBold.heartStraight,
+                                color: AppTheme.colors.love,
+                                size: 20,
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Intimacy',
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppTheme.colors.text,
+                                          ),
+                                    ),
+                                    if (log.rating != null) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Rating: ${log.rating}/5',
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                              color: AppTheme.colors.textSecondary,
+                                            ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                PhosphorIconsBold.caretRight,
+                                color: AppTheme.colors.textSecondary,
+                                size: 16,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
+                
+                // Events section
+                if (dayEvents.isNotEmpty) ...[
+                  Text(
+                    'Events',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.colors.text,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  ...dayEvents.map((event) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: BentoCard(
+                      padding: EdgeInsets.zero,
+                      child: InkWell(
+                        onTap: () {
+                          AddEventSheet.show(
+                            context,
+                            eventToEdit: event,
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(24),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Row(
+                            children: [
+                              Icon(
+                                PhosphorIconsBold.calendar,
+                                color: AppTheme.colors.primary,
+                                size: 20,
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      event.title,
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppTheme.colors.text,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _formatTime(event.date),
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: AppTheme.colors.textSecondary,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                PhosphorIconsBold.caretRight,
+                                color: AppTheme.colors.textSecondary,
+                                size: 16,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
+                
+                // Action buttons - pod sebou
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          context.push('/add-memory');
+                        },
+                        icon: Icon(
+                          PhosphorIconsBold.heart,
+                          color: AppTheme.colors.success,
+                          size: 18,
+                        ),
+                        label: const Text('Add Memory'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.colors.success,
+                          side: BorderSide(color: AppTheme.colors.success),
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          AddIntimacySheet.show(context);
+                        },
+                        icon: Icon(
+                          PhosphorIconsBold.heartStraight,
+                          color: AppTheme.colors.love,
+                          size: 18,
+                        ),
+                        label: const Text('Add Intimacy'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.colors.love,
+                          side: BorderSide(color: AppTheme.colors.love),
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          AddEventSheet.show(
+                            context,
+                            initialDate: selectedDate,
+                          );
+                        },
+                        icon: Icon(
+                          PhosphorIconsBold.calendarPlus,
+                          color: AppTheme.colors.primary,
+                          size: 18,
+                        ),
+                        label: const Text('Add Event'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.colors.primary,
+                          side: BorderSide(color: AppTheme.colors.primary),
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          onShowCycleLogSheet(selectedDate);
+                        },
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('Add Period Log'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.colors.warning,
+                          side: BorderSide(color: AppTheme.colors.warning),
+                          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

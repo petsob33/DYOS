@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
@@ -139,6 +140,90 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
+  Future<void> _handleSetAnniversaryDate(BuildContext context, WidgetRef ref) async {
+    final userAsync = ref.read(userProvider);
+    final user = await userAsync.when(
+      data: (u) => u,
+      loading: () => null,
+      error: (_, __) => null,
+    );
+
+    if (user == null || user.coupleId == null || user.coupleId!.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('You must be paired to set anniversary date'),
+            backgroundColor: AppTheme.colors.love,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    // Get current anniversary date
+    final coupleAsync = ref.read(currentCoupleProvider);
+    final couple = await coupleAsync.when(
+      data: (c) => c,
+      loading: () => null,
+      error: (_, __) => null,
+    );
+
+    final initialDate = couple?.anniversaryDate ?? DateTime.now();
+    final firstDate = DateTime(1900);
+    final lastDate = DateTime.now();
+
+    // Show date picker
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      helpText: 'Select anniversary date',
+      cancelText: 'Cancel',
+      confirmText: 'Set',
+    );
+
+    if (pickedDate == null || !context.mounted) return;
+
+    try {
+      // Update anniversary date in Firestore
+      final firestore = FirebaseFirestore.instance;
+      await firestore.collection('couples').doc(user.coupleId!).update({
+        'anniversaryDate': Timestamp.fromDate(pickedDate),
+      });
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Anniversary date updated'),
+            backgroundColor: AppTheme.colors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating anniversary date: ${e.toString()}'),
+            backgroundColor: AppTheme.colors.love,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
     // Show confirmation dialog
     final shouldLogout = await showDialog<bool>(
@@ -243,6 +328,122 @@ class SettingsScreen extends ConsumerWidget {
                     ),
               ),
               const SizedBox(height: AppSpacing.xl),
+              // Anniversary Date button
+              Consumer(
+                builder: (context, ref, child) {
+                  final coupleAsync = ref.watch(currentCoupleProvider);
+                  return coupleAsync.when(
+                    data: (couple) {
+                      final anniversaryDate = couple?.anniversaryDate;
+                      final daysTogether = anniversaryDate != null
+                          ? DateTime.now().difference(anniversaryDate).inDays
+                          : null;
+
+                      return Material(
+                        color: AppTheme.colors.card,
+                        borderRadius: BorderRadius.circular(16),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => _handleSetAnniversaryDate(context, ref),
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  PhosphorIconsBold.calendarHeart,
+                                  color: AppTheme.colors.primary,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: AppSpacing.md),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Anniversary Date',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              color: AppTheme.colors.text,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        anniversaryDate != null
+                                            ? '${anniversaryDate.year}-${anniversaryDate.month.toString().padLeft(2, '0')}-${anniversaryDate.day.toString().padLeft(2, '0')}${daysTogether != null ? ' • $daysTogether days together' : ''}'
+                                            : 'Set your anniversary date',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: AppTheme.colors.textSecondary,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  PhosphorIconsBold.caretRight,
+                                  color: AppTheme.colors.textSecondary,
+                                  size: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    loading: () => Material(
+                      color: AppTheme.colors.card,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Row(
+                          children: [
+                            Icon(
+                              PhosphorIconsBold.calendarHeart,
+                              color: AppTheme.colors.primary,
+                              size: 24,
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Anniversary Date',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: AppTheme.colors.text,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Loading...',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: AppTheme.colors.textSecondary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    error: (_, __) => const SizedBox.shrink(),
+                  );
+                },
+              ),
+              const SizedBox(height: AppSpacing.md),
               // Pairing button
               Material(
                 color: AppTheme.colors.card,

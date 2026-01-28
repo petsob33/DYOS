@@ -903,7 +903,7 @@ class _DaysTogetherCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final coupleAsync = ref.watch(currentCoupleProvider);
+    final coupleAsync = ref.watch(coupleProvider);
     
     return coupleAsync.when(
       data: (couple) {
