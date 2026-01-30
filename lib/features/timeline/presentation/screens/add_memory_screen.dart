@@ -9,6 +9,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
+import '../widgets/pick_place_screen.dart';
 
 /// Screen for adding a new memory with photos/videos
 /// 
@@ -33,6 +34,16 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
   List<File> _selectedFiles = [];
   DateTime _selectedDate = DateTime.now();
   MemoryCategory _selectedCategory = MemoryCategory.other;
+  Map<String, dynamic>? _location;
+
+  Future<void> _pickPlace() async {
+    final result = await pickPlaceOnMap(context, initialLocation: _location);
+    if (result != null && mounted) {
+      setState(() {
+        _location = result;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -166,6 +177,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       caption: _captionController.text.trim(),
       date: _selectedDate,
       category: _selectedCategory,
+      location: _location,
       createdAt: DateTime.now(),
     );
 
@@ -323,6 +335,19 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                   onCategorySelected: (category) {
                     setState(() {
                       _selectedCategory = category;
+                    });
+                  },
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Place section
+                _PlaceSection(
+                  location: _location,
+                  onAddPlace: _pickPlace,
+                  onChangePlace: _pickPlace,
+                  onRemovePlace: () {
+                    setState(() {
+                      _location = null;
                     });
                   },
                 ),
@@ -647,6 +672,129 @@ class _CategorySelectionSection extends StatelessWidget {
             );
           }).toList(),
         ),
+      ],
+    );
+  }
+}
+
+/// Place section: add / show name + change / remove
+class _PlaceSection extends StatelessWidget {
+  const _PlaceSection({
+    required this.location,
+    required this.onAddPlace,
+    required this.onChangePlace,
+    required this.onRemovePlace,
+  });
+
+  final Map<String, dynamic>? location;
+  final VoidCallback onAddPlace;
+  final VoidCallback onChangePlace;
+  final VoidCallback onRemovePlace;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = location?['name'] as String?;
+    final hasLocation = location != null &&
+        location!['lat'] != null &&
+        location!['lng'] != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Place',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.colors.text,
+              ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        if (!hasLocation)
+          Material(
+            color: AppTheme.colors.card,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: onAddPlace,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  children: [
+                    Icon(
+                      PhosphorIconsBold.mapPin,
+                      color: AppTheme.colors.primary,
+                      size: 24,
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Text(
+                        'Add place',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.colors.text,
+                            ),
+                      ),
+                    ),
+                    Icon(
+                      PhosphorIconsBold.caretRight,
+                      color: AppTheme.colors.textSecondary,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          Material(
+            color: AppTheme.colors.card,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  Icon(
+                    PhosphorIconsBold.mapPin,
+                    color: AppTheme.colors.primary,
+                    size: 24,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name ?? 'Location set',
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.colors.text,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: onChangePlace,
+                    icon: Icon(
+                      PhosphorIconsBold.pencilSimple,
+                      color: AppTheme.colors.primary,
+                      size: 20,
+                    ),
+                    tooltip: 'Change place',
+                  ),
+                  IconButton(
+                    onPressed: onRemovePlace,
+                    icon: Icon(
+                      PhosphorIconsBold.trash,
+                      color: AppTheme.colors.love,
+                      size: 20,
+                    ),
+                    tooltip: 'Remove place',
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }

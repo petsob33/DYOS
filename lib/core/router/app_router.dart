@@ -13,6 +13,9 @@ import '../../features/auth/presentation/pairing_screen.dart';
 import '../../features/dashboard/presentation/screens/home_screen.dart';
 import '../../features/timeline/presentation/screens/timeline_screen.dart';
 import '../../features/timeline/presentation/screens/add_memory_screen.dart';
+import '../../features/timeline/presentation/screens/memories_map_screen.dart';
+import '../../features/timeline/presentation/screens/memory_detail_screen.dart';
+import '../../features/timeline/domain/memory_model.dart';
 import '../../features/tracker/presentation/data_screen.dart';
 import '../../features/tracker/presentation/screens/intimacy_history_screen.dart';
 import '../../features/tracker/presentation/widgets/add_intimacy_sheet.dart';
@@ -131,6 +134,24 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/add-memory',
         name: 'add-memory',
         builder: (context, state) => const AddMemoryScreen(),
+      ),
+      GoRoute(
+        path: '/memory/map',
+        name: 'memory-map',
+        builder: (context, state) => const MemoriesMapScreen(),
+      ),
+      GoRoute(
+        path: '/memory/detail',
+        name: 'memory-detail',
+        builder: (context, state) {
+          final memory = state.extra as Memory?;
+          if (memory == null) {
+            return const Scaffold(
+              body: Center(child: Text('Memory not found')),
+            );
+          }
+          return MemoryDetailScreen(memory: memory);
+        },
       ),
       GoRoute(
         path: '/add-note',

@@ -25,11 +25,11 @@ class TimelineScreen extends ConsumerWidget {
         title: const Text('Timeline'),
         actions: [
           IconButton(
-            icon: const Icon(PhosphorIconsBold.mapPin),
+            icon: const Icon(PhosphorIconsBold.mapTrifold),
             onPressed: () {
-              // TODO: Navigate to map view
+              context.push('/memory/map');
             },
-            tooltip: 'Map view',
+            tooltip: 'Memories map',
           ),
         ],
       ),

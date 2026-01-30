@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location to show your position on the map and to search for places nearby.</string>
+	<key>GOOGLE_PLACES_API_KEY</key>
+	<string>AIzaSyAIFphUOhpjty5H7AcXoEjWBUGqfnzXV_A</string>
 </dict>
 </plist>

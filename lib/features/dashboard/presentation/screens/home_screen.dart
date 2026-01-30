@@ -2446,21 +2446,24 @@ class _ListsCard extends ConsumerWidget {
                           ),
                         ),
                         if (hasItems)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.colors.warning,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '$totalCount',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.colors.warning,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '$totalCount',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
                       ],
