@@ -21,6 +21,8 @@ import '../../../tracker/domain/intimacy_log_model.dart';
 import '../../../../core/services/firebase_service.dart';
 import '../../../../core/services/notification_service.dart';
 import 'package:flutter/services.dart';
+import '../../../cycle/presentation/cycle_provider.dart';
+import '../../../cycle/domain/cycle_calculator.dart';
 import '../haptic_listener_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -353,7 +355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     if (currentUserAsync.isLoading || coupleAsync.isLoading) {
       return Scaffold(
-        backgroundColor: AppTheme.colors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: const Center( 
           child: CircularProgressIndicator(), 
         ),
@@ -362,9 +364,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.colors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         leading: currentUserAsync.when(
@@ -496,9 +498,83 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
+            const SliverToBoxAdapter(
+              child: _PartnerInsightBanner(),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Banner "For your partner" – tip z cyklu (predikce nálady) na Home.
+class _PartnerInsightBanner extends ConsumerWidget {
+  const _PartnerInsightBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsAsync = ref.watch(cycleSettingsStreamProvider);
+    return settingsAsync.when(
+      data: (settings) {
+        if (settings != null && settings.lastPeriodDate != null) {
+          final status = CycleCalculator.calculateStatus(
+            settings: settings,
+            targetDate: DateTime.now(),
+          );
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
+            child: BentoCard(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    PhosphorIconsBold.heart,
+                    color: AppTheme.colors.primary,
+                    size: 22,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'For your partner',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(
+                                color: AppTheme.colors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          status.partnerMessage,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(
+                                color: AppTheme.colors.text,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
@@ -775,85 +851,121 @@ class _AvatarStatus extends ConsumerWidget {
     );
   }
 
+  static const List<String> _statusEmojiPicker = [
+    '😊', '🤗', '❤️', '😴', '🔋', '🤯', '💼', '🏃', '🍷', '📚',
+    '🎉', '😢', '☀️', '🌙', '💪', '🧘', '✈️', '🍳', '🎵', '💭',
+  ];
+
   Future<void> _showStatusEditDialog(BuildContext context, WidgetRef ref) async {
     if (userId == null || coupleId == null) return;
 
     final currentEmoji = emoji;
     final currentText = status;
 
-    final emojiController = TextEditingController(text: currentEmoji);
     final textController = TextEditingController(text: currentText);
+    String selectedEmoji = _statusEmojiPicker.contains(currentEmoji)
+        ? currentEmoji
+        : (currentEmoji.isNotEmpty ? currentEmoji : _statusEmojiPicker.first);
 
     final result = await showDialog<Map<String, String>>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        title: Text(
-          'Update Status',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: AppTheme.colors.text,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: emojiController,
-              decoration: InputDecoration(
-                labelText: 'Emoji',
-                hintText: '😊',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              maxLength: 2,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-            const SizedBox(height: AppSpacing.md),
-            TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                labelText: 'Status',
-                hintText: 'Ready',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              maxLength: 30,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: AppTheme.colors.textSecondary),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop({
-                'emoji': emojiController.text.trim().isNotEmpty
-                    ? emojiController.text.trim()
-                    : '😊',
-                'text': textController.text.trim().isNotEmpty
-                    ? textController.text.trim()
-                    : 'Ready',
-              });
-            },
-            child: Text(
-              'Save',
-              style: TextStyle(
-                color: AppTheme.colors.primary,
+            title: Text(
+              'Update Status',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
+                color: AppTheme.colors.text,
               ),
             ),
-          ),
-        ],
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Choose emoji',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: AppTheme.colors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
+                    children: _statusEmojiPicker.map((e) {
+                      final isSelected = selectedEmoji == e;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedEmoji = e),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppTheme.colors.primary.withValues(alpha: 0.15)
+                                : AppTheme.colors.background,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppTheme.colors.primary
+                                  : AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                              width: isSelected ? 2 : 1,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(e, style: const TextStyle(fontSize: 24)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextField(
+                    controller: textController,
+                    decoration: InputDecoration(
+                      labelText: 'Status',
+                      hintText: 'Ready',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    maxLength: 30,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: AppTheme.colors.textSecondary),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop({
+                    'emoji': selectedEmoji,
+                    'text': textController.text.trim().isNotEmpty
+                        ? textController.text.trim()
+                        : 'Ready',
+                  });
+                },
+                child: Text(
+                  'Save',
+                  style: TextStyle(
+                    color: AppTheme.colors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
 
@@ -866,7 +978,8 @@ class _AvatarStatus extends ConsumerWidget {
           emoji: result['emoji']!,
           text: result['text']!,
         );
-        
+        // Invalidate couple data so UI refreshes immediately with new status
+        ref.invalidate(currentCoupleProvider);
         // Show success feedback
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
