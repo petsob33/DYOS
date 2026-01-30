@@ -332,7 +332,6 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
           position: LatLng(lat, lng),
           onTap: () {
             setState(() => _selectedMemory = memory);
-            context.push('/memory/detail', extra: memory);
           },
         ),
       );
@@ -547,6 +546,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                 _selectedMemory = null;
               });
             },
+            onTap: () => context.push('/memory/detail', extra: _selectedMemory!),
           ),
       ],
     );
@@ -554,10 +554,15 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
 }
 
 class _MemoryInfoCard extends StatelessWidget {
-  const _MemoryInfoCard({required this.memory, required this.onClose});
+  const _MemoryInfoCard({
+    required this.memory,
+    required this.onClose,
+    required this.onTap,
+  });
 
   final Memory memory;
   final VoidCallback onClose;
+  final VoidCallback onTap;
 
   static String _formatDate(DateTime date) {
     final months = [
@@ -581,9 +586,12 @@ class _MemoryInfoCard extends StatelessWidget {
         shadowColor: AppTheme.colors.shadow,
         borderRadius: BorderRadius.circular(24),
         color: AppTheme.colors.card,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -647,6 +655,7 @@ class _MemoryInfoCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
