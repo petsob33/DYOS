@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
+import '../auth/presentation/auth_providers.dart';
 import '../../../models/note_item.dart';
 import '../../../models/notes_provider.dart';
 
@@ -19,7 +20,7 @@ class ListsScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Lists'),
         actions: [
@@ -28,9 +29,7 @@ class ListsScreen extends ConsumerWidget {
               PhosphorIconsBold.plus,
               color: AppTheme.colors.text,
             ),
-            onPressed: () {
-              context.push('/add-note?type=bucketList');
-            },
+            onPressed: () => context.push('/add-note?type=bucketList'),
             tooltip: 'Add note',
           ),
         ],
@@ -234,15 +233,9 @@ class _BucketListItem extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return 'Today';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else {
-      return '${date.day}/${date.month}/${date.year}';
-    }
+    if (difference.inDays == 0) return 'Today';
+    if (difference.inDays == 1) return 'Yesterday';
+    if (difference.inDays < 7) return '${difference.inDays} days ago';
+    return '${date.day}/${date.month}/${date.year}';
   }
 }

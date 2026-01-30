@@ -40,3 +40,4 @@ Změny v konzoli mohou trvat pár minut. Pak na telefonu:
 ---
 
 **Poznámka:** SHA-1 výše je z **debug** keystore (`~/.android/debug.keystore`). Pro release build budeš potřebovat SHA-1 z release keystore a přidat ho v konzoli jako další položku (stejný package name, jiný SHA-1).
+RE

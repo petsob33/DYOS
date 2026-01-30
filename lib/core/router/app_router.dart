@@ -172,14 +172,14 @@ GoRouter appRouter(AppRouterRef ref) {
         },
       ),
       GoRoute(
-        path: '/lists',
-        name: 'lists',
-        builder: (context, state) => const ListsScreen(),
-      ),
-      GoRoute(
         path: '/events',
         name: 'events',
         builder: (context, state) => const EventsScreen(),
+      ),
+      GoRoute(
+        path: '/lists',
+        name: 'lists',
+        builder: (context, state) => const ListsScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -233,11 +233,23 @@ class RootShell extends StatelessWidget {
 
   final StatefulNavigationShell navigationShell;
 
+  static const int _branchCount = 4; // Home, Memory, Data, Cycle
+  static const double _swipeVelocityThreshold = 200; // px/s – min. rychlost pro přepnutí
+
   void _onTabSelected(int index) {
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
     );
+  }
+
+  void _onHorizontalSwipe(double velocity) {
+    final current = navigationShell.currentIndex;
+    if (velocity < -_swipeVelocityThreshold && current < _branchCount - 1) {
+      navigationShell.goBranch(current + 1);
+    } else if (velocity > _swipeVelocityThreshold && current > 0) {
+      navigationShell.goBranch(current - 1);
+    }
   }
 
   @override
@@ -250,8 +262,15 @@ class RootShell extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
-      body: navigationShell,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          final velocity = details.primaryVelocity ?? 0;
+          _onHorizontalSwipe(velocity.toDouble());
+        },
+        behavior: HitTestBehavior.translucent,
+        child: navigationShell,
+      ),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -260,11 +279,11 @@ class RootShell extends StatelessWidget {
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: AppTheme.colors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.colors.shadow,
+                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -358,16 +377,16 @@ class _BottomNavItem extends StatelessWidget {
             Icon(
               item.icon,
               color: selected
-                  ? AppTheme.colors.primary
-                  : AppTheme.colors.textSecondary,
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 4),
             Text(
               item.label,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: selected
-                        ? AppTheme.colors.primary
-                        : AppTheme.colors.textSecondary,
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                     fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
                   ),
             ),
