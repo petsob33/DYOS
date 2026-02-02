@@ -60,11 +60,15 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     super.dispose();
   }
 
-  /// Pick multiple images/videos from gallery
+  /// Pick multiple images/videos from gallery (with compression)
   Future<void> _pickImages() async {
     try {
-      final List<XFile> pickedFiles = await _imagePicker.pickMultiImage();
-      
+      final List<XFile> pickedFiles = await _imagePicker.pickMultiImage(
+        imageQuality: 85,
+        maxWidth: 1024,
+        maxHeight: 1024,
+      );
+
       if (pickedFiles.isNotEmpty) {
         setState(() {
           _selectedFiles = pickedFiles.map((file) => File(file.path)).toList();
@@ -86,11 +90,14 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     }
   }
 
-  /// Pick a single image/video (alternative method)
+  /// Pick a single image/video (alternative method, with compression)
   Future<void> _pickImage() async {
     try {
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
+        imageQuality: 85,
+        maxWidth: 1024,
+        maxHeight: 1024,
       );
 
       if (pickedFile != null) {
