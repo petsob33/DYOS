@@ -91,6 +91,20 @@ class AddMemoryController extends StateNotifier<AddMemoryState> {
     }
   }
 
+  Future<bool> updateMemory(Memory memory) async {
+    try {
+      final repository = ref.read(memoryRepositoryProvider);
+      await repository.updateMemory(memory);
+      state = AddMemorySuccess(memory);
+      return true;
+    } catch (e) {
+      state = AddMemoryError(
+        e.toString().replaceFirst('Exception: ', ''),
+      );
+      return false;
+    }
+  }
+
   void reset() {
     state = AddMemoryInitial();
   }

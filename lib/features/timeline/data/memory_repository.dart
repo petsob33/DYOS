@@ -170,6 +170,34 @@ class MemoryRepository {
     });
   }
 
+  /// Update an existing memory (caption, date, category, location only; media unchanged).
+  Future<Memory> updateMemory(Memory memory) async {
+    if (memory.pairId.isEmpty || memory.id.isEmpty) {
+      throw Exception('pairId and id cannot be empty');
+    }
+    final memoryRef = _firestore
+        .collection('couples')
+        .doc(memory.pairId)
+        .collection('memories')
+        .doc(memory.id);
+    final updateJson = memory.toJson();
+    await memoryRef.update(updateJson);
+    return memory;
+  }
+
+  /// Delete a memory from Firestore (and optionally its media from Storage).
+  Future<void> deleteMemory(Memory memory) async {
+    if (memory.pairId.isEmpty || memory.id.isEmpty) {
+      throw Exception('pairId and id cannot be empty');
+    }
+    final memoryRef = _firestore
+        .collection('couples')
+        .doc(memory.pairId)
+        .collection('memories')
+        .doc(memory.id);
+    await memoryRef.delete();
+  }
+
   /// Helper method to parse memory documents
   List<Memory> _parseMemories(List<QueryDocumentSnapshot> docs) {
     return docs.map((doc) {

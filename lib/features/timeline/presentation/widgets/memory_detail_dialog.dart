@@ -1,13 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../data/memory_repository.dart';
 import '../../domain/memory_model.dart';
 
 /// Full-screen widget-style dialog showing memory details with larger images
-class MemoryDetailDialog extends StatefulWidget {
+class MemoryDetailDialog extends ConsumerStatefulWidget {
   const MemoryDetailDialog({
     super.key,
     required this.memory,
@@ -33,12 +36,65 @@ class MemoryDetailDialog extends StatefulWidget {
   }
 
   @override
-  State<MemoryDetailDialog> createState() => _MemoryDetailDialogState();
+  ConsumerState<MemoryDetailDialog> createState() => _MemoryDetailDialogState();
 }
 
-class _MemoryDetailDialogState extends State<MemoryDetailDialog> {
+class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
+  bool _isDeleting = false;
   late PageController _pageController;
   late int _currentPage;
+
+  Future<void> _confirmDelete() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text('Delete memory?'),
+        content: const Text(
+          'This memory will be removed. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('Cancel', style: TextStyle(color: AppTheme.colors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Delete', style: TextStyle(color: AppTheme.colors.love, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    setState(() => _isDeleting = true);
+    try {
+      final repo = ref.read(memoryRepositoryProvider);
+      await repo.deleteMemory(widget.memory);
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Memory deleted'),
+            backgroundColor: AppTheme.colors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isDeleting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete: ${e.toString()}'),
+            backgroundColor: AppTheme.colors.love,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -57,8 +113,6 @@ class _MemoryDetailDialogState extends State<MemoryDetailDialog> {
   Widget build(BuildContext context) {
     final hasMultipleImages = widget.memory.mediaUrls.length > 1;
     final locationName = widget.memory.location?['name'] as String?;
-    final locationLat = widget.memory.location?['lat'] as double?;
-    final locationLng = widget.memory.location?['lng'] as double?;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -247,16 +301,18 @@ class _MemoryDetailDialogState extends State<MemoryDetailDialog> {
                 ),
               ),
 
-              // Details section at bottom
+              // Details section at bottom – clean card with actions
               Container(
+                margin: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: AppTheme.colors.card,
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.colors.shadow,
-                      blurRadius: 10,
-                      offset: const Offset(0, -2),
+                      color: AppTheme.colors.shadow.withValues(alpha: 0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -277,99 +333,129 @@ class _MemoryDetailDialogState extends State<MemoryDetailDialog> {
                       const SizedBox(height: AppSpacing.md),
                     ],
 
-                    // Location info
-                    if (locationName != null)
+                    // Location chip
+                    if (locationName != null) ...[
                       Container(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
+                        ),
                         decoration: BoxDecoration(
                           color: AppTheme.colors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               PhosphorIconsBold.mapPin,
-                              size: 20,
+                              size: 16,
                               color: AppTheme.colors.primary,
                             ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    locationName,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: AppTheme.colors.text,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                  if (locationLat != null && locationLng != null)
-                                    Text(
-                                      '${locationLat!.toStringAsFixed(4)}, ${locationLng!.toStringAsFixed(4)}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: AppTheme.colors.textSecondary,
-                                          ),
+                            const SizedBox(width: AppSpacing.xs),
+                            Flexible(
+                              child: Text(
+                                locationName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: AppTheme.colors.primary,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                ],
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: AppSpacing.md),
+                    ],
 
-                    // Additional metadata
+                    // Date + page indicator in one subtle row
                     Row(
                       children: [
                         Icon(
-                          PhosphorIconsBold.calendar,
-                          size: 16,
-                          color: AppTheme.colors.textSecondary,
+                          PhosphorIconsBold.calendarBlank,
+                          size: 14,
+                          color: AppTheme.colors.textSecondary.withValues(alpha: 0.9),
                         ),
                         const SizedBox(width: AppSpacing.xs),
-                        Expanded(
-                          child: Text(
-                            _formatDateTime(widget.memory.date),
+                        Text(
+                          _formatDateTime(widget.memory.date),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color: AppTheme.colors.textSecondary,
+                              ),
+                        ),
+                        if (widget.memory.mediaUrls.length > 1) ...[
+                          const Spacer(),
+                          Text(
+                            '${_currentPage + 1} / ${widget.memory.mediaUrls.length}',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
                                   color: AppTheme.colors.textSecondary,
+                                  fontWeight: FontWeight.w600,
                                 ),
                           ),
-                        ),
-                        if (widget.memory.mediaUrls.length > 1)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.xs,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.colors.background,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '${_currentPage + 1} / ${widget.memory.mediaUrls.length}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                          ),
+                        ],
                       ],
                     ),
 
-                    // Bottom padding for safe area
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Edit & Delete actions – single row, clear buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _isDeleting
+                                ? null
+                                : () {
+                                    Navigator.of(context).pop();
+                                    context.push('/memory/edit', extra: widget.memory);
+                                  },
+                            icon: const Icon(PhosphorIconsBold.pencilSimple, size: 18),
+                            label: const Text('Edit'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppTheme.colors.primary,
+                              side: BorderSide(color: AppTheme.colors.primary.withValues(alpha: 0.5)),
+                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _isDeleting ? null : _confirmDelete,
+                            icon: _isDeleting
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Icon(PhosphorIconsBold.trash, size: 18),
+                            label: Text(_isDeleting ? 'Deleting…' : 'Delete'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppTheme.colors.love,
+                              side: BorderSide(color: AppTheme.colors.love.withValues(alpha: 0.5)),
+                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
                     SizedBox(height: MediaQuery.of(context).padding.bottom),
                   ],
                 ),

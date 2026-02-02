@@ -136,6 +136,19 @@ GoRouter appRouter(AppRouterRef ref) {
         builder: (context, state) => const AddMemoryScreen(),
       ),
       GoRoute(
+        path: '/memory/edit',
+        name: 'memory-edit',
+        builder: (context, state) {
+          final memory = state.extra as Memory?;
+          if (memory == null) {
+            return const Scaffold(
+              body: Center(child: Text('Memory not found')),
+            );
+          }
+          return AddMemoryScreen(initialMemory: memory);
+        },
+      ),
+      GoRoute(
         path: '/memory/map',
         name: 'memory-map',
         builder: (context, state) => const MemoriesMapScreen(),

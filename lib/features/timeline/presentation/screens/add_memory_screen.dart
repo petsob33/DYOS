@@ -11,16 +11,11 @@ import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 import '../widgets/pick_place_screen.dart';
 
-/// Screen for adding a new memory with photos/videos
-/// 
-/// Features:
-/// - Multiple photo/video selection using image_picker
-/// - Caption text field
-/// - Date picker (defaults to today)
-/// - Category selection with emoji chips
-/// - Save button with loading state
+/// Screen for adding a new memory or editing an existing one (caption, date, category, place only).
 class AddMemoryScreen extends ConsumerStatefulWidget {
-  const AddMemoryScreen({super.key});
+  const AddMemoryScreen({super.key, this.initialMemory});
+
+  final Memory? initialMemory;
 
   @override
   ConsumerState<AddMemoryScreen> createState() => _AddMemoryScreenState();
@@ -35,6 +30,20 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
   DateTime _selectedDate = DateTime.now();
   MemoryCategory _selectedCategory = MemoryCategory.other;
   Map<String, dynamic>? _location;
+
+  bool get _isEditMode => widget.initialMemory != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final m = widget.initialMemory;
+    if (m != null) {
+      _captionController.text = m.caption;
+      _selectedDate = m.date;
+      _selectedCategory = m.category;
+      _location = m.location;
+    }
+  }
 
   Future<void> _pickPlace() async {
     final result = await pickPlaceOnMap(context, initialLocation: _location);
@@ -147,14 +156,38 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     }
   }
 
-  /// Save the memory
+  /// Save the memory (create or update)
   Future<void> _saveMemory() async {
-    // Validate form
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) return;
+
+    final controller = ref.read(addMemoryControllerProvider.notifier);
+
+    if (_isEditMode) {
+      final m = widget.initialMemory!;
+      final updated = m.copyWith(
+        caption: _captionController.text.trim(),
+        date: _selectedDate,
+        category: _selectedCategory,
+        location: _location,
+      );
+      final ok = await controller.updateMemory(updated);
+      if (ok && mounted) {
+        ref.read(addMemoryControllerProvider.notifier).reset();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Memory updated'),
+            backgroundColor: AppTheme.colors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        context.pop();
+      }
       return;
     }
 
-    // Validate at least one image or caption
     if (_selectedFiles.isEmpty && _captionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -169,11 +202,10 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       return;
     }
 
-    // Create memory object
     final memory = Memory(
-      id: '', // Will be auto-generated
-      pairId: '', // Will be set by controller
-      authorId: '', // Will be set by controller
+      id: '',
+      pairId: '',
+      authorId: '',
       caption: _captionController.text.trim(),
       date: _selectedDate,
       category: _selectedCategory,
@@ -181,9 +213,6 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       createdAt: DateTime.now(),
     );
 
-    // Get controller and upload
-    // The state changes will be handled by ref.listen in build method
-    final controller = ref.read(addMemoryControllerProvider.notifier);
     await controller.uploadMemory(
       memory: memory,
       mediaFiles: _selectedFiles,
@@ -235,7 +264,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
       appBar: AppBar(
-        title: const Text('Add Memory'),
+        title: Text(_isEditMode ? 'Edit Memory' : 'Add Memory'),
         actions: [
           if (isUploading)
             const Padding(
@@ -272,14 +301,15 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Image picker section
-                _ImagePickerSection(
-                  selectedFiles: _selectedFiles,
-                  onPickImages: _pickImages,
-                  onPickImage: _pickImage,
-                  onRemoveImage: _removeImage,
-                ),
-                const SizedBox(height: AppSpacing.lg),
+                if (!_isEditMode) ...[
+                  _ImagePickerSection(
+                    selectedFiles: _selectedFiles,
+                    onPickImages: _pickImages,
+                    onPickImage: _pickImage,
+                    onRemoveImage: _removeImage,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
 
                 // Caption field
                 TextFormField(
@@ -355,7 +385,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
 
                 // Save button
                 ElevatedButton(
-                  onPressed: isUploading ? null : _saveMemory,
+                  onPressed: (isUploading && !_isEditMode) ? null : _saveMemory,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.colors.primary,
                     foregroundColor: Colors.white,
@@ -367,7 +397,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: isUploading
+                  child: (isUploading && !_isEditMode)
                       ? const SizedBox(
                           height: 20,
                           width: 20,
@@ -376,9 +406,9 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Save Memory',
-                          style: TextStyle(
+                      : Text(
+                          _isEditMode ? 'Update Memory' : 'Save Memory',
+                          style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
                           ),
