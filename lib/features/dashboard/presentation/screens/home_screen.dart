@@ -24,6 +24,7 @@ import 'package:flutter/services.dart';
 import '../../../cycle/presentation/cycle_provider.dart';
 import '../../../cycle/domain/cycle_calculator.dart';
 import '../haptic_listener_provider.dart';
+import '../widgets/insight_horizontal_scroll.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -477,6 +478,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   currentUserAsync: currentUserAsync,
                 ),
               ),
+            ),
+            const SliverToBoxAdapter(
+              child: InsightHorizontalScroll(),
             ),
             SliverToBoxAdapter(
               child: Padding(
