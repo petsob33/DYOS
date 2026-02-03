@@ -21,8 +21,6 @@ import '../../../tracker/domain/intimacy_log_model.dart';
 import '../../../../core/services/firebase_service.dart';
 import '../../../../core/services/notification_service.dart';
 import 'package:flutter/services.dart';
-import '../../../cycle/presentation/cycle_provider.dart';
-import '../../../cycle/domain/cycle_calculator.dart';
 import '../haptic_listener_provider.dart';
 import '../widgets/insight_horizontal_scroll.dart';
 
@@ -479,8 +477,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: InsightHorizontalScroll(),
+            SliverPadding(
+              padding: const EdgeInsets.only(
+                top: AppSpacing.xl,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              ),
+              sliver: const SliverToBoxAdapter(
+                child: InsightHorizontalScroll(),
+              ),
             ),
             SliverToBoxAdapter(
               child: Padding(
@@ -502,83 +508,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: _PartnerInsightBanner(),
-            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Banner "For your partner" – tip z cyklu (predikce nálady) na Home.
-class _PartnerInsightBanner extends ConsumerWidget {
-  const _PartnerInsightBanner();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final settingsAsync = ref.watch(cycleSettingsStreamProvider);
-    return settingsAsync.when(
-      data: (settings) {
-        if (settings != null && settings.lastPeriodDate != null) {
-          final status = CycleCalculator.calculateStatus(
-            settings: settings,
-            targetDate: DateTime.now(),
-          );
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            child: BentoCard(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    PhosphorIconsBold.heart,
-                    color: AppTheme.colors.primary,
-                    size: 22,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'For your partner',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall
-                              ?.copyWith(
-                                color: AppTheme.colors.textSecondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          status.partnerMessage,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                                color: AppTheme.colors.text,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        return const SizedBox.shrink();
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
@@ -1743,6 +1675,7 @@ class _TapticTouchCard extends ConsumerStatefulWidget {
 class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
   DateTime? _pressStartTime;
   bool _isPressed = false;
+  bool _justSent = false;
 
   @override
   Widget build(BuildContext context) {
@@ -1781,16 +1714,35 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
               decoration: BoxDecoration(
                 color: _isPressed
                     ? AppTheme.colors.love.withValues(alpha: 0.1)
-                    : AppTheme.colors.background,
+                    : _justSent
+                        ? AppTheme.colors.success.withValues(alpha: 0.1)
+                        : AppTheme.colors.background,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Center(
-                child: Icon(
-                  PhosphorIconsBold.heart,
-                  color: _isPressed
-                      ? AppTheme.colors.love
-                      : AppTheme.colors.love.withValues(alpha: 0.6),
-                  size: 48,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      PhosphorIconsBold.heart,
+                      color: _isPressed
+                          ? AppTheme.colors.love
+                          : _justSent
+                              ? AppTheme.colors.success
+                              : AppTheme.colors.love.withValues(alpha: 0.6),
+                      size: 48,
+                    ),
+                    if (_justSent) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Sent',
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: AppTheme.colors.success,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),
@@ -1830,17 +1782,32 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
 
     HapticFeedback.lightImpact();
 
-    // Send haptic signal to partner
     final firebaseService = ref.read(firebaseServiceProvider);
     firebaseService.sendHapticTouch(
       coupleId: coupleId,
       fromUserId: userId,
       durationMs: durationMs,
-    ).catchError((error) {
+    ).then((_) {
+      if (!mounted) return;
+      setState(() => _justSent = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Sent to partner'),
+          backgroundColor: AppTheme.colors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) setState(() => _justSent = false);
+      });
+    }).catchError((error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error sending touch: $error'),
+            content: Text('Error sending: $error'),
             backgroundColor: AppTheme.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(

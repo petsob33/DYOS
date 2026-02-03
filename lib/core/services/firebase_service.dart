@@ -201,6 +201,25 @@ final partnerUserDoc = results[1];
     }
   }
 
+  /// Update subscription fields on the couple document.
+  /// Called after a successful RevenueCat purchase so both partners get premium via the couple stream.
+  Future<void> updateCoupleSubscription(
+    String coupleId, {
+    required String subscriptionTier,
+    DateTime? subscriptionExpiry,
+  }) async {
+    final coupleRef = _firestore.collection('couples').doc(coupleId);
+    final updates = <String, dynamic>{
+      'subscriptionTier': subscriptionTier,
+    };
+    if (subscriptionExpiry != null) {
+      updates['subscriptionExpiry'] = Timestamp.fromDate(subscriptionExpiry);
+    } else {
+      updates['subscriptionExpiry'] = FieldValue.delete();
+    }
+    await coupleRef.update(updates);
+  }
+
   // Check if user is paired
   Future<bool> isUserPaired() async {
     final userData = await getUserData();
