@@ -9,7 +9,6 @@ import '../../../../core/theme/app_theme.dart';
 import '../../data/memory_repository.dart';
 import '../../domain/memory_model.dart';
 
-/// Full-screen widget-style dialog showing memory details with larger images
 class MemoryDetailDialog extends ConsumerStatefulWidget {
   const MemoryDetailDialog({
     super.key,
@@ -27,6 +26,7 @@ class MemoryDetailDialog extends ConsumerStatefulWidget {
   }) {
     return showDialog(
       context: context,
+      barrierDismissible: true, // Důležité: Kliknutí mimo zavře dialog
       barrierColor: AppTheme.colors.shadow.withValues(alpha: 0.5),
       builder: (context) => MemoryDetailDialog(
         memory: memory,
@@ -56,11 +56,14 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('Cancel', style: TextStyle(color: AppTheme.colors.textSecondary)),
+            child: Text('Cancel',
+                style: TextStyle(color: AppTheme.colors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Delete', style: TextStyle(color: AppTheme.colors.love, fontWeight: FontWeight.w600)),
+            child: Text('Delete',
+                style: TextStyle(
+                    color: AppTheme.colors.love, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -77,7 +80,8 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
             content: const Text('Memory deleted'),
             backgroundColor: AppTheme.colors.success,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -89,7 +93,8 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
             content: Text('Failed to delete: ${e.toString()}'),
             backgroundColor: AppTheme.colors.love,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -115,349 +120,319 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
     final locationName = widget.memory.location?['name'] as String?;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.zero,
+      backgroundColor: Colors.transparent, 
+      insetPadding: const EdgeInsets.all(AppSpacing.md),
       child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: AppTheme.colors.background,
-        child: SafeArea(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxWidth: 400,
+        ),
+        decoration: BoxDecoration(
+          color: AppTheme.colors.card, 
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.colors.shadow.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header section
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.md,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.colors.card,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.colors.shadow,
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
+              // --- 1. ČÁST: FOTKY ---
+              Flexible(
+                flex: 3,
+                child: Stack(
                   children: [
-                    // Date and category
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _formatFullDate(widget.memory.date),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: AppTheme.colors.text,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Row(
-                            children: [
-                              Text(
-                                widget.memory.category.emoji,
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              Text(
-                                widget.memory.category.displayName,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: AppTheme.colors.textSecondary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Close button
-                    IconButton(
-                      icon: Icon(
-                        PhosphorIconsBold.x,
-                        color: AppTheme.colors.textSecondary,
-                        size: 24,
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Large image viewer - takes most of the screen
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: AppTheme.colors.card,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.colors.shadow,
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Stack(
-                      children: [
-                        // Image carousel
-                        if (widget.memory.mediaUrls.isNotEmpty)
-                          PageView.builder(
-                            controller: _pageController,
-                            onPageChanged: (index) {
-                              setState(() {
-                                _currentPage = index;
-                              });
-                            },
-                            itemCount: widget.memory.mediaUrls.length,
-                            itemBuilder: (context, index) {
-                              return InteractiveViewer(
-                                minScale: 0.5,
-                                maxScale: 3.0,
+                    if (widget.memory.mediaUrls.isNotEmpty)
+                      Container(
+                        color: Colors.black,
+                        height: 400,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentPage = index;
+                            });
+                          },
+                          itemCount: widget.memory.mediaUrls.length,
+                          itemBuilder: (context, index) {
+                            return CachedNetworkImage(
+                              imageUrl: widget.memory.mediaUrls[index],
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: AppTheme.colors.background,
                                 child: Center(
-                                  child: CachedNetworkImage(
-                                    imageUrl: widget.memory.mediaUrls[index],
-                                    fit: BoxFit.contain,
-                                    placeholder: (context, url) => Container(
-                                      color: AppTheme.colors.background,
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: AppTheme.colors.primary,
-                                        ),
-                                      ),
-                                    ),
-                                    errorWidget: (context, url, error) => Container(
-                                      color: AppTheme.colors.background,
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              PhosphorIconsBold.image,
-                                              size: 48,
-                                              color: AppTheme.colors.textSecondary
-                                                  .withValues(alpha: 0.4),
-                                            ),
-                                            const SizedBox(height: AppSpacing.sm),
-                                            Text(
-                                              'Failed to load image',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                    color: AppTheme.colors
-                                                        .textSecondary,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppTheme.colors.primary,
                                   ),
                                 ),
-                              );
-                            },
-                          )
-                        else
-                          Center(
-                            child: Icon(
-                              PhosphorIconsBold.image,
-                              size: 64,
-                              color: AppTheme.colors.textSecondary
-                                  .withValues(alpha: 0.4),
-                            ),
-                          ),
-
-                        // Page indicator (if multiple images)
-                        if (hasMultipleImages)
-                          Positioned(
-                            bottom: AppSpacing.md,
-                            left: 0,
-                            right: 0,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(
-                                widget.memory.mediaUrls.length,
-                                (index) => _PageIndicator(
-                                  isActive: index == _currentPage,
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: AppTheme.colors.background,
+                                child: const Center(
+                                  child: Icon(
+                                    PhosphorIconsBold.image,
+                                    size: 48,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
+                            );
+                          },
+                        ),
+                      )
+                    else
+                      Container(
+                        height: 200,
+                        color: AppTheme.colors.background,
+                        child: Center(
+                          child: Text(
+                            'No Photos',
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                  color: AppTheme.colors.textSecondary,
+                                ),
+                          ),
+                        ),
+                      ),
+                      
+                    // Tlačítko Zavřít (X)
+                    Positioned(
+                      top: AppSpacing.sm,
+                      right: AppSpacing.sm,
+                      child: IconButton(
+                        icon: const Icon(
+                          PhosphorIconsBold.x,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.black.withValues(alpha: 0.4),
+                          padding: const EdgeInsets.all(8),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+
+                    // Indikátor stránek (Tečky)
+                    if (hasMultipleImages)
+                      Positioned(
+                        bottom: AppSpacing.md,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            widget.memory.mediaUrls.length,
+                            (index) => _PageIndicator(
+                              isActive: index == _currentPage,
                             ),
                           ),
-                      ],
-                    ),
-                  ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
 
-              // Details section at bottom – clean card with actions
-              Container(
-                margin: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: AppTheme.colors.card,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.colors.shadow.withValues(alpha: 0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Caption
-                    if (widget.memory.caption.isNotEmpty) ...[
-                      Text(
-                        widget.memory.caption,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppTheme.colors.text,
-                              fontWeight: FontWeight.w600,
-                              height: 1.5,
-                            ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-
-                    // Location chip
-                    if (locationName != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.colors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+              // --- 2. ČÁST: INFO (Bílý obdélník dole) ---
+              Flexible(
+                flex: 2,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Titulek a Ozubené kolo
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              PhosphorIconsBold.mapPin,
-                              size: 16,
-                              color: AppTheme.colors.primary,
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            Flexible(
+                            Expanded(
                               child: Text(
-                                locationName,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: AppTheme.colors.primary,
-                                      fontWeight: FontWeight.w600,
+                                widget.memory.caption.isNotEmpty
+                                    ? widget.memory.caption
+                                    : locationName ?? 'Memory',
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      // Oprava: Použití standardní černé/šedé místo textPrimary
+                                      color: Colors.black87, 
                                     ),
-                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                PhosphorIconsBold.gear,
+                                size: 24,
+                                color: AppTheme.colors.textSecondary,
+                              ),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (ctx) => Container(
+                                    padding: const EdgeInsets.all(AppSpacing.lg),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.colors.card,
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(24),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          leading: Icon(
+                                            PhosphorIconsBold.pencilSimple,
+                                            color: AppTheme.colors.primary,
+                                          ),
+                                          title: const Text('Edit'),
+                                          onTap: () {
+                                            Navigator.of(ctx).pop();
+                                            Navigator.of(context).pop();
+                                            context.push('/memory/edit',
+                                                extra: widget.memory);
+                                          },
+                                        ),
+                                        ListTile(
+                                          leading: Icon(
+                                            PhosphorIconsBold.trash,
+                                            color: AppTheme.colors.love,
+                                          ),
+                                          title: Text(
+                                            'Delete',
+                                            style: TextStyle(
+                                              color: AppTheme.colors.love,
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            Navigator.of(ctx).pop();
+                                            _confirmDelete();
+                                          },
+                                        ),
+                                        SizedBox(
+                                            height: MediaQuery.of(context)
+                                                .padding
+                                                .bottom),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: IconButton.styleFrom(
+                                backgroundColor: AppTheme.colors.background,
+                                padding: const EdgeInsets.all(8),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
+                        
+                        const SizedBox(height: AppSpacing.md),
+                        
+                        // Datum
+                        Row(
+                          children: [
+                            Icon(
+                              PhosphorIconsBold.calendarBlank,
+                              size: 16,
+                              color: AppTheme.colors.textSecondary,
+                            ),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text(
+                              _formatDateTime(widget.memory.date),
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppTheme.colors.textSecondary,
+                                  ),
+                            ),
+                          ],
+                        ),
 
-                    // Date + page indicator in one subtle row
-                    Row(
-                      children: [
-                        Icon(
-                          PhosphorIconsBold.calendarBlank,
-                          size: 14,
-                          color: AppTheme.colors.textSecondary.withValues(alpha: 0.9),
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          _formatDateTime(widget.memory.date),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: AppTheme.colors.textSecondary,
-                              ),
-                        ),
-                        if (widget.memory.mediaUrls.length > 1) ...[
-                          const Spacer(),
-                          Text(
-                            '${_currentPage + 1} / ${widget.memory.mediaUrls.length}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(
-                                  color: AppTheme.colors.textSecondary,
-                                  fontWeight: FontWeight.w600,
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Tagy
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: AppSpacing.sm,
+                          children: [
+                            if (locationName != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: 8,
                                 ),
-                          ),
-                        ],
-                      ],
-                    ),
-
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Edit & Delete actions – single row, clear buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: _isDeleting
-                                ? null
-                                : () {
-                                    Navigator.of(context).pop();
-                                    context.push('/memory/edit', extra: widget.memory);
-                                  },
-                            icon: const Icon(PhosphorIconsBold.pencilSimple, size: 18),
-                            label: const Text('Edit'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppTheme.colors.primary,
-                              side: BorderSide(color: AppTheme.colors.primary.withValues(alpha: 0.5)),
-                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      PhosphorIconsBold.mapPin,
+                                      size: 14,
+                                      color: AppTheme.colors.primary,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      locationName,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: AppTheme.colors.primary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            // Kategorie
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.md,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.colors.background,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  // Oprava: Použití standardní šedé místo AppTheme.colors.border
+                                  color: Colors.black12, 
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    widget.memory.category.emoji,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    widget.memory.category.displayName,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: AppTheme.colors.textSecondary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: _isDeleting ? null : _confirmDelete,
-                            icon: _isDeleting
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Icon(PhosphorIconsBold.trash, size: 18),
-                            label: Text(_isDeleting ? 'Deleting…' : 'Delete'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppTheme.colors.love,
-                              side: BorderSide(color: AppTheme.colors.love.withValues(alpha: 0.5)),
-                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
-
-                    SizedBox(height: MediaQuery.of(context).padding.bottom),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -467,53 +442,12 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
     );
   }
 
-  String _formatFullDate(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    final weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
-    return '${weekdays[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}, ${date.year}';
-  }
-
   String _formatDateTime(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${date.day} ${months[date.month - 1]} ${date.year} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
 
-/// Page indicator dot for PageView
 class _PageIndicator extends StatelessWidget {
   const _PageIndicator({required this.isActive});
 
@@ -524,18 +458,18 @@ class _PageIndicator extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.symmetric(horizontal: 3),
-      width: isActive ? 24 : 8,
-      height: 8,
+      width: isActive ? 20 : 6,
+      height: 6,
       decoration: BoxDecoration(
         color: isActive
-            ? AppTheme.colors.primary
-            : AppTheme.colors.textSecondary.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(4),
+            ? Colors.white
+            : Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(3),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
           ),
         ],
       ),

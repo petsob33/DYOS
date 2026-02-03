@@ -213,6 +213,38 @@ class ProfileScreen extends ConsumerWidget {
                         const SizedBox(height: AppSpacing.sm),
                         BentoCard(
                           onTap: () {
+                            context.push('/premium');
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                PhosphorIconsBold.crown,
+                                color: AppTheme.colors.primary,
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Expanded(
+                                child: Text(
+                                  'DYOS+ / Upgrade',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.colors.text,
+                                      ),
+                                ),
+                              ),
+                              Icon(
+                                PhosphorIconsBold.caretRight,
+                                color: AppTheme.colors.textSecondary,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        BentoCard(
+                          onTap: () {
                             context.push('/secret-notes');
                           },
                           child: Row(
