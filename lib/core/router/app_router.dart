@@ -24,6 +24,7 @@ import '../../features/lists/settings_screen.dart';
 import '../../features/notes/presentation/screens/add_note_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/auth/presentation/edit_profile_picture_screen.dart';
+import '../../features/premium/presentation/screens/premium_landing_screen.dart';
 import '../../features/notes/presentation/screens/secret_notes_screen.dart';
 import '../../features/cycle/presentation/cycle_tracking_screen.dart';
 import '../../features/events/presentation/add_event_sheet.dart';
@@ -114,6 +115,11 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/profile',
         name: 'profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/premium',
+        name: 'premium',
+        builder: (context, state) => const PremiumLandingScreen(),
       ),
       GoRoute(
         path: '/edit-profile-picture',
@@ -248,6 +254,7 @@ class RootShell extends StatelessWidget {
 
   static const int _branchCount = 4; // Home, Memory, Data, Cycle
   static const double _swipeVelocityThreshold = 200; // px/s – min. rychlost pro přepnutí
+  static const double _swipeUpVelocityThreshold = 400; // px/s – swipe nahoru otevře Quick Add
 
   void _onTabSelected(int index) {
     navigationShell.goBranch(
@@ -271,7 +278,7 @@ class RootShell extends StatelessWidget {
       _NavItem('Home', PhosphorIconsBold.house),
       _NavItem('Memory', PhosphorIconsBold.clockCounterClockwise),
       _NavItem('Data', PhosphorIconsBold.chartPieSlice),
-      _NavItem('Cycle', PhosphorIconsBold.calendar),
+      _NavItem('Calendar', PhosphorIconsBold.calendar),
     ];
 
     return Scaffold(
@@ -280,6 +287,12 @@ class RootShell extends StatelessWidget {
         onHorizontalDragEnd: (details) {
           final velocity = details.primaryVelocity ?? 0;
           _onHorizontalSwipe(velocity.toDouble());
+        },
+        onVerticalDragEnd: (details) {
+          final velocity = details.primaryVelocity ?? 0;
+          if (velocity < -_swipeUpVelocityThreshold) {
+            showQuickAddSheet(context);
+          }
         },
         behavior: HitTestBehavior.translucent,
         child: navigationShell,
@@ -318,14 +331,7 @@ class RootShell extends StatelessWidget {
                         child: InkWell(
                           customBorder: const CircleBorder(),
                           onTap: () {
-                            showModalBottomSheet<void>(
-                              context: context,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(24)),
-                              ),
-                              builder: (context) => const _QuickAddSheet(),
-                            );
+                            showQuickAddSheet(context);
                           },
                           child: SizedBox(
                             width: 56,
@@ -408,6 +414,19 @@ class _BottomNavItem extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Shows the Quick Add bottom sheet (add memory, note, intimacy, event).
+/// Used by shell FAB and by swipe-up on the home insight widget.
+void showQuickAddSheet(BuildContext context) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) => const _QuickAddSheet(),
+  );
 }
 
 class _QuickAddSheet extends StatelessWidget {

@@ -11,6 +11,7 @@ part 'couple_model.g.dart';
 /// When two users pair up, a CoupleModel document is created in Firestore.
 @freezed
 class CoupleModel with _$CoupleModel {
+  const CoupleModel._();
   @JsonSerializable(explicitToJson: true)
   const factory CoupleModel({
     @JsonKey(includeFromJson: true, includeToJson: false) required String id,
@@ -29,6 +30,15 @@ class CoupleModel with _$CoupleModel {
 
   factory CoupleModel.fromJson(Map<String, dynamic> json) =>
       _$CoupleModelFromJson(json);
+
+  /// True when the couple has an active premium subscription.
+  bool get isPremium =>
+      subscriptionTier == 'premium' &&
+      (subscriptionExpiry == null ||
+          subscriptionExpiry!.isAfter(DateTime.now()));
+
+  /// When the premium subscription ends; alias for subscriptionExpiry.
+  DateTime? get premiumExpiration => subscriptionExpiry;
 
   /// Create CoupleModel from Firestore document
   factory CoupleModel.fromFirestore(DocumentSnapshot doc) {

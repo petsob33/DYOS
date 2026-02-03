@@ -204,7 +204,7 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
 /// @nodoc
 
 @JsonSerializable(explicitToJson: true)
-class _$CoupleModelImpl implements _CoupleModel {
+class _$CoupleModelImpl extends _CoupleModel {
   const _$CoupleModelImpl({
     @JsonKey(includeFromJson: true, includeToJson: false) required this.id,
     required final List<String> members,
@@ -214,7 +214,8 @@ class _$CoupleModelImpl implements _CoupleModel {
     @TimestampConverter() this.subscriptionExpiry,
     final Map<String, CoupleStatus>? status,
   }) : _members = members,
-       _status = status;
+       _status = status,
+       super._();
 
   factory _$CoupleModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$CoupleModelImplFromJson(json);
@@ -311,7 +312,7 @@ class _$CoupleModelImpl implements _CoupleModel {
   }
 }
 
-abstract class _CoupleModel implements CoupleModel {
+abstract class _CoupleModel extends CoupleModel {
   const factory _CoupleModel({
     @JsonKey(includeFromJson: true, includeToJson: false)
     required final String id,
@@ -322,6 +323,7 @@ abstract class _CoupleModel implements CoupleModel {
     @TimestampConverter() final DateTime? subscriptionExpiry,
     final Map<String, CoupleStatus>? status,
   }) = _$CoupleModelImpl;
+  const _CoupleModel._() : super._();
 
   factory _CoupleModel.fromJson(Map<String, dynamic> json) =
       _$CoupleModelImpl.fromJson;

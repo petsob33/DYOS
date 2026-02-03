@@ -155,110 +155,8 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: AppTheme.colors.card,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.colors.shadow,
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Stack(
-                    children: [
-                      if (widget.memory.mediaUrls.isNotEmpty)
-                        PageView.builder(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() => _currentPage = index);
-                          },
-                          itemCount: widget.memory.mediaUrls.length,
-                          itemBuilder: (context, index) {
-                            return InteractiveViewer(
-                              minScale: 0.5,
-                              maxScale: 3.0,
-                              child: Center(
-                                child: CachedNetworkImage(
-                                  imageUrl: widget.memory.mediaUrls[index],
-                                  fit: BoxFit.contain,
-                                  placeholder: (context, url) => Container(
-                                    color: AppTheme.colors.background,
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppTheme.colors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) => Container(
-                                    color: AppTheme.colors.background,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            PhosphorIconsBold.image,
-                                            size: 48,
-                                            color: AppTheme.colors.textSecondary
-                                                .withValues(alpha: 0.4),
-                                          ),
-                                          const SizedBox(height: AppSpacing.sm),
-                                          Text(
-                                            'Failed to load image',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: AppTheme.colors.textSecondary,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      else
-                        Center(
-                          child: Icon(
-                            PhosphorIconsBold.image,
-                            size: 64,
-                            color: AppTheme.colors.textSecondary
-                                .withValues(alpha: 0.4),
-                          ),
-                        ),
-                      if (hasMultipleImages)
-                        Positioned(
-                          bottom: AppSpacing.md,
-                          left: 0,
-                          right: 0,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              widget.memory.mediaUrls.length,
-                              (index) => _PageIndicator(
-                                isActive: index == _currentPage,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
             Container(
-              margin: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+              margin: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 0),
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
                 color: AppTheme.colors.card,
@@ -399,8 +297,109 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: MediaQuery.of(context).padding.bottom),
                 ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: AppTheme.colors.card,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.colors.shadow,
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Stack(
+                    children: [
+                      if (widget.memory.mediaUrls.isNotEmpty)
+                        PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() => _currentPage = index);
+                          },
+                          itemCount: widget.memory.mediaUrls.length,
+                          itemBuilder: (context, index) {
+                            return InteractiveViewer(
+                              minScale: 0.5,
+                              maxScale: 3.0,
+                              child: Center(
+                                child: CachedNetworkImage(
+                                  imageUrl: widget.memory.mediaUrls[index],
+                                  fit: BoxFit.contain,
+                                  placeholder: (context, url) => Container(
+                                    color: AppTheme.colors.background,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppTheme.colors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) => Container(
+                                    color: AppTheme.colors.background,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            PhosphorIconsBold.image,
+                                            size: 48,
+                                            color: AppTheme.colors.textSecondary
+                                                .withValues(alpha: 0.4),
+                                          ),
+                                          const SizedBox(height: AppSpacing.sm),
+                                          Text(
+                                            'Failed to load image',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                  color: AppTheme.colors.textSecondary,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      else
+                        Center(
+                          child: Icon(
+                            PhosphorIconsBold.image,
+                            size: 64,
+                            color: AppTheme.colors.textSecondary
+                                .withValues(alpha: 0.4),
+                          ),
+                        ),
+                      if (hasMultipleImages)
+                        Positioned(
+                          bottom: AppSpacing.md,
+                          left: 0,
+                          right: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              widget.memory.mediaUrls.length,
+                              (index) => _PageIndicator(
+                                isActive: index == _currentPage,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
