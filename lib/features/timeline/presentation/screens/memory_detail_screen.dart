@@ -98,6 +98,9 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
   Widget build(BuildContext context) {
     final hasMultipleImages = widget.memory.mediaUrls.length > 1;
     final locationName = widget.memory.location?['name'] as String?;
+    final captionOrLocation = widget.memory.caption.isNotEmpty 
+        ? widget.memory.caption 
+        : locationName ?? '';
 
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
@@ -109,56 +112,45 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
           onPressed: () => context.pop(),
           tooltip: 'Back',
         ),
-        title: Text(
-          _formatFullDate(widget.memory.date),
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppTheme.colors.text,
-                fontWeight: FontWeight.w700,
-              ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _formatFullDate(widget.memory.date),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: AppTheme.colors.text,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  widget.memory.category == MemoryCategory.trip
+                      ? PhosphorIconsBold.airplane
+                      : PhosphorIconsBold.circle,
+                  size: 14,
+                  color: AppTheme.colors.textSecondary,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  widget.memory.category.displayName,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.colors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ],
+            ),
+          ],
         ),
         actions: [
           IconButton(
-            icon: Icon(PhosphorIconsBold.pencilSimple, color: AppTheme.colors.primary),
-            onPressed: _isDeleting ? null : () => context.push('/memory/edit', extra: widget.memory),
-            tooltip: 'Edit',
-          ),
-          IconButton(
-            icon: _isDeleting
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Icon(PhosphorIconsBold.trash, color: AppTheme.colors.love),
-            onPressed: _isDeleting ? null : _confirmDelete,
-            tooltip: 'Delete',
+            icon: Icon(PhosphorIconsBold.x, color: AppTheme.colors.text),
+            onPressed: () => context.pop(),
+            tooltip: 'Close',
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(36),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16, bottom: 8),
-              child: Row(
-                children: [
-                  Text(
-                    widget.memory.category.emoji,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    widget.memory.category.displayName,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
       ),
       body: SafeArea(
         child: Column(
@@ -283,17 +275,18 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (widget.memory.caption.isNotEmpty) ...[
+                  // Title (caption or location name) - large heading
+                  if (captionOrLocation.isNotEmpty) ...[
                     Text(
-                      widget.memory.caption,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      captionOrLocation,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w600,
-                            height: 1.5,
+                            fontWeight: FontWeight.w700,
                           ),
                     ),
                     const SizedBox(height: AppSpacing.md),
                   ],
+                  // Location chip
                   if (locationName != null) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -331,6 +324,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                   ],
+                  // Date and page indicator
                   Row(
                     children: [
                       Icon(
@@ -358,6 +352,51 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  // Edit and Delete buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _isDeleting
+                              ? null
+                              : () => context.push('/memory/edit', extra: widget.memory),
+                          icon: const Icon(PhosphorIconsBold.pencilSimple, size: 18),
+                          label: const Text('Edit'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.colors.primary,
+                            side: BorderSide(color: AppTheme.colors.primary.withValues(alpha: 0.5)),
+                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _isDeleting ? null : _confirmDelete,
+                          icon: _isDeleting
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Icon(PhosphorIconsBold.trash, size: 18),
+                          label: Text(_isDeleting ? 'Deleting…' : 'Delete'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.colors.love,
+                            side: BorderSide(color: AppTheme.colors.love.withValues(alpha: 0.5)),
+                            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: MediaQuery.of(context).padding.bottom),

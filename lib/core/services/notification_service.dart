@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -5,8 +8,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'notification_service.g.dart';
 
 /// Service for handling notifications in the app
-/// 
-/// This service handles local notifications that appear in the system notification tray.
+///
+/// Handles:
+/// - Local notifications (in-app / foreground)
+/// - Firebase Cloud Messaging (push when app is in background or closed)
 @riverpod
 NotificationService notificationService(NotificationServiceRef ref) {
   return NotificationService();
@@ -61,11 +66,111 @@ class NotificationService {
 
       _initialized = true;
       print('NotificationService setup complete');
+
+      // FCM: request permission, get token, save to Firestore, set up handlers
+      await _initializeFcm();
     } catch (e, stackTrace) {
       print('Error initializing NotificationService: $e');
       print('Stack trace: $stackTrace');
       // Don't set _initialized to true if initialization failed
     }
+  }
+
+  /// Initialize Firebase Cloud Messaging for push when app is background/closed
+  Future<void> _initializeFcm() async {
+    try {
+      final settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      print('FCM permission: ${settings.authorizationStatus}');
+
+      await _saveFcmTokenIfLoggedIn();
+
+      FirebaseMessaging.instance.onTokenRefresh.listen((token) {
+        _saveFcmTokenToFirestore(token);
+      });
+
+      FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+      FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
+
+      final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+      if (initialMessage != null) {
+        _handleNotificationTap(initialMessage);
+      }
+    } catch (e, stackTrace) {
+      print('Error initializing FCM: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
+  Future<void> _saveFcmTokenIfLoggedIn() async {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      await _saveFcmTokenToFirestore(token);
+    }
+  }
+
+  Future<void> _saveFcmTokenToFirestore(String token) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(uid).set(
+        {'fcmToken': token},
+        SetOptions(merge: true),
+      );
+      print('FCM token saved to Firestore');
+    } catch (e) {
+      print('Error saving FCM token: $e');
+    }
+  }
+
+  void _handleForegroundMessage(RemoteMessage message) {
+    final notification = message.notification;
+    if (notification != null &&
+        notification.title != null &&
+        notification.body != null) {
+      _showFcmAsLocalNotification(notification.title!, notification.body!);
+      return;
+    }
+    final type = message.data['type'] as String?;
+    if (type == 'haptic') {
+      showHapticNotification();
+    } else if (type == 'quick_message') {
+      final body = message.data['message'] as String? ?? '';
+      showQuickMessageNotification(body);
+    }
+  }
+
+  Future<void> _showFcmAsLocalNotification(String title, String body) async {
+    if (!_initialized) return;
+    try {
+      const androidDetails = AndroidNotificationDetails(
+        'quick_messages',
+        'Quick Messages',
+        channelDescription: 'Notifications from your partner',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+      await _notifications.show(
+        DateTime.now().millisecondsSinceEpoch % 100000,
+        title,
+        body,
+        const NotificationDetails(android: androidDetails, iOS: iosDetails),
+      );
+    } catch (e) {
+      print('Error showing FCM as local notification: $e');
+    }
+  }
+
+  void _handleNotificationTap(RemoteMessage message) {
+    print('Notification tapped: ${message.notification?.title}');
   }
 
   /// Create notification channels for Android
