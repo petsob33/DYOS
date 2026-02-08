@@ -255,6 +255,41 @@ final partnerUserDoc = results[1];
     }
   }
 
+  /// Add XP to the couple (gamification). Persisted in Firestore.
+  Future<void> addCoupleXp(String coupleId, int amount) async {
+    if (amount <= 0) return;
+    final ref = _firestore.collection('couples').doc(coupleId);
+    await ref.update({'xp': FieldValue.increment(amount)});
+  }
+
+  /// Save blueprint answers for a section and user. Merges into couple.blueprintAnswers.
+  Future<void> saveBlueprintAnswers({
+    required String coupleId,
+    required String sectionId,
+    required String userId,
+    required Map<String, dynamic> answers,
+  }) async {
+    final ref = _firestore.collection('couples').doc(coupleId);
+    final path = 'blueprintAnswers.$sectionId.$userId';
+    await ref.update({path: answers});
+  }
+
+  /// Mark a blueprint section as completed for XP (so +100 XP is only given once per section).
+  Future<void> addCompletedBlueprintSection(String coupleId, String sectionId) async {
+    final ref = _firestore.collection('couples').doc(coupleId);
+    await ref.update({
+      'completedBlueprintSections': FieldValue.arrayUnion([sectionId]),
+    });
+  }
+
+  /// Set last date XP was granted for a quest (for "once per day" logic).
+  Future<void> setQuestXpGrantedAt(String coupleId, String questId, String dateString) async {
+    final ref = _firestore.collection('couples').doc(coupleId);
+    await ref.update({
+      'questXpLastGrantedAt.$questId': dateString,
+    });
+  }
+
   /// Update user's status in the couple document
   /// 
   /// Updates the emoji and text status for the current user.

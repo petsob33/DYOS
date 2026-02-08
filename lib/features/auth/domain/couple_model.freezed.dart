@@ -35,7 +35,16 @@ mixin _$CoupleModel {
   DateTime? get subscriptionExpiry => throw _privateConstructorUsedError; // When premium subscription ends
   // Status widget data - stored here to avoid reading extra documents on app start
   // Key is user UID, value is their status (emoji + text)
-  Map<String, CoupleStatus>? get status => throw _privateConstructorUsedError;
+  Map<String, CoupleStatus>? get status =>
+      throw _privateConstructorUsedError; // Gamification: couple XP (persisted in Firestore)
+  int get xp =>
+      throw _privateConstructorUsedError; // Blueprint answers: sectionId -> userId -> { questionId: value }
+  Map<String, dynamic>? get blueprintAnswers =>
+      throw _privateConstructorUsedError; // Section IDs for which XP was already awarded (once per section per couple)
+  List<String>? get completedBlueprintSections =>
+      throw _privateConstructorUsedError; // Quest XP granted once per day: questId -> "YYYY-MM-DD"
+  Map<String, String>? get questXpLastGrantedAt =>
+      throw _privateConstructorUsedError;
 
   /// Serializes this CoupleModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -62,6 +71,10 @@ abstract class $CoupleModelCopyWith<$Res> {
     String subscriptionTier,
     @TimestampConverter() DateTime? subscriptionExpiry,
     Map<String, CoupleStatus>? status,
+    int xp,
+    Map<String, dynamic>? blueprintAnswers,
+    List<String>? completedBlueprintSections,
+    Map<String, String>? questXpLastGrantedAt,
   });
 }
 
@@ -87,6 +100,10 @@ class _$CoupleModelCopyWithImpl<$Res, $Val extends CoupleModel>
     Object? subscriptionTier = null,
     Object? subscriptionExpiry = freezed,
     Object? status = freezed,
+    Object? xp = null,
+    Object? blueprintAnswers = freezed,
+    Object? completedBlueprintSections = freezed,
+    Object? questXpLastGrantedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -118,6 +135,22 @@ class _$CoupleModelCopyWithImpl<$Res, $Val extends CoupleModel>
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as Map<String, CoupleStatus>?,
+            xp: null == xp
+                ? _value.xp
+                : xp // ignore: cast_nullable_to_non_nullable
+                      as int,
+            blueprintAnswers: freezed == blueprintAnswers
+                ? _value.blueprintAnswers
+                : blueprintAnswers // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>?,
+            completedBlueprintSections: freezed == completedBlueprintSections
+                ? _value.completedBlueprintSections
+                : completedBlueprintSections // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
+            questXpLastGrantedAt: freezed == questXpLastGrantedAt
+                ? _value.questXpLastGrantedAt
+                : questXpLastGrantedAt // ignore: cast_nullable_to_non_nullable
+                      as Map<String, String>?,
           )
           as $Val,
     );
@@ -141,6 +174,10 @@ abstract class _$$CoupleModelImplCopyWith<$Res>
     String subscriptionTier,
     @TimestampConverter() DateTime? subscriptionExpiry,
     Map<String, CoupleStatus>? status,
+    int xp,
+    Map<String, dynamic>? blueprintAnswers,
+    List<String>? completedBlueprintSections,
+    Map<String, String>? questXpLastGrantedAt,
   });
 }
 
@@ -165,6 +202,10 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
     Object? subscriptionTier = null,
     Object? subscriptionExpiry = freezed,
     Object? status = freezed,
+    Object? xp = null,
+    Object? blueprintAnswers = freezed,
+    Object? completedBlueprintSections = freezed,
+    Object? questXpLastGrantedAt = freezed,
   }) {
     return _then(
       _$CoupleModelImpl(
@@ -196,6 +237,22 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
             ? _value._status
             : status // ignore: cast_nullable_to_non_nullable
                   as Map<String, CoupleStatus>?,
+        xp: null == xp
+            ? _value.xp
+            : xp // ignore: cast_nullable_to_non_nullable
+                  as int,
+        blueprintAnswers: freezed == blueprintAnswers
+            ? _value._blueprintAnswers
+            : blueprintAnswers // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>?,
+        completedBlueprintSections: freezed == completedBlueprintSections
+            ? _value._completedBlueprintSections
+            : completedBlueprintSections // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
+        questXpLastGrantedAt: freezed == questXpLastGrantedAt
+            ? _value._questXpLastGrantedAt
+            : questXpLastGrantedAt // ignore: cast_nullable_to_non_nullable
+                  as Map<String, String>?,
       ),
     );
   }
@@ -213,8 +270,15 @@ class _$CoupleModelImpl extends _CoupleModel {
     this.subscriptionTier = 'free',
     @TimestampConverter() this.subscriptionExpiry,
     final Map<String, CoupleStatus>? status,
+    this.xp = 0,
+    final Map<String, dynamic>? blueprintAnswers,
+    final List<String>? completedBlueprintSections,
+    final Map<String, String>? questXpLastGrantedAt,
   }) : _members = members,
        _status = status,
+       _blueprintAnswers = blueprintAnswers,
+       _completedBlueprintSections = completedBlueprintSections,
+       _questXpLastGrantedAt = questXpLastGrantedAt,
        super._();
 
   factory _$CoupleModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -262,9 +326,51 @@ class _$CoupleModelImpl extends _CoupleModel {
     return EqualUnmodifiableMapView(value);
   }
 
+  // Gamification: couple XP (persisted in Firestore)
+  @override
+  @JsonKey()
+  final int xp;
+  // Blueprint answers: sectionId -> userId -> { questionId: value }
+  final Map<String, dynamic>? _blueprintAnswers;
+  // Blueprint answers: sectionId -> userId -> { questionId: value }
+  @override
+  Map<String, dynamic>? get blueprintAnswers {
+    final value = _blueprintAnswers;
+    if (value == null) return null;
+    if (_blueprintAnswers is EqualUnmodifiableMapView) return _blueprintAnswers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  // Section IDs for which XP was already awarded (once per section per couple)
+  final List<String>? _completedBlueprintSections;
+  // Section IDs for which XP was already awarded (once per section per couple)
+  @override
+  List<String>? get completedBlueprintSections {
+    final value = _completedBlueprintSections;
+    if (value == null) return null;
+    if (_completedBlueprintSections is EqualUnmodifiableListView)
+      return _completedBlueprintSections;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  // Quest XP granted once per day: questId -> "YYYY-MM-DD"
+  final Map<String, String>? _questXpLastGrantedAt;
+  // Quest XP granted once per day: questId -> "YYYY-MM-DD"
+  @override
+  Map<String, String>? get questXpLastGrantedAt {
+    final value = _questXpLastGrantedAt;
+    if (value == null) return null;
+    if (_questXpLastGrantedAt is EqualUnmodifiableMapView)
+      return _questXpLastGrantedAt;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   String toString() {
-    return 'CoupleModel(id: $id, members: $members, anniversaryDate: $anniversaryDate, createdAt: $createdAt, subscriptionTier: $subscriptionTier, subscriptionExpiry: $subscriptionExpiry, status: $status)';
+    return 'CoupleModel(id: $id, members: $members, anniversaryDate: $anniversaryDate, createdAt: $createdAt, subscriptionTier: $subscriptionTier, subscriptionExpiry: $subscriptionExpiry, status: $status, xp: $xp, blueprintAnswers: $blueprintAnswers, completedBlueprintSections: $completedBlueprintSections, questXpLastGrantedAt: $questXpLastGrantedAt)';
   }
 
   @override
@@ -282,7 +388,20 @@ class _$CoupleModelImpl extends _CoupleModel {
                 other.subscriptionTier == subscriptionTier) &&
             (identical(other.subscriptionExpiry, subscriptionExpiry) ||
                 other.subscriptionExpiry == subscriptionExpiry) &&
-            const DeepCollectionEquality().equals(other._status, _status));
+            const DeepCollectionEquality().equals(other._status, _status) &&
+            (identical(other.xp, xp) || other.xp == xp) &&
+            const DeepCollectionEquality().equals(
+              other._blueprintAnswers,
+              _blueprintAnswers,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._completedBlueprintSections,
+              _completedBlueprintSections,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._questXpLastGrantedAt,
+              _questXpLastGrantedAt,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -296,6 +415,10 @@ class _$CoupleModelImpl extends _CoupleModel {
     subscriptionTier,
     subscriptionExpiry,
     const DeepCollectionEquality().hash(_status),
+    xp,
+    const DeepCollectionEquality().hash(_blueprintAnswers),
+    const DeepCollectionEquality().hash(_completedBlueprintSections),
+    const DeepCollectionEquality().hash(_questXpLastGrantedAt),
   );
 
   /// Create a copy of CoupleModel
@@ -322,6 +445,10 @@ abstract class _CoupleModel extends CoupleModel {
     final String subscriptionTier,
     @TimestampConverter() final DateTime? subscriptionExpiry,
     final Map<String, CoupleStatus>? status,
+    final int xp,
+    final Map<String, dynamic>? blueprintAnswers,
+    final List<String>? completedBlueprintSections,
+    final Map<String, String>? questXpLastGrantedAt,
   }) = _$CoupleModelImpl;
   const _CoupleModel._() : super._();
 
@@ -346,7 +473,15 @@ abstract class _CoupleModel extends CoupleModel {
   // Status widget data - stored here to avoid reading extra documents on app start
   // Key is user UID, value is their status (emoji + text)
   @override
-  Map<String, CoupleStatus>? get status;
+  Map<String, CoupleStatus>? get status; // Gamification: couple XP (persisted in Firestore)
+  @override
+  int get xp; // Blueprint answers: sectionId -> userId -> { questionId: value }
+  @override
+  Map<String, dynamic>? get blueprintAnswers; // Section IDs for which XP was already awarded (once per section per couple)
+  @override
+  List<String>? get completedBlueprintSections; // Quest XP granted once per day: questId -> "YYYY-MM-DD"
+  @override
+  Map<String, String>? get questXpLastGrantedAt;
 
   /// Create a copy of CoupleModel
   /// with the given fields replaced by the non-null parameter values.

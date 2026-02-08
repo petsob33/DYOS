@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/auth_providers.dart';
+import '../../../gamification/presentation/user_stats_provider.dart';
 import '../../data/intimacy_repository.dart';
 import '../../domain/intimacy_log_model.dart';
 
@@ -255,6 +256,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           await repository.updateLog(log, userData.coupleId!);
         } else {
           await repository.addLog(log, userData.coupleId!);
+          grantQuestXpIfEligible(ref, 'intimacy', 20);
         }
 
         if (mounted) {
@@ -262,7 +264,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
             SnackBar(
               content: Text(isEditing
                   ? 'Intimacy log updated successfully!'
-                  : 'Intimacy log added successfully!'),
+                  : 'Intimacy log added! +20 XP'),
               backgroundColor: AppTheme.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
