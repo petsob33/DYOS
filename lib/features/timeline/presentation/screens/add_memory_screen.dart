@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../gamification/presentation/user_stats_provider.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 import '../widgets/pick_place_screen.dart';
@@ -235,10 +236,15 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       addMemoryControllerProvider,
       (previous, next) {
         if (next is AddMemorySuccess) {
+          if (widget.initialMemory == null) {
+            grantQuestXpIfEligible(ref, 'memory', 25);
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Memory "${next.memory.caption.isEmpty ? 'Untitled' : next.memory.caption}" saved successfully!',
+                widget.initialMemory == null
+                    ? 'Memory saved! +25 XP'
+                    : 'Memory "${next.memory.caption.isEmpty ? 'Untitled' : next.memory.caption}" updated.',
               ),
               backgroundColor: AppTheme.colors.success,
               behavior: SnackBarBehavior.floating,

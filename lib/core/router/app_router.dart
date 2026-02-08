@@ -25,6 +25,11 @@ import '../../features/notes/presentation/screens/add_note_screen.dart';
 import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/auth/presentation/edit_profile_picture_screen.dart';
 import '../../features/premium/presentation/screens/premium_landing_screen.dart';
+import '../../features/gamification/presentation/screens/system_status_demo_screen.dart';
+import '../../features/blueprints/data/blueprint_mock_data.dart';
+import '../../features/blueprints/presentation/screens/blueprint_detail_screen.dart';
+import '../../features/blueprints/presentation/screens/blueprints_list_screen.dart';
+import '../../features/gamification/presentation/screens/level_screen.dart';
 import '../../features/notes/presentation/screens/secret_notes_screen.dart';
 import '../../features/cycle/presentation/cycle_tracking_screen.dart';
 import '../../features/events/presentation/add_event_sheet.dart';
@@ -187,6 +192,69 @@ GoRouter appRouter(AppRouterRef ref) {
           context,
           state,
           const PremiumLandingScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/system-status-demo',
+        name: 'system-status-demo',
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const SystemStatusDemoScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/level',
+        name: 'level',
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const LevelScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/blueprints',
+        name: 'blueprints',
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const BlueprintsListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/blueprint/:sectionId',
+        name: 'blueprint-detail',
+        pageBuilder: (context, state) {
+          final sectionId = state.pathParameters['sectionId'] ?? '';
+          final section = BlueprintMockData.sectionById(sectionId);
+          if (section == null) {
+            return buildPageWithSlideTransition(
+              context,
+              state,
+              const Scaffold(
+                body: Center(child: Text('Blueprint not found')),
+              ),
+            );
+          }
+          return buildPageWithSlideTransition(
+            context,
+            state,
+            BlueprintDetailScreen(
+              sectionTitle: section.title,
+              sectionEmoji: section.emoji,
+              questions: section.questions,
+              sectionId: section.id,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/blueprint/travel-config',
+        name: 'blueprint-travel-config',
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const TravelConfigBlueprintScreen(),
         ),
       ),
       GoRoute(

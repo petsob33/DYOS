@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/presentation/auth_providers.dart';
+import '../../gamification/presentation/user_stats_provider.dart';
 import '../data/event_repository.dart';
 import '../domain/event_model.dart';
 
@@ -183,12 +184,16 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
 
         await repository.addOrUpdateEvent(event, userData.coupleId!);
 
+        if (!isEditing) {
+          grantQuestXpIfEligible(ref, 'event', 15);
+        }
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(isEditing
                   ? 'Event updated successfully!'
-                  : 'Event added successfully!'),
+                  : 'Event added! +15 XP'),
               backgroundColor: AppTheme.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
