@@ -307,48 +307,77 @@ class _MemoryCardState extends State<MemoryCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Date and Category Chip
+          // Header: Caption (title) with Category Chip, then Date
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Row(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.xs,
+              0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Date
-                Expanded(
+                // Caption (title) and Category Chip on same row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Caption (title) - large, on the left
+                    if (widget.memory.caption.isNotEmpty)
+                      Expanded(
+                        child: Text(
+                          widget.memory.caption,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: AppTheme.colors.text,
+                                fontWeight: FontWeight.w600,
+                                height: 1.5,
+                              ),
+                        ),
+                      ),
+                    // Category Chip - on the right
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.colors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.memory.category.emoji,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          Text(
+                            widget.memory.category.displayName,
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: AppTheme.colors.primary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                // Date - small, right below caption
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 2,
+                    bottom: AppSpacing.md,
+                  ),
                   child: Text(
                     _formatDate(widget.memory.date),
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: AppTheme.colors.textSecondary,
                           fontWeight: FontWeight.w500,
+                          fontSize: 11,
                         ),
-                  ),
-                ),
-                // Category Chip
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.colors.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        widget.memory.category.emoji,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        widget.memory.category.displayName,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppTheme.colors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                            ),
-                      ),
-                    ],
                   ),
                 ),
               ],
@@ -478,47 +507,25 @@ class _MemoryCardState extends State<MemoryCard> {
               ),
             ),
 
-          // Footer: Caption and location (if not shown as badge)
-          if (widget.memory.caption.isNotEmpty ||
-              (locationName != null && !hasImages))
+          // Footer: Location (if not shown as badge and no images)
+          if (locationName != null && !hasImages)
             Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  // Caption
-                  if (widget.memory.caption.isNotEmpty)
-                    Text(
-                      widget.memory.caption,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w600,
-                            height: 1.5,
-                          ),
-                    ),
-                  // Location in footer (if not shown as badge on image)
-                  if (locationName != null && !hasImages) ...[
-                    if (widget.memory.caption.isNotEmpty)
-                      const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      children: [
-                        Icon(
-                          PhosphorIconsBold.mapPin,
-                          size: 16,
+                  Icon(
+                    PhosphorIconsBold.mapPin,
+                    size: 16,
+                    color: AppTheme.colors.textSecondary,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    locationName,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppTheme.colors.textSecondary,
+                          fontWeight: FontWeight.w500,
                         ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          locationName,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ],
               ),
             ),

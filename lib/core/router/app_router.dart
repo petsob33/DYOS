@@ -33,6 +33,46 @@ import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
 
+/// Helper function to create a page with slide transition animation
+Page<T> buildPageWithSlideTransition<T extends Object?>(
+  BuildContext context,
+  GoRouterState state,
+  Widget child, {
+  Duration transitionDuration = const Duration(milliseconds: 300),
+  Curve transitionCurve = Curves.easeInOut,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+    ) {
+      // Slide from right to left when pushing
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      final tween = Tween<Offset>(begin: begin, end: end);
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: transitionCurve,
+      );
+      final offsetAnimation = tween.animate(curvedAnimation);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      );
+    },
+    transitionDuration: transitionDuration,
+    reverseTransitionDuration: transitionDuration,
+  );
+}
+
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
   // Watch auth state - Stream<User?>
@@ -89,93 +129,157 @@ GoRouter appRouter(AppRouterRef ref) {
       GoRoute(
         path: '/login',
         name: 'login',
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const LoginScreen(),
+        ),
       ),
       GoRoute(
         path: '/register',
         name: 'register',
-        builder: (context, state) => const RegisterScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const RegisterScreen(),
+        ),
       ),
       GoRoute(
         path: '/firebase-test',
         name: 'firebase-test',
-        builder: (context, state) => const FirebaseTestScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const FirebaseTestScreen(),
+        ),
       ),
       GoRoute(
         path: '/pairing',
         name: 'pairing',
-        builder: (context, state) => const PairingScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const PairingScreen(),
+        ),
       ),
       GoRoute(
         path: '/settings',
         name: 'settings',
-        builder: (context, state) => const SettingsScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const SettingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/profile',
         name: 'profile',
-        builder: (context, state) => const ProfileScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const ProfileScreen(),
+        ),
       ),
       GoRoute(
         path: '/premium',
         name: 'premium',
-        builder: (context, state) => const PremiumLandingScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const PremiumLandingScreen(),
+        ),
       ),
       GoRoute(
         path: '/edit-profile-picture',
         name: 'edit-profile-picture',
-        builder: (context, state) => const EditProfilePictureScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const EditProfilePictureScreen(),
+        ),
       ),
       GoRoute(
         path: '/intimacy-history',
         name: 'intimacy-history',
-        builder: (context, state) => const IntimacyHistoryScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const IntimacyHistoryScreen(),
+        ),
       ),
       GoRoute(
         path: '/secret-notes',
         name: 'secret-notes',
-        builder: (context, state) => const SecretNotesScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const SecretNotesScreen(),
+        ),
       ),
       GoRoute(
         path: '/add-memory',
         name: 'add-memory',
-        builder: (context, state) => const AddMemoryScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const AddMemoryScreen(),
+        ),
       ),
       GoRoute(
         path: '/memory/edit',
         name: 'memory-edit',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final memory = state.extra as Memory?;
           if (memory == null) {
-            return const Scaffold(
-              body: Center(child: Text('Memory not found')),
+            return buildPageWithSlideTransition(
+              context,
+              state,
+              const Scaffold(
+                body: Center(child: Text('Memory not found')),
+              ),
             );
           }
-          return AddMemoryScreen(initialMemory: memory);
+          return buildPageWithSlideTransition(
+            context,
+            state,
+            AddMemoryScreen(initialMemory: memory),
+          );
         },
       ),
       GoRoute(
         path: '/memory/map',
         name: 'memory-map',
-        builder: (context, state) => const MemoriesMapScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const MemoriesMapScreen(),
+        ),
       ),
       GoRoute(
         path: '/memory/detail',
         name: 'memory-detail',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final memory = state.extra as Memory?;
           if (memory == null) {
-            return const Scaffold(
-              body: Center(child: Text('Memory not found')),
+            return buildPageWithSlideTransition(
+              context,
+              state,
+              const Scaffold(
+                body: Center(child: Text('Memory not found')),
+              ),
             );
           }
-          return MemoryDetailScreen(memory: memory);
+          return buildPageWithSlideTransition(
+            context,
+            state,
+            MemoryDetailScreen(memory: memory),
+          );
         },
       ),
       GoRoute(
         path: '/add-note',
         name: 'add-note',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final typeParam = state.uri.queryParameters['type'];
           NoteType? initialType;
           if (typeParam != null) {
@@ -187,18 +291,30 @@ GoRouter appRouter(AppRouterRef ref) {
               // Invalid type parameter, use default
             }
           }
-          return AddNoteScreen(initialType: initialType);
+          return buildPageWithSlideTransition(
+            context,
+            state,
+            AddNoteScreen(initialType: initialType),
+          );
         },
       ),
       GoRoute(
         path: '/events',
         name: 'events',
-        builder: (context, state) => const EventsScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const EventsScreen(),
+        ),
       ),
       GoRoute(
         path: '/lists',
         name: 'lists',
-        builder: (context, state) => const ListsScreen(),
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const ListsScreen(),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
