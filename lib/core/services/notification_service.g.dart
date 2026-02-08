@@ -11,7 +11,9 @@ String _$notificationServiceHash() =>
 
 /// Service for handling notifications in the app
 ///
-/// This service handles local notifications that appear in the system notification tray.
+/// Handles:
+/// - Local notifications (in-app / foreground)
+/// - Firebase Cloud Messaging (push when app is in background or closed)
 ///
 /// Copied from [notificationService].
 @ProviderFor(notificationService)

@@ -25,7 +25,7 @@ final purchaseServiceProvider = AutoDisposeProvider<PurchaseService>.internal(
 typedef PurchaseServiceRef = AutoDisposeProviderRef<PurchaseService>;
 String _$isPremiumHash() => r'008ed0b9c5a105ca952448c8c01ff8b6739abea8';
 
-/// Derives premium status from the couple stream so the app can depend on a single AsyncValue<bool>.
+/// Derives premium status from the couple stream so the app can depend on a single AsyncValue for bool.
 ///
 /// Copied from [isPremium].
 @ProviderFor(isPremium)

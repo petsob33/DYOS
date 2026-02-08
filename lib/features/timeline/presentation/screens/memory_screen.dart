@@ -172,6 +172,22 @@ class _TimelineMemoryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Caption (title) above image
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.md,
+            ),
+            child: Text(
+              memory.caption,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppTheme.colors.text,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
           // Image placeholder
           Container(
             width: double.infinity,
@@ -179,7 +195,7 @@ class _TimelineMemoryCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.colors.textSecondary.withOpacity(0.1),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
+                bottom: Radius.circular(24),
               ),
             ),
             child: Stack(
@@ -229,58 +245,49 @@ class _TimelineMemoryCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.lg,
+            ),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    // Date
-                    Text(
-                      memory.date,
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: AppTheme.colors.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const Spacer(),
-                    // Tags
-                    if (memory.tags.isNotEmpty)
-                      Wrap(
-                        spacing: AppSpacing.xs,
-                        children: memory.tags.map((tag) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _getTagColor(tag).withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              tag,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: _getTagColor(tag),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 11,
-                                  ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                // Caption
+                // Date
                 Text(
-                  memory.caption,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppTheme.colors.text,
-                    fontWeight: FontWeight.w600,
+                  memory.date,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: AppTheme.colors.textSecondary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
+                const Spacer(),
+                // Tags
+                if (memory.tags.isNotEmpty)
+                  Wrap(
+                    spacing: AppSpacing.xs,
+                    children: memory.tags.map((tag) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getTagColor(tag).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          tag,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: _getTagColor(tag),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                              ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
               ],
             ),
           ),
