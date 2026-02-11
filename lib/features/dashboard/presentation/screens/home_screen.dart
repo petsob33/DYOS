@@ -577,7 +577,7 @@ class _AppBarLevelStrip extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$currentXp XP',
+                  '$currentXp SP',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: c.textSecondary,
                         fontWeight: FontWeight.w600,

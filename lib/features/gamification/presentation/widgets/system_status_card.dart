@@ -6,7 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../domain/level_manager.dart';
 
-/// iOS System Update–style Bento card showing current "OS Version" and XP progress.
+/// iOS System Update–style Bento card showing current "OS Version" and SP progress.
 class SystemStatusCard extends StatefulWidget {
   const SystemStatusCard({
     super.key,
@@ -125,12 +125,12 @@ class _SystemStatusCardState extends State<SystemStatusCard>
             },
           ),
           const SizedBox(height: AppSpacing.sm),
-          // XP text: "750 / 2000 XP to v3.0"
+          // SP text: "750 / 2000 SP to v3.0"
           Center(
             child: Text(
               nextLabel != null && xpToNext != null
-                  ? '${widget.currentXp} / $tierMax XP to $nextLabel'
-                  : '${widget.currentXp} XP · Max level',
+                  ? '${widget.currentXp} / $tierMax SP to $nextLabel'
+                  : '${widget.currentXp} SP · Max level',
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
