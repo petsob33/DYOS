@@ -9,7 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../tracker/presentation/widgets/add_intimacy_sheet.dart';
 import '../../domain/level_manager.dart';
-import '../../domain/level_tier.dart';
+import '../../domain/progression_plan.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../user_stats_provider.dart';
 
@@ -20,17 +20,16 @@ class LevelScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = AppTheme.colors;
-    final currentXp = ref.watch(currentXpProvider);
+    final currentSp = ref.watch(currentXpProvider); // SP stored as xp in Firestore
     final couple = ref.watch(coupleProvider).when(
           data: (x) => x,
           loading: () => null,
           error: (_, __) => null,
         );
-    final currentTier = LevelManager.tiers
-        .lastWhere((t) => currentXp >= t.minXp, orElse: () => LevelManager.tiers.first);
-    final nextTier = LevelManager.nextTierVersionLabel(currentXp);
-    final xpToNext = LevelManager.xpToNextTier(currentXp);
-    final progress = LevelManager.calculateProgress(currentXp);
+    final currentPhase = ProgressionPlan.phaseForSp(currentSp);
+    final nextTier = LevelManager.nextTierVersionLabel(currentSp);
+    final spToNext = LevelManager.xpToNextTier(currentSp);
+    final progress = LevelManager.calculateProgress(currentSp);
 
     return Scaffold(
       backgroundColor: c.background,
@@ -88,32 +87,31 @@ class LevelScreen extends ConsumerWidget {
                       ),
                       child: Column(
                         children: [
-                          Icon(
-                            PhosphorIconsBold.star,
-                            size: 40,
-                            color: c.primary,
+                          Text(
+                            currentPhase?.emoji ?? '🏁',
+                            style: const TextStyle(fontSize: 40),
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
-                            currentTier.versionShort,
+                            currentPhase?.name ?? 'Boot Sequence',
                             style: GoogleFonts.inter(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              color: c.primary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: c.text,
                             ),
                           ),
                           Text(
-                            currentTier.rewardName != '—' ? currentTier.rewardName : 'Starter',
+                            LevelManager.currentVersionString(currentSp),
                             style: GoogleFonts.inter(
                               fontSize: 14,
-                              color: c.textSecondary,
-                              fontWeight: FontWeight.w500,
+                              color: c.primary,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: AppSpacing.sm),
-                          if (nextTier != null && xpToNext != null)
+                          if (nextTier != null && spToNext != null)
                             Text(
-                              'Collect $xpToNext XP to get to $nextTier',
+                              'Collect $spToNext SP to get to $nextTier',
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 color: c.textSecondary,
@@ -122,7 +120,7 @@ class LevelScreen extends ConsumerWidget {
                             ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            '$currentXp points',
+                            '$currentSp SP',
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -133,17 +131,17 @@ class LevelScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    _TierStepper(currentXp: currentXp, progress: progress),
+                    _TierStepper(currentXp: currentSp, progress: progress),
                   ],
                 ),
               ),
             ),
-            // Your Rewards
+            // All milestones (rewards + level ups)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
                 child: Text(
-                  'Your Rewards',
+                  'Progression & Rewards',
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -155,34 +153,7 @@ class LevelScreen extends ConsumerWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _RewardCard(
-                            icon: PhosphorIconsBold.gift,
-                            label: 'Unlocked',
-                            subtitle: currentTier.rewardName != '—' ? currentTier.rewardName : 'Keep going',
-                            isUnlocked: true,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: _RewardCard(
-                            icon: PhosphorIconsBold.rocket,
-                            label: nextTier ?? 'Max',
-                            subtitle: nextTier != null ? 'Next tier' : 'Top level',
-                            isUnlocked: false,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    _RewardsList(currentXp: currentXp),
-                  ],
-                ),
+                child: _MilestonesList(currentSp: currentSp),
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
@@ -210,7 +181,7 @@ class LevelScreen extends ConsumerWidget {
                       _QuestRow(
                         questId: 'blueprint',
                         title: 'Complete a Blueprint section',
-                        xp: 100,
+                        sp: 100,
                         icon: PhosphorIconsBold.clipboardText,
                         completedToday: isQuestCompletedToday(couple, 'blueprint'),
                         onTap: () => context.push('/blueprints'),
@@ -219,7 +190,7 @@ class LevelScreen extends ConsumerWidget {
                       _QuestRow(
                         questId: 'memory',
                         title: 'Add a memory',
-                        xp: 25,
+                        sp: 25,
                         icon: PhosphorIconsBold.image,
                         completedToday: isQuestCompletedToday(couple, 'memory'),
                         onTap: () => context.push('/add-memory'),
@@ -228,7 +199,7 @@ class LevelScreen extends ConsumerWidget {
                       _QuestRow(
                         questId: 'event',
                         title: 'Add an event',
-                        xp: 15,
+                        sp: 15,
                         icon: PhosphorIconsBold.calendar,
                         completedToday: isQuestCompletedToday(couple, 'event'),
                         onTap: () => context.push('/events'),
@@ -237,7 +208,7 @@ class LevelScreen extends ConsumerWidget {
                       _QuestRow(
                         questId: 'intimacy',
                         title: 'Log intimacy',
-                        xp: 20,
+                        sp: 20,
                         icon: PhosphorIconsBold.heart,
                         completedToday: isQuestCompletedToday(couple, 'intimacy'),
                         onTap: () => AddIntimacySheet.show(context),
@@ -315,133 +286,202 @@ class _TierStepper extends StatelessWidget {
   }
 }
 
-class _RewardCard extends StatelessWidget {
-  const _RewardCard({
-    required this.icon,
-    required this.label,
-    required this.subtitle,
-    required this.isUnlocked,
-  });
+/// Full list of progression milestones with a vertical progress line.
+class _MilestonesList extends StatelessWidget {
+  const _MilestonesList({required this.currentSp});
 
-  final IconData icon;
-  final String label;
-  final String subtitle;
-  final bool isUnlocked;
+  final int currentSp;
+
+  static const double _dotSize = 24.0;
+  static const double _lineWidth = 2.0;
+  static const double _trackWidth = 40.0;
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
-    return BentoCard(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: isUnlocked ? c.primary.withOpacity(0.12) : c.background,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, size: 28, color: isUnlocked ? c.primary : c.textSecondary),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: isUnlocked ? c.text : c.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          Text(
-            subtitle,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: c.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RewardsList extends StatelessWidget {
-  const _RewardsList({required this.currentXp});
-
-  final int currentXp;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppTheme.colors;
-    final tiers = LevelManager.tiers;
+    final milestones = ProgressionPlan.milestones;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var i = 0; i < tiers.length; i++) ...[
-          _RewardListTile(
-            tier: tiers[i],
-            unlocked: currentXp >= tiers[i].minXp,
+        for (var i = 0; i < milestones.length; i++) ...[
+          _MilestoneRow(
+            milestone: milestones[i],
+            unlocked: ProgressionPlan.isMilestoneUnlocked(currentSp, milestones[i].spRequired),
+            isFirst: i == 0,
+            isLast: i == milestones.length - 1,
+            lineAboveUnlocked: i > 0 && ProgressionPlan.isMilestoneUnlocked(currentSp, milestones[i - 1].spRequired),
+            dotSize: _dotSize,
+            lineWidth: _lineWidth,
+            trackWidth: _trackWidth,
           ),
-          if (i < tiers.length - 1) const SizedBox(height: AppSpacing.xs),
         ],
       ],
     );
   }
 }
 
-class _RewardListTile extends StatelessWidget {
-  const _RewardListTile({required this.tier, required this.unlocked});
+class _MilestoneRow extends StatelessWidget {
+  const _MilestoneRow({
+    required this.milestone,
+    required this.unlocked,
+    required this.isFirst,
+    required this.isLast,
+    required this.lineAboveUnlocked,
+    required this.dotSize,
+    required this.lineWidth,
+    required this.trackWidth,
+  });
 
-  final LevelTier tier;
+  final ProgressionMilestone milestone;
   final bool unlocked;
+  final bool isFirst;
+  final bool isLast;
+  final bool lineAboveUnlocked;
+  final double dotSize;
+  final double lineWidth;
+  final double trackWidth;
+
+  /// Version string for level-up milestones (e.g. "v2.0" from "Přechod na v2.0").
+  String get _versionShort {
+    final d = milestone.description;
+    final match = RegExp(r'v\d+\.\d+').firstMatch(d);
+    return match?.group(0) ?? milestone.title;
+  }
 
   @override
   Widget build(BuildContext context) {
     final c = AppTheme.colors;
-    return BentoCard(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+    final isLevelUp = milestone.type == MilestoneType.levelUp;
+
+    return IntrinsicHeight(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            unlocked ? PhosphorIconsBold.checkCircle : PhosphorIconsBold.circle,
-            size: 22,
-            color: unlocked ? c.success : c.textSecondary.withOpacity(0.5),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
+          // Progress line: segment above + node (dot or version gate) + segment below
+          SizedBox(
+            width: trackWidth,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  tier.versionShort,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: unlocked ? c.text : c.textSecondary,
+                if (isFirst) SizedBox(height: dotSize / 2) else Expanded(
+                  child: Container(
+                    width: lineWidth,
+                    margin: EdgeInsets.only(left: (trackWidth - lineWidth) / 2),
+                    decoration: BoxDecoration(
+                      color: lineAboveUnlocked ? c.primary : c.textSecondary.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(lineWidth / 2),
+                    ),
                   ),
                 ),
-                Text(
-                  tier.rewardName,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: c.textSecondary,
+                // Node: version gate (pill) for level-up, round dot for rewards
+                if (isLevelUp)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: unlocked ? c.primary : c.textSecondary.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: unlocked ? c.primary : c.textSecondary.withOpacity(0.4),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Text(
+                      _versionShort,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: unlocked ? Colors.white : c.textSecondary,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: dotSize,
+                    height: dotSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: unlocked ? c.primary : c.background,
+                      border: Border.all(
+                        color: unlocked ? c.primary : c.textSecondary.withOpacity(0.4),
+                        width: 2,
+                      ),
+                      boxShadow: unlocked
+                          ? [
+                              BoxShadow(
+                                color: c.primary.withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        milestone.emoji ?? (unlocked ? '✓' : ''),
+                        style: TextStyle(fontSize: dotSize * 0.5),
+                      ),
+                    ),
+                  ),
+                if (isLast) SizedBox(height: dotSize / 2) else Expanded(
+                  child: Container(
+                    width: lineWidth,
+                    margin: EdgeInsets.only(left: (trackWidth - lineWidth) / 2),
+                    decoration: BoxDecoration(
+                      color: unlocked ? c.primary : c.textSecondary.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(lineWidth / 2),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          if (!unlocked)
-            Text(
-              '${tier.minXp} XP',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: c.textSecondary,
+          const SizedBox(width: AppSpacing.sm),
+          // Content card
+          Expanded(
+            child: BentoCard(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          milestone.title,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: unlocked ? c.text : c.textSecondary,
+                          ),
+                        ),
+                        Text(
+                          milestone.description,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: c.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (!unlocked)
+                    Text(
+                      '${milestone.spRequired} SP',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: c.textSecondary,
+                      ),
+                    )
+                  else
+                    Icon(
+                      PhosphorIconsBold.checkCircle,
+                      size: 20,
+                      color: c.success,
+                    ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );
@@ -452,7 +492,7 @@ class _QuestRow extends StatelessWidget {
   const _QuestRow({
     required this.questId,
     required this.title,
-    required this.xp,
+    required this.sp,
     required this.icon,
     required this.completedToday,
     this.onTap,
@@ -460,7 +500,7 @@ class _QuestRow extends StatelessWidget {
 
   final String questId;
   final String title;
-  final int xp;
+  final int sp;
   final IconData icon;
   final bool completedToday;
   final VoidCallback? onTap;
@@ -514,7 +554,7 @@ class _QuestRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '+$xp XP',
+                  '+$sp SP',
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
