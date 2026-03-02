@@ -256,6 +256,7 @@ service cloud.firestore {
         // Smazání: Člen páru
         allow delete: if isCoupleMember();
       }
+      
     }
     
     // ============================================

@@ -18,7 +18,6 @@ enum RewardKind {
   premiumTrial,
   chatWallpapers,
   mapView,
-  timeCapsule,
   lifetimeLicense,
 }
 
@@ -211,14 +210,6 @@ class ProgressionPlan {
       emoji: '🔓',
     ),
     ProgressionMilestone(
-      spRequired: 50000,
-      type: MilestoneType.reward,
-      title: 'Time Capsule',
-      description: 'Odemkne zprávy do budoucnosti',
-      rewardKind: RewardKind.timeCapsule,
-      emoji: '🔓',
-    ),
-    ProgressionMilestone(
       spRequired: 75000,
       type: MilestoneType.reward,
       title: 'System Architect',
@@ -299,6 +290,25 @@ class ProgressionPlan {
 
   /// Whether the milestone at [spRequired] is unlocked for given [sp].
   static bool isMilestoneUnlocked(int sp, int spRequired) => sp >= spRequired;
+
+  /// Functional unlocks (Map, Blueprints pack, Taptic, Widget) are
+  /// unlocked immediately with DYOS+; otherwise they follow SP milestones.
+  /// Cosmetic rewards (badges, icons, wallpapers) and Lifetime are SP-only.
+  static const Set<RewardKind> functionalRewardKinds = {
+    RewardKind.widget,
+    RewardKind.taptic,
+    RewardKind.blueprintPack,
+    RewardKind.mapView,
+  };
+
+  /// True if the feature for [kind] is unlocked: premium unlocks all functional
+  /// features; otherwise uses [currentSp] vs milestone threshold.
+  static bool isFeatureUnlocked(RewardKind kind, int currentSp, bool isPremium) {
+    if (isPremium && functionalRewardKinds.contains(kind)) return true;
+    final list = milestones.where((m) => m.rewardKind == kind).toList();
+    if (list.isEmpty) return false;
+    return currentSp >= list.first.spRequired;
+  }
 
   /// Short tip for "next reward" in UI.
   static String nextRewardTip(int sp) {
