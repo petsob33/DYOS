@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -6,6 +8,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/auth/presentation/auth_providers.dart';
+import '../../features/gamification/domain/progression_plan.dart';
+import '../../features/gamification/presentation/user_stats_provider.dart';
+import '../../features/gamification/presentation/widgets/level_up_unlock_sheet.dart';
+import '../../features/premium/presentation/premium_provider.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/firebase_test_screen.dart';
@@ -99,7 +105,7 @@ GoRouter appRouter(AppRouterRef ref) {
       // Define public routes (don't require authentication)
       final isPublicRoute = state.matchedLocation == '/login' || 
                            state.matchedLocation == '/register' ||
-                           state.matchedLocation == '/firebase-test';
+                           (kDebugMode && state.matchedLocation == '/firebase-test');
       
       // Define pairing route (requires auth but not pairing)
       final isPairingRoute = state.matchedLocation == '/pairing';
@@ -149,15 +155,16 @@ GoRouter appRouter(AppRouterRef ref) {
           const RegisterScreen(),
         ),
       ),
-      GoRoute(
-        path: '/firebase-test',
-        name: 'firebase-test',
-        pageBuilder: (context, state) => buildPageWithSlideTransition(
-          context,
-          state,
-          const FirebaseTestScreen(),
+      if (kDebugMode)
+        GoRoute(
+          path: '/firebase-test',
+          name: 'firebase-test',
+          pageBuilder: (context, state) => buildPageWithSlideTransition(
+            context,
+            state,
+            const FirebaseTestScreen(),
+          ),
         ),
-      ),
       GoRoute(
         path: '/pairing',
         name: 'pairing',
@@ -431,7 +438,7 @@ GoRouter appRouter(AppRouterRef ref) {
 }
 
 
-class RootShell extends StatelessWidget {
+class RootShell extends ConsumerWidget {
   const RootShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
@@ -440,24 +447,41 @@ class RootShell extends StatelessWidget {
   static const double _swipeVelocityThreshold = 200; // px/s – min. rychlost pro přepnutí
   static const double _swipeUpVelocityThreshold = 400; // px/s – swipe nahoru otevře Quick Add
 
-  void _onTabSelected(int index) {
+  void _onTabSelected(BuildContext context, WidgetRef ref, int index) {
+    if (index == 1) {
+      final currentSp = ref.read(currentXpProvider);
+      final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
+      if (!ProgressionPlan.isFeatureUnlocked(FeatureID.memories, currentSp, isPremium)) {
+        showLevelUpUnlockSheet(context, ref, FeatureID.memories);
+        return;
+      }
+    }
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
     );
   }
 
-  void _onHorizontalSwipe(double velocity) {
+  void _onHorizontalSwipe(BuildContext context, WidgetRef ref, double velocity) {
     final current = navigationShell.currentIndex;
     if (velocity < -_swipeVelocityThreshold && current < _branchCount - 1) {
-      navigationShell.goBranch(current + 1);
+      final nextIndex = current + 1;
+      if (nextIndex == 1) {
+        final currentSp = ref.read(currentXpProvider);
+        final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
+        if (!ProgressionPlan.isFeatureUnlocked(FeatureID.memories, currentSp, isPremium)) {
+          showLevelUpUnlockSheet(context, ref, FeatureID.memories);
+          return;
+        }
+      }
+      navigationShell.goBranch(nextIndex);
     } else if (velocity > _swipeVelocityThreshold && current > 0) {
       navigationShell.goBranch(current - 1);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final items = [
       _NavItem('Home', PhosphorIconsBold.house),
       _NavItem('Memory', PhosphorIconsBold.clockCounterClockwise),
@@ -470,12 +494,12 @@ class RootShell extends StatelessWidget {
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
           final velocity = details.primaryVelocity ?? 0;
-          _onHorizontalSwipe(velocity.toDouble());
+          _onHorizontalSwipe(context, ref, velocity.toDouble());
         },
         onVerticalDragEnd: (details) {
           final velocity = details.primaryVelocity ?? 0;
           if (velocity < -_swipeUpVelocityThreshold) {
-            showQuickAddSheet(context);
+            showQuickAddSheet(context, ref);
           }
         },
         behavior: HitTestBehavior.translucent,
@@ -515,7 +539,7 @@ class RootShell extends StatelessWidget {
                         child: InkWell(
                           customBorder: const CircleBorder(),
                           onTap: () {
-                            showQuickAddSheet(context);
+                            showQuickAddSheet(context, ref);
                           },
                           child: SizedBox(
                             width: 56,
@@ -536,7 +560,7 @@ class RootShell extends StatelessWidget {
                         item: items[i > 2 ? i - 1 : i],
                         index: i > 2 ? i - 1 : i,
                         selected: navigationShell.currentIndex == (i > 2 ? i - 1 : i),
-                        onTap: () => _onTabSelected(i > 2 ? i - 1 : i),
+                        onTap: () => _onTabSelected(context, ref, i > 2 ? i - 1 : i),
                       ),
                     ),
               ],
@@ -602,22 +626,32 @@ class _BottomNavItem extends StatelessWidget {
 
 /// Shows the Quick Add bottom sheet (add memory, note, intimacy, event).
 /// Used by shell FAB and by swipe-up on the home insight widget.
-void showQuickAddSheet(BuildContext context) {
+void showQuickAddSheet(BuildContext context, WidgetRef ref) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (context) => const _QuickAddSheet(),
+    builder: (sheetContext) => _QuickAddSheet(parentContext: context),
   );
 }
 
-class _QuickAddSheet extends StatelessWidget {
-  const _QuickAddSheet();
+class _QuickAddSheet extends ConsumerWidget {
+  const _QuickAddSheet({required this.parentContext});
+
+  final BuildContext parentContext;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentSp = ref.watch(currentXpProvider);
+    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
+    final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
+      FeatureID.memories,
+      currentSp,
+      isPremium,
+    );
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -653,7 +687,16 @@ class _QuickAddSheet extends StatelessWidget {
               _QuickActionChip(
                 icon: PhosphorIconsBold.camera,
                 label: 'Add memory',
-                navigationRoute: '/add-memory',
+                navigationRoute: memoriesUnlocked ? '/add-memory' : null,
+                onTap: memoriesUnlocked
+                    ? null
+                    : () {
+                        showLevelUpUnlockSheet(
+                          parentContext,
+                          ref,
+                          FeatureID.memories,
+                        );
+                      },
               ),
               _QuickActionChip(
                 icon: PhosphorIconsBold.heart,

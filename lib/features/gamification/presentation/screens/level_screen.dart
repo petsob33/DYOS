@@ -8,10 +8,12 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../tracker/presentation/widgets/add_intimacy_sheet.dart';
+import '../../../premium/presentation/premium_provider.dart';
 import '../../domain/level_manager.dart';
 import '../../domain/progression_plan.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../user_stats_provider.dart';
+import '../widgets/level_up_unlock_sheet.dart';
 
 /// Level / rewards screen in loyalty-style layout. Uses app template: Inter, primary #5E5CE6, Bento cards.
 class LevelScreen extends ConsumerWidget {
@@ -21,6 +23,12 @@ class LevelScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final c = AppTheme.colors;
     final currentSp = ref.watch(currentXpProvider); // SP stored as xp in Firestore
+    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
+    final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
+      FeatureID.memories,
+      currentSp,
+      isPremium,
+    );
     final couple = ref.watch(coupleProvider).when(
           data: (x) => x,
           loading: () => null,
@@ -193,7 +201,13 @@ class LevelScreen extends ConsumerWidget {
                         sp: 25,
                         icon: PhosphorIconsBold.image,
                         completedToday: isQuestCompletedToday(couple, 'memory'),
-                        onTap: () => context.push('/add-memory'),
+                        onTap: () {
+                          if (memoriesUnlocked) {
+                            context.push('/add-memory');
+                          } else {
+                            showLevelUpUnlockSheet(context, ref, FeatureID.memories);
+                          }
+                        },
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       _QuestRow(

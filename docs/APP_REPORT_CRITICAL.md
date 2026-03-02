@@ -3,6 +3,8 @@
 **Datum:** březen 2025  
 **Účel:** Kompletní přehled hotového / nedokončeného, bezpečnostní rizika, funkčnost a doporučení. Dokument je záměrně kritický.
 
+**Po úpravách (dle tohoto reportu):** Odstraněn hardcoded Google Places API klíč z Info.plist (použit Secrets.xcconfig). Přidána Storage pravidla pro `profile_pictures`. Route `/firebase-test` je jen v debug buildu. Waitlist get jen pro přihlášené. V notification_service a couple_model použit `debugPrint` místo `print`. Přidána dokumentace `docs/ARCHITECTURE.md` (Auth, Pairing, Router, Firebase, RevenueCat).
+
 ---
 
 ## 1. Přehled aplikace
@@ -98,8 +100,7 @@
 - **Firestore test:** používá kolekci `_test` – v pravidlech není výjimka, takže v produkci by zápis/čtení selhal (správně), ale obrazovka zůstává v buildu.
 
 ### 3.4 Dokumentace a konzistence
-- Technická spec vs. kód je zčásti popsána v `TECHNICAL_SPEC_COMPARISON.md`; chybí popis Auth, Pairing, Events, Notes, Router, Firebase schématu přímo v hlavní spec.
-- RevenueCat je v .cursorrules, v technickém specu chybí.
+- RevenueCat a technické detaily (Auth, Pairing, Router, Firebase) jsou v `docs/ARCHITECTURE.md`.
 
 ---
 

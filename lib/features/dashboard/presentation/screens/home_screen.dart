@@ -26,6 +26,7 @@ import '../widgets/insight_horizontal_scroll.dart';
 import '../../../gamification/domain/level_manager.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
 import '../../../gamification/domain/progression_plan.dart';
+import '../../../gamification/presentation/widgets/level_up_unlock_sheet.dart';
 import '../../../premium/presentation/premium_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -605,7 +606,7 @@ class _BlueprintsCard extends ConsumerWidget {
     final isPremium =
         ref.watch(isPremiumProvider).valueOrNull ?? false;
     final unlocked = ProgressionPlan.isFeatureUnlocked(
-      RewardKind.blueprintPack,
+      FeatureID.blueprints,
       currentSp,
       isPremium,
     );
@@ -613,7 +614,7 @@ class _BlueprintsCard extends ConsumerWidget {
     return BentoCard(
       onTap: () => unlocked
           ? context.push('/blueprints')
-          : context.push('/premium'),
+          : showLevelUpUnlockSheet(context, ref, FeatureID.blueprints),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -1836,7 +1837,7 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
     final currentSp = ref.watch(currentXpProvider);
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
     final unlocked =
-        ProgressionPlan.isFeatureUnlocked(RewardKind.taptic, currentSp, isPremium);
+        ProgressionPlan.isRewardUnlocked(RewardKind.taptic, currentSp, isPremium);
 
     final coupleAsync = ref.watch(currentCoupleProvider);
     final currentUserAsync = ref.watch(currentUserDataProvider);
@@ -2043,10 +2044,23 @@ class _QuickMessageCard extends ConsumerWidget {
         }
 
         final currentUserId = currentUserAsync.valueOrNull?.uid ?? '';
+        final currentSp = ref.watch(currentXpProvider);
+        final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
+        final quickMessagesUnlocked = ProgressionPlan.isFeatureUnlocked(
+          FeatureID.quickMessages,
+          currentSp,
+          isPremium,
+        );
 
         return BentoCard(
           child: InkWell(
-            onTap: () => _showQuickMessageDialog(context, ref, couple.id, currentUserId),
+            onTap: () {
+              if (quickMessagesUnlocked) {
+                _showQuickMessageDialog(context, ref, couple.id, currentUserId);
+              } else {
+                showLevelUpUnlockSheet(context, ref, FeatureID.quickMessages);
+              }
+            },
             borderRadius: BorderRadius.circular(24),
             child: Container(
               decoration: BoxDecoration(

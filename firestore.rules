@@ -267,8 +267,8 @@ service cloud.firestore {
       allow create: if request.resource.data.email is string &&
                        request.resource.data.email == emailId;
       
-      // Kontrola existence (get), ale zákaz hromadného výpisu (list)
-      allow get: if true;
+      // Get jen pro přihlášené (např. admin / ověření); zákaz listu
+      allow get: if request.auth != null;
       allow list, update, delete: if false;
     }
     

@@ -7,6 +7,10 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../gamification/domain/progression_plan.dart';
+import '../../../gamification/presentation/user_stats_provider.dart';
+import '../../../gamification/presentation/widgets/level_up_unlock_sheet.dart';
+import '../../../premium/presentation/premium_provider.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 import '../widgets/memory_detail_dialog.dart';
@@ -18,6 +22,18 @@ class TimelineScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final memoriesAsync = ref.watch(memoriesStreamProvider);
+    final currentSp = ref.watch(currentXpProvider);
+    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
+    final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
+      FeatureID.memories,
+      currentSp,
+      isPremium,
+    );
+    final mapViewUnlocked = ProgressionPlan.isFeatureUnlocked(
+      FeatureID.mapView,
+      currentSp,
+      isPremium,
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
@@ -27,7 +43,11 @@ class TimelineScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(PhosphorIconsBold.mapTrifold),
             onPressed: () {
-              context.push('/memory/map');
+              if (mapViewUnlocked) {
+                context.push('/memory/map');
+              } else {
+                showLevelUpUnlockSheet(context, ref, FeatureID.mapView);
+              }
             },
             tooltip: 'Memories map',
           ),
@@ -71,7 +91,11 @@ class TimelineScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.push('/add-memory');
+          if (memoriesUnlocked) {
+            context.push('/add-memory');
+          } else {
+            showLevelUpUnlockSheet(context, ref, FeatureID.memories);
+          }
         },
         backgroundColor: AppTheme.colors.primary,
         child: const Icon(
