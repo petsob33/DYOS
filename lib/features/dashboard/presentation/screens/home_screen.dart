@@ -25,6 +25,8 @@ import '../haptic_listener_provider.dart';
 import '../widgets/insight_horizontal_scroll.dart';
 import '../../../gamification/domain/level_manager.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
+import '../../../gamification/domain/progression_plan.dart';
+import '../../../premium/presentation/premium_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -599,8 +601,19 @@ class _BlueprintsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentSp = ref.watch(currentXpProvider);
+    final isPremium =
+        ref.watch(isPremiumProvider).valueOrNull ?? false;
+    final unlocked = ProgressionPlan.isFeatureUnlocked(
+      RewardKind.blueprintPack,
+      currentSp,
+      isPremium,
+    );
+
     return BentoCard(
-      onTap: () => context.push('/blueprints'),
+      onTap: () => unlocked
+          ? context.push('/blueprints')
+          : context.push('/premium'),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -645,7 +658,20 @@ class _BlueprintsCard extends ConsumerWidget {
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.3,
                     ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
+              if (!unlocked) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Odemkni s DYOS+ nebo na Roadmapě',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.colors.textSecondary,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ],
             ],
           ),
         ),
@@ -1807,6 +1833,11 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
 
   @override
   Widget build(BuildContext context) {
+    final currentSp = ref.watch(currentXpProvider);
+    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
+    final unlocked =
+        ProgressionPlan.isFeatureUnlocked(RewardKind.taptic, currentSp, isPremium);
+
     final coupleAsync = ref.watch(currentCoupleProvider);
     final currentUserAsync = ref.watch(currentUserDataProvider);
 
@@ -1829,14 +1860,27 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
         return BentoCard(
           child: GestureDetector(
             onTapDown: (_) {
+              if (!unlocked) {
+                HapticFeedback.selectionClick();
+                return;
+              }
               setState(() {
                 _isPressed = true;
                 _pressStartTime = DateTime.now();
               });
               HapticFeedback.mediumImpact();
             },
-            onTapUp: (_) => _handleRelease(couple.id, currentUserId),
-            onTapCancel: () => _handleRelease(couple.id, currentUserId),
+            onTapUp: (_) {
+              if (!unlocked) {
+                context.push('/premium');
+              } else {
+                _handleRelease(couple.id, currentUserId);
+              }
+            },
+            onTapCancel: () {
+              if (!unlocked) return;
+              _handleRelease(couple.id, currentUserId);
+            },
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
@@ -1860,6 +1904,15 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
                               : AppTheme.colors.love.withValues(alpha: 0.6),
                       size: 48,
                     ),
+                    if (!unlocked) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Odemkni s DYOS+ nebo na Roadmapě',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppTheme.colors.textSecondary,
+                            ),
+                      ),
+                    ],
                     if (_justSent) ...[
                       const SizedBox(height: 8),
                       Text(
@@ -2688,6 +2741,8 @@ class _ListsCard extends ConsumerWidget {
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.3,
                           ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
@@ -2697,6 +2752,8 @@ class _ListsCard extends ConsumerWidget {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppTheme.colors.textSecondary,
                           ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                   ],
                 ),

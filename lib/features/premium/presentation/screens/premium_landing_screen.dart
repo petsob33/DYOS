@@ -8,6 +8,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
+import '../../domain/premium_copy.dart';
 import '../premium_provider.dart';
 
 /// Premium / DYOS+ screen: same colors as app, Bento style, focused on purchase.
@@ -26,7 +27,6 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
   Package? _selectedPackage;
   Package? _purchasingPackage;
   bool _restoring = false;
-  bool _freeTrialEnabled = true;
   String? _errorMessage;
 
   @override
@@ -187,8 +187,6 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                     const SizedBox(height: AppSpacing.xl),
                     _buildBenefitsCard(context, c),
                     const SizedBox(height: AppSpacing.lg),
-                    _buildTrialCard(context, c),
-                    const SizedBox(height: AppSpacing.lg),
                     Text(
                       'Choose your plan',
                       style: GoogleFonts.inter(
@@ -241,6 +239,16 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: c.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      PremiumCopy.footerNoteWithRoadmap,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: c.textSecondary,
+                        height: 1.35,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -310,18 +318,12 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
   }
 
   Widget _buildBenefitsCard(BuildContext context, AppPalette c) {
-    final benefits = [
-      (PhosphorIconsBold.infinity, 'Unlimited memories & timeline'),
-      (PhosphorIconsBold.heart, 'Shared for you both'),
-      (PhosphorIconsBold.chartBar, 'Insights & reminders'),
-      (PhosphorIconsBold.sparkle, 'No ads, no limits'),
-    ];
     return BentoCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'What you get',
+            'Okamžité benefity',
             style: GoogleFonts.inter(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -329,10 +331,11 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          ...benefits.map(
+          ...PremiumCopy.instantBenefits.map(
             (b) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.md),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.xs),
@@ -341,20 +344,32 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
-                      b.$1,
+                      PhosphorIconsBold.lockKeyOpen,
                       size: 20,
                       color: c.primary,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Text(
-                      b.$2,
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: c.text,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          b.$1,
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: c.text,
+                          ),
+                        ),
+                        Text(
+                          b.$2,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: c.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Icon(
@@ -365,49 +380,6 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrialCard(BuildContext context, AppPalette c) {
-    return BentoCard(
-      child: Row(
-        children: [
-          Icon(
-            PhosphorIconsBold.gift,
-            color: c.primary,
-            size: 24,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '7-day free trial',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: c.text,
-                  ),
-                ),
-                Text(
-                  'Try everything, then decide',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: c.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: _freeTrialEnabled,
-            onChanged: (v) => setState(() => _freeTrialEnabled = v),
-            activeTrackColor: c.primary.withValues(alpha: 0.5),
-            activeThumbColor: c.primary,
           ),
         ],
       ),
@@ -483,7 +455,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                'Best value',
+                                PremiumCopy.yearlySavings,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -496,8 +468,8 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       ),
                       Text(
                         isYearly
-                            ? 'Billed once a year'
-                            : 'Billed every month',
+                            ? 'Roční platba'
+                            : 'Měsíční platba',
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: c.textSecondary,

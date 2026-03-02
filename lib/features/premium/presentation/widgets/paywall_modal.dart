@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../domain/premium_copy.dart';
 import '../premium_provider.dart';
 
 /// Dark-mode paywall colors (Bento style).
@@ -203,18 +204,14 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
   }
 
   Widget _buildBenefits() {
-    final benefits = [
-      (PhosphorIconsRegular.heart, 'Unlock all features together'),
-      (PhosphorIconsRegular.calendar, 'Shared calendar & reminders'),
-      (PhosphorIconsRegular.lockKeyOpen, 'Premium support for you both'),
-    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: benefits
+      children: PremiumCopy.instantBenefits
           .map(
             (b) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.md),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.sm),
@@ -224,19 +221,32 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
                       border: Border.all(color: _PaywallColors.border),
                     ),
                     child: Icon(
-                      b.$1,
+                      PhosphorIconsRegular.lockKeyOpen,
                       color: _PaywallColors.primary,
                       size: 24,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Text(
-                      b.$2,
-                      style: GoogleFonts.inter(
-                        color: _PaywallColors.textPrimary,
-                        fontSize: 16,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          b.$1,
+                          style: GoogleFonts.inter(
+                            color: _PaywallColors.textPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          b.$2,
+                          style: GoogleFonts.inter(
+                            color: _PaywallColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -287,8 +297,8 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
     return Column(
       children: packages.map((package) {
         final isYearly = package.packageType == PackageType.annual;
-        final title = isYearly ? 'Yearly' : 'Monthly';
-        final subtitle = isYearly ? 'Best value' : 'Billed monthly';
+        final title = isYearly ? 'Roční' : 'Měsíční';
+        final subtitle = isYearly ? PremiumCopy.yearlySavings : 'Měsíční platba';
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: Material(
