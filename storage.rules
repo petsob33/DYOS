@@ -44,6 +44,25 @@ service firebase.storage {
     }
     
     // ============================================
+    // PROFILE PICTURES
+    // ============================================
+    // Storage path: profile_pictures/{userId}/{filename}
+    // Only the owner can upload/update/delete; any authenticated user can read (for avatars in app).
+    match /profile_pictures/{userId}/{fileName} {
+      function isAuthenticated() {
+        return request.auth != null;
+      }
+      function isOwner() {
+        return request.auth.uid == userId;
+      }
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner() &&
+        request.resource.size < 2 * 1024 * 1024 &&
+        (request.resource.contentType.matches('image/.*') || fileName.matches('.*\\.(jpg|jpeg|png|gif|webp)$'));
+      allow delete: if isOwner();
+    }
+    
+    // ============================================
     // DEFAULT DENY
     // ============================================
     // Deny all other paths by default

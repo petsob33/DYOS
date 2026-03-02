@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,12 +28,12 @@ class NotificationService {
   /// Sets up notification channels and requests permissions
   Future<void> initialize() async {
     if (_initialized) {
-      print('NotificationService already initialized');
+      debugPrint('NotificationService already initialized');
       return;
     }
 
     try {
-      print('Initializing NotificationService...');
+      debugPrint('Initializing NotificationService...');
       
       // Android initialization
       const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -55,23 +56,23 @@ class NotificationService {
       );
 
       if (initialized != true) {
-        print('NotificationService initialization returned false or null');
+        debugPrint('NotificationService initialization returned false or null');
         return;
       }
 
-      print('NotificationService initialized successfully');
+      debugPrint('NotificationService initialized successfully');
 
       // Create notification channels for Android
       await _createNotificationChannels();
 
       _initialized = true;
-      print('NotificationService setup complete');
+      debugPrint('NotificationService setup complete');
 
       // FCM: request permission, get token, save to Firestore, set up handlers
       await _initializeFcm();
     } catch (e, stackTrace) {
-      print('Error initializing NotificationService: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error initializing NotificationService: $e');
+      debugPrint('Stack trace: $stackTrace');
       // Don't set _initialized to true if initialization failed
     }
   }
@@ -84,7 +85,7 @@ class NotificationService {
         badge: true,
         sound: true,
       );
-      print('FCM permission: ${settings.authorizationStatus}');
+      debugPrint('FCM permission: ${settings.authorizationStatus}');
 
       await _saveFcmTokenIfLoggedIn();
 
@@ -100,8 +101,8 @@ class NotificationService {
         _handleNotificationTap(initialMessage);
       }
     } catch (e, stackTrace) {
-      print('Error initializing FCM: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error initializing FCM: $e');
+      debugPrint('Stack trace: $stackTrace');
     }
   }
 
@@ -120,9 +121,9 @@ class NotificationService {
         {'fcmToken': token},
         SetOptions(merge: true),
       );
-      print('FCM token saved to Firestore');
+      debugPrint('FCM token saved to Firestore');
     } catch (e) {
-      print('Error saving FCM token: $e');
+      debugPrint('Error saving FCM token: $e');
     }
   }
 
@@ -165,12 +166,12 @@ class NotificationService {
         const NotificationDetails(android: androidDetails, iOS: iosDetails),
       );
     } catch (e) {
-      print('Error showing FCM as local notification: $e');
+      debugPrint('Error showing FCM as local notification: $e');
     }
   }
 
   void _handleNotificationTap(RemoteMessage message) {
-    print('Notification tapped: ${message.notification?.title}');
+    debugPrint('Notification tapped: ${message.notification?.title}');
   }
 
   /// Create notification channels for Android
@@ -218,10 +219,10 @@ class NotificationService {
   /// Show a local notification for haptic signal
   Future<void> showHapticNotification() async {
     if (!_initialized) {
-      print('NotificationService not initialized, attempting initialization...');
+      debugPrint('NotificationService not initialized, attempting initialization...');
       await initialize();
       if (!_initialized) {
-        print('Failed to initialize NotificationService, cannot show notification');
+        debugPrint('Failed to initialize NotificationService, cannot show notification');
         return;
       }
     }
@@ -256,20 +257,20 @@ class NotificationService {
         details,
         payload: 'haptic',
       );
-      print('Haptic notification shown successfully');
+      debugPrint('Haptic notification shown successfully');
     } catch (e, stackTrace) {
-      print('Error showing haptic notification: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error showing haptic notification: $e');
+      debugPrint('Stack trace: $stackTrace');
     }
   }
 
   /// Show a local notification for quick message
   Future<void> showQuickMessageNotification(String message) async {
     if (!_initialized) {
-      print('NotificationService not initialized, attempting initialization...');
+      debugPrint('NotificationService not initialized, attempting initialization...');
       await initialize();
       if (!_initialized) {
-        print('Failed to initialize NotificationService, cannot show notification');
+        debugPrint('Failed to initialize NotificationService, cannot show notification');
         return;
       }
     }
@@ -304,16 +305,16 @@ class NotificationService {
         details,
         payload: 'message:$message',
       );
-      print('Quick message notification shown successfully');
+      debugPrint('Quick message notification shown successfully');
     } catch (e, stackTrace) {
-      print('Error showing quick message notification: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error showing quick message notification: $e');
+      debugPrint('Stack trace: $stackTrace');
     }
   }
 
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
-    print('Notification tapped: ${response.payload}');
+    debugPrint('Notification tapped: ${response.payload}');
     // TODO: Navigate to appropriate screen based on payload
   }
 }

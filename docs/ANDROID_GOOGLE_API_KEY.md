@@ -39,5 +39,16 @@ Změny v konzoli mohou trvat pár minut. Pak na telefonu:
 
 ---
 
+## iOS – Google Places API klíč
+
+Aplikace čte Places API klíč z `Info.plist` pod klíčem `GOOGLE_PLACES_API_KEY`. Hodnota se bere z build nastavení (xcconfig), ne z kódu.
+
+1. Zkopíruj `ios/Runner/Secrets.xcconfig.example` na `ios/Runner/Secrets.xcconfig`.
+2. Do `Secrets.xcconfig` nastav `GOOGLE_PLACES_API_KEY=tvůj_klíč`.
+3. V Google Cloud Console omezení klíče nastav i pro iOS (bundle ID aplikace).
+
+Soubor `Secrets.xcconfig` můžeš přidat do `.gitignore`, aby se do repozitáře necommitol skutečný klíč. V repu je `Secrets.xcconfig` s placeholderem `REPLACE_WITH_YOUR_KEY`, aby build prošel po klonu.
+
+---
+
 **Poznámka:** SHA-1 výše je z **debug** keystore (`~/.android/debug.keystore`). Pro release build budeš potřebovat SHA-1 z release keystore a přidat ho v konzoli jako další položku (stejný package name, jiný SHA-1).
-RE

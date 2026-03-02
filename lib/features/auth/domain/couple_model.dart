@@ -1,5 +1,6 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 // Generated files
 part 'couple_model.freezed.dart';
@@ -96,9 +97,9 @@ class CoupleModel with _$CoupleModel {
       
       return CoupleModel.fromJson(convertedData);
     } catch (e, stackTrace) {
-      print('Error in CoupleModel.fromFirestore for doc ${doc.id}: $e');
-      print('Stack trace: $stackTrace');
-      print('Document data: ${doc.data()}');
+      debugPrint('Error in CoupleModel.fromFirestore for doc ${doc.id}: $e');
+      debugPrint('Stack trace: $stackTrace');
+      debugPrint('Document data: ${doc.data()}');
       rethrow;
     }
   }

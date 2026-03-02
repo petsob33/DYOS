@@ -9,6 +9,14 @@ enum MilestoneType {
   reward,
 }
 
+/// Feature gates for UI locking (Memories, Blueprints, Quick Messages, Map View).
+enum FeatureID {
+  memories,
+  blueprints,
+  quickMessages,
+  mapView,
+}
+
 enum RewardKind {
   badge,
   widget,
@@ -50,6 +58,7 @@ class ProgressionMilestone {
     required this.description,
     this.rewardKind,
     this.emoji,
+    this.subscriptionReward = false,
   });
 
   final int spRequired;
@@ -58,6 +67,8 @@ class ProgressionMilestone {
   final String description;
   final RewardKind? rewardKind;
   final String? emoji;
+  /// True for milestones that grant subscription credit (1 Month Free / 1 Year Free).
+  final bool subscriptionReward;
 }
 
 /// Full progression plan: phases and milestones. SP = XP in backend.
@@ -107,123 +118,194 @@ class ProgressionPlan {
     ),
   ];
 
-  /// All milestones in SP order (0, 250, 500, 1000, ...).
+  /// All milestones in SP order.
   static const List<ProgressionMilestone> milestones = [
     ProgressionMilestone(
-      spRequired: 0,
-      type: MilestoneType.levelUp,
-      title: 'Start',
-      description: 'v1.0',
-      emoji: '🚀',
+      spRequired: 25,
+      type: MilestoneType.reward,
+      title: 'Memory Core',
+      description: 'Unlock Memories',
+      rewardKind: RewardKind.badge,
+      emoji: '🔓',
     ),
     ProgressionMilestone(
-      spRequired: 250,
+      spRequired: 50,
       type: MilestoneType.reward,
-      title: 'Hello World',
-      description: 'První odznak na profil',
+      title: 'Blueprint Protocol',
+      description: 'Unlock Blueprints',
+      rewardKind: RewardKind.blueprintPack,
+      emoji: '🔓',
+    ),
+    ProgressionMilestone(
+      spRequired: 100,
+      type: MilestoneType.reward,
+      title: 'Badge: Initiate',
+      description: 'First milestone badge',
+      rewardKind: RewardKind.badge,
+      emoji: '🏅',
+    ),
+    ProgressionMilestone(
+      spRequired: 200,
+      type: MilestoneType.reward,
+      title: 'Quick Link',
+      description: 'Unlock Quick Messages',
+      rewardKind: RewardKind.badge,
+      emoji: '🔓',
+    ),
+    ProgressionMilestone(
+      spRequired: 300,
+      type: MilestoneType.reward,
+      title: 'Badge: Data Miner',
+      description: 'Earned at 300 SP',
       rewardKind: RewardKind.badge,
       emoji: '🏅',
     ),
     ProgressionMilestone(
       spRequired: 500,
       type: MilestoneType.reward,
-      title: 'Sticky Note Widget',
-      description: 'Odemkne widget na plochu',
-      rewardKind: RewardKind.widget,
-      emoji: '🔓',
+      title: 'Badge: Synchronized',
+      description: 'Earned at 500 SP',
+      rewardKind: RewardKind.badge,
+      emoji: '🏅',
+    ),
+    ProgressionMilestone(
+      spRequired: 750,
+      type: MilestoneType.reward,
+      title: 'BP Expansion I',
+      description: 'Blueprint expansion pack',
+      rewardKind: RewardKind.blueprintPack,
+      emoji: '📦',
     ),
     ProgressionMilestone(
       spRequired: 1000,
-      type: MilestoneType.levelUp,
-      title: 'Connected',
-      description: 'Přechod na v2.0',
-      emoji: '⬆️',
+      type: MilestoneType.reward,
+      title: 'Badge: Verified Couple',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🎁',
+      subscriptionReward: true,
     ),
     ProgressionMilestone(
-      spRequired: 1500,
+      spRequired: 2000,
       type: MilestoneType.reward,
-      title: 'Dark Mode',
-      description: 'Změna ikony aplikace na černou',
-      rewardKind: RewardKind.iconPack,
-      emoji: '🎨',
+      title: 'BP Expansion II',
+      description: 'Blueprint expansion pack',
+      rewardKind: RewardKind.blueprintPack,
+      emoji: '📦',
     ),
     ProgressionMilestone(
-      spRequired: 2500,
+      spRequired: 3000,
       type: MilestoneType.reward,
-      title: 'Taptic Touch',
-      description: 'Haptická komunikace',
-      rewardKind: RewardKind.taptic,
-      emoji: '🔓',
-    ),
-    ProgressionMilestone(
-      spRequired: 3500,
-      type: MilestoneType.reward,
-      title: 'Streak Master',
-      description: 'Za udržení aktivity',
+      title: 'Badge: System Architect',
+      description: 'Earned at 3000 SP',
       rewardKind: RewardKind.badge,
       emoji: '🏅',
     ),
     ProgressionMilestone(
       spRequired: 5000,
-      type: MilestoneType.levelUp,
-      title: 'Synchronized',
-      description: 'Přechod na v3.0',
-      emoji: '⬆️',
-    ),
-    ProgressionMilestone(
-      spRequired: 7500,
-      type: MilestoneType.reward,
-      title: 'Sex & Intimacy Pack',
-      description: 'Odemkne speciální sadu otázek v Blueprints',
-      rewardKind: RewardKind.blueprintPack,
-      emoji: '🔓',
-    ),
-    ProgressionMilestone(
-      spRequired: 10000,
-      type: MilestoneType.reward,
-      title: '1 Month Premium Trial',
-      description: 'Ochutnávka Premium funkcí na měsíc zdarma',
-      rewardKind: RewardKind.premiumTrial,
-      emoji: '🎁',
-    ),
-    ProgressionMilestone(
-      spRequired: 15000,
-      type: MilestoneType.reward,
-      title: 'Chat Wallpapers',
-      description: 'Vlastní pozadí v chatu',
-      rewardKind: RewardKind.chatWallpapers,
-      emoji: '🎨',
-    ),
-    ProgressionMilestone(
-      spRequired: 20000,
-      type: MilestoneType.levelUp,
-      title: 'Mainframe',
-      description: 'Přechod na v4.0',
-      emoji: '⬆️',
-    ),
-    ProgressionMilestone(
-      spRequired: 30000,
       type: MilestoneType.reward,
       title: 'Map View',
-      description: 'Odemkne mapu vzpomínek',
+      description: 'Unlock Memory Map',
       rewardKind: RewardKind.mapView,
       emoji: '🔓',
     ),
     ProgressionMilestone(
-      spRequired: 75000,
+      spRequired: 7500,
       type: MilestoneType.reward,
-      title: 'System Architect',
-      description: 'Zlatý profilový rámeček',
+      title: 'Badge: Global Explorer',
+      description: 'Earned at 7500 SP',
       rewardKind: RewardKind.badge,
       emoji: '🏅',
     ),
     ProgressionMilestone(
+      spRequired: 10000,
+      type: MilestoneType.reward,
+      title: 'Golden Frame',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🎁',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 20000,
+      type: MilestoneType.reward,
+      title: 'Badge: 20k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 30000,
+      type: MilestoneType.reward,
+      title: 'Badge: 30k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 40000,
+      type: MilestoneType.reward,
+      title: 'Badge: 40k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 50000,
+      type: MilestoneType.reward,
+      title: 'Badge: 50k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 60000,
+      type: MilestoneType.reward,
+      title: 'Badge: 60k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 70000,
+      type: MilestoneType.reward,
+      title: 'Badge: 70k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 80000,
+      type: MilestoneType.reward,
+      title: 'Badge: 80k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
+      spRequired: 90000,
+      type: MilestoneType.reward,
+      title: 'Badge: 90k SP',
+      description: '1 Month Free',
+      rewardKind: RewardKind.premiumTrial,
+      emoji: '🏅',
+      subscriptionReward: true,
+    ),
+    ProgressionMilestone(
       spRequired: 100000,
       type: MilestoneType.reward,
-      title: 'Lifetime DYOS+ License',
-      description: 'Ultimate reward',
+      title: 'Singularity Frame',
+      description: '1 Year Free',
       rewardKind: RewardKind.lifetimeLicense,
       emoji: '🏆',
+      subscriptionReward: true,
     ),
   ];
 
@@ -301,13 +383,34 @@ class ProgressionPlan {
     RewardKind.mapView,
   };
 
-  /// True if the feature for [kind] is unlocked: premium unlocks all functional
+  /// True if the reward for [kind] is unlocked: premium unlocks all functional
   /// features; otherwise uses [currentSp] vs milestone threshold.
-  static bool isFeatureUnlocked(RewardKind kind, int currentSp, bool isPremium) {
+  /// For feature gates (Memories, Blueprints, Quick Messages, Map View) use [isFeatureUnlocked] with [FeatureID].
+  static bool isRewardUnlocked(RewardKind kind, int currentSp, bool isPremium) {
     if (isPremium && functionalRewardKinds.contains(kind)) return true;
     final list = milestones.where((m) => m.rewardKind == kind).toList();
     if (list.isEmpty) return false;
     return currentSp >= list.first.spRequired;
+  }
+
+  /// SP required to unlock [feature] via progression (premium unlocks regardless).
+  static int spRequiredForFeature(FeatureID feature) {
+    switch (feature) {
+      case FeatureID.memories:
+        return 25;
+      case FeatureID.blueprints:
+        return 50;
+      case FeatureID.quickMessages:
+        return 200;
+      case FeatureID.mapView:
+        return 5000;
+    }
+  }
+
+  /// True if [feature] is unlocked: user has active premium or has reached the required SP.
+  static bool isFeatureUnlocked(FeatureID feature, int currentSp, bool isPremium) {
+    if (isPremium) return true;
+    return currentSp >= spRequiredForFeature(feature);
   }
 
   /// Short tip for "next reward" in UI.
