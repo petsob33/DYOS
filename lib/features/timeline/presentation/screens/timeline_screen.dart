@@ -22,6 +22,7 @@ class TimelineScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final memoriesAsync = ref.watch(memoriesStreamProvider);
+    final memoriesCount = memoriesAsync.valueOrNull?.length ?? 0;
     final currentSp = ref.watch(currentXpProvider);
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
     final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
@@ -56,6 +57,11 @@ class TimelineScreen extends ConsumerWidget {
       body: Column(
         children: [
           const _CategoryFilter(),
+          if (!isPremium)
+            _MemoriesLimitBar(
+              currentCount: memoriesCount,
+              limit: 30,
+            ),
           Expanded(
             child: memoriesAsync.when(
               data: (memories) {
@@ -91,11 +97,27 @@ class TimelineScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (memoriesUnlocked) {
-            context.push('/add-memory');
-          } else {
+          if (!memoriesUnlocked) {
             showLevelUpUnlockSheet(context, ref, FeatureID.memories);
+            return;
           }
+
+          const freeLimit = 30;
+          if (!isPremium && memoriesCount >= freeLimit) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  'Překročil jsi free limit 30 vzpomínek. Odemkni neomezené Memories v DYOS+.',
+                ),
+                backgroundColor: AppTheme.colors.warning,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            context.push('/premium');
+            return;
+          }
+
+          context.push('/add-memory');
         },
         backgroundColor: AppTheme.colors.primary,
         child: const Icon(
@@ -152,6 +174,62 @@ class _CategoryFilter extends ConsumerWidget {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+}
+
+class _MemoriesLimitBar extends StatelessWidget {
+  const _MemoriesLimitBar({
+    required this.currentCount,
+    required this.limit,
+  });
+
+  final int currentCount;
+  final int limit;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppTheme.colors;
+    final progress = (currentCount / limit).clamp(0.0, 1.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: c.card,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Memories limit (Free)',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: c.text,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: c.textSecondary.withValues(alpha: 0.15),
+              valueColor: AlwaysStoppedAnimation<Color>(c.primary),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '$currentCount / $limit vzpomínek v rámci free plánu',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: c.textSecondary,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

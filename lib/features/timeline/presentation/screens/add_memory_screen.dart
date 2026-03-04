@@ -8,6 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
+import '../../../premium/presentation/premium_provider.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 import '../widgets/pick_place_screen.dart';
@@ -192,6 +193,31 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
           ),
         );
         context.pop();
+      }
+      return;
+    }
+
+    // Free plan limit: max 30 memories without premium
+    const freeLimit = 30;
+    final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
+    final memoriesAsync = ref.read(memoriesStreamProvider);
+    final currentCount = memoriesAsync.valueOrNull?.length ?? 0;
+
+    if (!isPremium && currentCount >= freeLimit) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Překročil jsi free limit 30 vzpomínek. Odemkni neomezené Memories v DYOS+.',
+            ),
+            backgroundColor: AppTheme.colors.warning,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        context.push('/premium');
       }
       return;
     }

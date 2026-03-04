@@ -611,70 +611,18 @@ class _BlueprintsCard extends ConsumerWidget {
       isPremium,
     );
 
+    final c = AppTheme.colors;
+
     return BentoCard(
       onTap: () => unlocked
           ? context.push('/blueprints')
           : showLevelUpUnlockSheet(context, ref, FeatureID.blueprints),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.colors.primary.withOpacity(0.08),
-              AppTheme.colors.primary.withOpacity(0.03),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppTheme.colors.primary.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      PhosphorIconsBold.clipboardText,
-                      color: AppTheme.colors.primary,
-                      size: 24,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                'Blueprints',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppTheme.colors.text,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                    ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              if (!unlocked) ...[
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  'Odemkni s DYOS+ nebo na Roadmapě',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.colors.textSecondary,
-                      ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-              ],
-            ],
-          ),
+      background: c.card,
+      child: Center(
+        child: Icon(
+          PhosphorIconsBold.clipboardText,
+          color: c.primary,
+          size: 52,
         ),
       ),
     );
@@ -909,8 +857,6 @@ class _AvatarStatus extends ConsumerWidget {
                     color: AppTheme.colors.text,
                     fontSize: 14,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
                 ),
                 const SizedBox(height: 2),
                 Row(
@@ -922,8 +868,6 @@ class _AvatarStatus extends ConsumerWidget {
                           color: AppTheme.colors.textSecondary,
                           fontSize: 12,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
                       ),
                     ),
                     if (isEditable)
@@ -1123,12 +1067,14 @@ class _DaysTogetherCard extends ConsumerWidget {
                       ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Text(
-                  '0',
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.colors.text,
-                      ),
+                Center(
+                  child: Text(
+                    '0',
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.colors.text,
+                        ),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
@@ -1157,22 +1103,17 @@ class _DaysTogetherCard extends ConsumerWidget {
                     ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              Text(
-                '$daysTogether',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.colors.text,
-                    ),
+              Center(
+                child: Text(
+                  '$daysTogether',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.colors.text,
+                      ),
+                ),
               ),
               const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Stronger every day.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.colors.textSecondary,
-                    ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+              
             ],
           ),
         );
@@ -1191,12 +1132,14 @@ class _DaysTogetherCard extends ConsumerWidget {
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              '0',
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppTheme.colors.text,
-                  ),
+            Center(
+              child: Text(
+                '0',
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.colors.text,
+                    ),
+              ),
             ),
           ],
         ),
@@ -1252,263 +1195,50 @@ class _EventsCard extends ConsumerWidget {
           return eventDate.isAfter(todayDate) || eventDate.isAtSameMomentAs(todayDate);
         }).toList();
         
-        final totalCount = events.length;
-        final upcomingCount = upcomingEvents.length;
-        
+        final c = AppTheme.colors;
+
         return BentoCard(
-          child: InkWell(
-            onTap: () {
-              context.push('/events');
-            },
-            borderRadius: BorderRadius.circular(24),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.colors.success.withOpacity(0.1),
-                    AppTheme.colors.success.withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.success,
-                                AppTheme.colors.success.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.success.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            PhosphorIconsBold.calendar,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                        if (upcomingCount > 0)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.colors.success,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '$upcomingCount',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'Events',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      upcomingCount > 0
-                          ? '$upcomingCount upcoming event${upcomingCount == 1 ? '' : 's'}'
-                          : totalCount > 0
-                              ? '$totalCount total event${totalCount == 1 ? '' : 's'}'
-                              : 'No events yet',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.colors.textSecondary,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
+          onTap: () {
+            context.push('/events');
+          },
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.calendar,
+              color: c.success,
+              size: 52,
             ),
           ),
         );
       },
-      loading: () => BentoCard(
-        child: InkWell(
+      loading: () {
+        final c = AppTheme.colors;
+        return BentoCard(
           onTap: () {
             context.push('/events');
           },
-          borderRadius: BorderRadius.circular(24),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.colors.success.withOpacity(0.1),
-                  AppTheme.colors.success.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppTheme.colors.success,
-                              AppTheme.colors.success.withOpacity(0.8),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.colors.success.withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          PhosphorIconsBold.calendar,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Events',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.colors.text,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  const Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                ],
-              ),
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.calendar,
+              color: c.success,
+              size: 52,
             ),
           ),
-        ),
-      ),
+        );
+      },
       error: (error, stackTrace) {
+        final c = AppTheme.colors;
         return BentoCard(
-          child: InkWell(
-            onTap: () {
-              context.push('/events');
-            },
-            borderRadius: BorderRadius.circular(24),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.colors.success.withOpacity(0.1),
-                    AppTheme.colors.success.withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.success,
-                                AppTheme.colors.success.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.success.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            PhosphorIconsBold.calendar,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'Events',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'Error loading events',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.colors.textSecondary,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
+          onTap: () {
+            context.push('/events');
+          },
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.calendar,
+              color: c.success,
+              size: 52,
             ),
           ),
         );
@@ -1638,26 +1368,12 @@ class _IntimacySparkCard extends ConsumerWidget {
         if (logs.isEmpty) {
           return BentoCard(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      PhosphorIconsBold.heart,
-                      color: AppTheme.colors.love,
-                      size: 20,
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    Expanded(
-                      child: Text(
-                        'Intimacy',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: AppTheme.colors.textSecondary,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                Icon(
+                  PhosphorIconsBold.heart,
+                  color: AppTheme.colors.love,
+                  size: 24,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
@@ -1709,13 +1425,6 @@ class _IntimacySparkCard extends ConsumerWidget {
                     color: AppTheme.colors.love,
                     size: 20,
                   ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    'Intimacy',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                        ),
-                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -1723,8 +1432,6 @@ class _IntimacySparkCard extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: RichText(
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
                       text: TextSpan(
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppTheme.colors.textSecondary,
@@ -1757,26 +1464,12 @@ class _IntimacySparkCard extends ConsumerWidget {
       },
       loading: () => BentoCard(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Icon(
-                  PhosphorIconsBold.heart,
-                  color: AppTheme.colors.love,
-                  size: 20,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: Text(
-                    'Intimacy Spark',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                        ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            Icon(
+              PhosphorIconsBold.heart,
+              color: AppTheme.colors.love,
+              size: 24,
             ),
             const SizedBox(height: AppSpacing.sm),
             const Center(child: CircularProgressIndicator()),
@@ -1785,26 +1478,12 @@ class _IntimacySparkCard extends ConsumerWidget {
       ),
       error: (_, __) => BentoCard(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Icon(
-                  PhosphorIconsBold.heart,
-                  color: AppTheme.colors.love,
-                  size: 20,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: Text(
-                    'Intimacy Spark',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
-                        ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            Icon(
+              PhosphorIconsBold.heart,
+              color: AppTheme.colors.love,
+              size: 24,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -1850,7 +1529,7 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
               child: Icon(
                 PhosphorIconsBold.heart,
                 color: AppTheme.colors.love.withValues(alpha: 0.3),
-                size: 48,
+                size: 56,
               ),
             ),
           );
@@ -1903,7 +1582,7 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
                           : _justSent
                               ? AppTheme.colors.success
                               : AppTheme.colors.love.withValues(alpha: 0.6),
-                      size: 48,
+                      size: 56,
                     ),
                     if (!unlocked) ...[
                       const SizedBox(height: 8),
@@ -1936,7 +1615,7 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
           child: Icon(
             PhosphorIconsBold.heart,
             color: AppTheme.colors.love.withValues(alpha: 0.3),
-            size: 48,
+            size: 56,
           ),
         ),
       ),
@@ -1945,7 +1624,7 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
           child: Icon(
             PhosphorIconsBold.heart,
             color: AppTheme.colors.love.withValues(alpha: 0.3),
-            size: 48,
+            size: 56,
           ),
         ),
       ),
@@ -2015,30 +1694,15 @@ class _QuickMessageCard extends ConsumerWidget {
     return coupleAsync.when(
       data: (couple) {
         if (couple == null) {
+          final c = AppTheme.colors;
           return BentoCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  PhosphorIconsBold.chatCircle,
-                  color: AppTheme.colors.primary,
-                  size: 24,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Quick Message',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppTheme.colors.textSecondary,
-                      ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  'Pair to use',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.colors.textSecondary,
-                      ),
-                ),
-              ],
+            background: c.card,
+            child: Center(
+              child: Icon(
+                PhosphorIconsBold.chatCircle,
+                color: c.primary,
+                size: 52,
+              ),
             ),
           );
         }
@@ -2052,230 +1716,52 @@ class _QuickMessageCard extends ConsumerWidget {
           isPremium,
         );
 
+        final c = AppTheme.colors;
+
         return BentoCard(
-          child: InkWell(
-            onTap: () {
-              if (quickMessagesUnlocked) {
-                _showQuickMessageDialog(context, ref, couple.id, currentUserId);
-              } else {
-                showLevelUpUnlockSheet(context, ref, FeatureID.quickMessages);
-              }
-            },
-            borderRadius: BorderRadius.circular(24),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.colors.primary.withOpacity(0.08),
-                    AppTheme.colors.primary.withOpacity(0.03),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.primary,
-                                AppTheme.colors.primary.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.primary.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            PhosphorIconsBold.chatCircle,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Quick',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: AppTheme.colors.text,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.3,
-                              ),
-                          maxLines: 1,
-                        ),
-                        Text(
-                          'Message',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: AppTheme.colors.text,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.3,
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+          onTap: () {
+            if (quickMessagesUnlocked) {
+              _showQuickMessageDialog(context, ref, couple.id, currentUserId);
+            } else {
+              showLevelUpUnlockSheet(context, ref, FeatureID.quickMessages);
+            }
+          },
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.chatCircle,
+              color: c.primary,
+              size: 44,
             ),
           ),
         );
       },
-      loading: () => BentoCard(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.colors.primary.withOpacity(0.08),
-                AppTheme.colors.primary.withOpacity(0.03),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.primary,
-                                AppTheme.colors.primary.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.primary.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            PhosphorIconsBold.chatCircle,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  'Quick Message',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppTheme.colors.text,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ],
+      loading: () {
+        final c = AppTheme.colors;
+        return BentoCard(
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.chatCircle,
+              color: c.primary,
+              size: 52,
             ),
           ),
-        ),
-      ),
-      error: (_, __) => BentoCard(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.colors.primary.withOpacity(0.08),
-                AppTheme.colors.primary.withOpacity(0.03),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.primary,
-                                AppTheme.colors.primary.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.primary.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            PhosphorIconsBold.chatCircle,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  'Quick Message',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppTheme.colors.text,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ],
+        );
+      },
+      error: (_, __) {
+        final c = AppTheme.colors;
+        return BentoCard(
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.chatCircle,
+              color: c.primary,
+              size: 52,
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -2389,7 +1875,7 @@ class _QuickMessageCard extends ConsumerWidget {
                 );
 
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar( 
                     SnackBar(
                       content: const Text('Message sent!'),
                       backgroundColor: AppTheme.colors.success,
@@ -2670,265 +2156,50 @@ class _ListsCard extends ConsumerWidget {
         final totalCount = notes.length;
         final hasItems = totalCount > 0;
         
+        final c = AppTheme.colors;
+
         return BentoCard(
-          child: InkWell(
-            onTap: () {
-              context.push('/lists');
-            },
-            borderRadius: BorderRadius.circular(24),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.colors.warning.withOpacity(0.1),
-                    AppTheme.colors.warning.withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.warning,
-                                AppTheme.colors.warning.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.warning.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            PhosphorIconsBold.listChecks,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                        if (hasItems)
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.sm,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppTheme.colors.warning,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '$totalCount',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'Bucket List',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      hasItems
-                          ? '$totalCount item${totalCount == 1 ? '' : 's'}'
-                          : 'No items yet',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.colors.textSecondary,
-                          ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ],
-                ),
-              ),
+          onTap: () {
+            context.push('/lists');
+          },
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.listChecks,
+              color: c.warning,
+              size: 52,
             ),
           ),
         );
       },
-      loading: () => BentoCard(
-        child: InkWell(
+      loading: () {
+        final c = AppTheme.colors;
+        return BentoCard(
           onTap: () {
             context.push('/lists');
           },
-          borderRadius: BorderRadius.circular(24),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.colors.warning.withOpacity(0.1),
-                  AppTheme.colors.warning.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppTheme.colors.warning,
-                              AppTheme.colors.warning.withOpacity(0.8),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.colors.warning.withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          PhosphorIconsBold.listChecks,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Bucket List',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.colors.text,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
-                        ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  const Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                ],
-              ),
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.listChecks,
+              color: c.warning,
+              size: 52,
             ),
           ),
-        ),
-      ),
+        );
+      },
       error: (error, stackTrace) {
+        final c = AppTheme.colors;
         return BentoCard(
-          child: InkWell(
-            onTap: () {
-              context.push('/lists');
-            },
-            borderRadius: BorderRadius.circular(24),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppTheme.colors.warning.withOpacity(0.1),
-                    AppTheme.colors.warning.withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppTheme.colors.warning,
-                                AppTheme.colors.warning.withOpacity(0.8),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.colors.warning.withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            PhosphorIconsBold.listChecks,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      'Bucket List',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppTheme.colors.text,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'Error loading bucket list',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.colors.textSecondary,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
+          onTap: () {
+            context.push('/lists');
+          },
+          background: c.card,
+          child: Center(
+            child: Icon(
+              PhosphorIconsBold.listChecks,
+              color: c.warning,
+              size: 52,
             ),
           ),
         );
@@ -2936,5 +2207,4 @@ class _ListsCard extends ConsumerWidget {
     );
   }
 }
-
 
