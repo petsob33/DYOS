@@ -44,6 +44,15 @@ import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
 
+/// Debug routes must be explicitly enabled with:
+/// --dart-define=ENABLE_DEBUG_ROUTES=true
+const bool _enableDebugRoutes = bool.fromEnvironment(
+  'ENABLE_DEBUG_ROUTES',
+  defaultValue: false,
+);
+
+bool get _isFirebaseTestRouteEnabled => !kReleaseMode && _enableDebugRoutes;
+
 /// Helper function to create a page with slide transition animation
 Page<T> buildPageWithSlideTransition<T extends Object?>(
   BuildContext context,
@@ -105,7 +114,8 @@ GoRouter appRouter(AppRouterRef ref) {
       // Define public routes (don't require authentication)
       final isPublicRoute = state.matchedLocation == '/login' || 
                            state.matchedLocation == '/register' ||
-                           (kDebugMode && state.matchedLocation == '/firebase-test');
+                           (_isFirebaseTestRouteEnabled &&
+                               state.matchedLocation == '/firebase-test');
       
       // Define pairing route (requires auth but not pairing)
       final isPairingRoute = state.matchedLocation == '/pairing';
@@ -155,7 +165,7 @@ GoRouter appRouter(AppRouterRef ref) {
           const RegisterScreen(),
         ),
       ),
-      if (kDebugMode)
+      if (_isFirebaseTestRouteEnabled)
         GoRoute(
           path: '/firebase-test',
           name: 'firebase-test',
