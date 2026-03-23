@@ -1,14 +1,19 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const sharp = require("sharp");
+const {
+  normalizeInviteCode,
+  isValidInviteCode,
+  shouldRejectForMissingAppCheck,
+  evaluateRateLimitWindow,
+} = require("./security_helpers");
 
 admin.initializeApp();
 const db = admin.firestore();
 const ENFORCE_APP_CHECK = process.env.ENFORCE_APP_CHECK === "true";
 
 function assertAppCheck(context) {
-  if (!ENFORCE_APP_CHECK) return;
-  if (!context.app) {
+  if (shouldRejectForMissingAppCheck(ENFORCE_APP_CHECK, context)) {
     throw new functions.https.HttpsError(
       "failed-precondition",
       "App Check token is required."
@@ -36,12 +41,15 @@ async function enforceRateLimit(uid, action, maxRequests, windowSeconds) {
     }
 
     const data = snap.data() || {};
-    const count = typeof data.count === "number" ? data.count : 0;
-    const windowStartMs =
-      typeof data.windowStartMs === "number" ? data.windowStartMs : nowMs;
-    const inSameWindow = nowMs - windowStartMs < windowMs;
+    const next = evaluateRateLimitWindow({
+      existingCount: data.count,
+      existingWindowStartMs: data.windowStartMs,
+      nowMs,
+      maxRequests,
+      windowMs,
+    });
 
-    if (!inSameWindow) {
+    if (next.resetWindow) {
       tx.set(
         ref,
         {
@@ -56,7 +64,7 @@ async function enforceRateLimit(uid, action, maxRequests, windowSeconds) {
       return;
     }
 
-    if (count >= maxRequests) {
+    if (next.blocked) {
       throw new functions.https.HttpsError(
         "resource-exhausted",
         "Too many requests. Please try again later."
@@ -66,21 +74,12 @@ async function enforceRateLimit(uid, action, maxRequests, windowSeconds) {
     tx.set(
       ref,
       {
-        count: count + 1,
+        count: next.nextCount,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
   });
-}
-
-function normalizeInviteCode(value) {
-  if (typeof value !== "string") return "";
-  return value.trim().toUpperCase();
-}
-
-function isValidInviteCode(value) {
-  return /^[A-Z]{2,10}-\d{4}$/.test(value);
 }
 
 exports.getUserByInviteCode = functions.https.onCall(async (data, context) => {

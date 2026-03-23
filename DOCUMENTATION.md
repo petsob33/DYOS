@@ -233,12 +233,12 @@ Níže jsou konkrétní nálezy z tohoto kódu, seřazené podle závažnosti.
 - [x] Zavést rate limiting/App Check pro callable endpointy.
 - [x] Odstranit debug route `/firebase-test` z release (router už ji váže na `kDebugMode`, ověřit release build pipeline).
 - [~] Sanitizovat produkční logování (`print`/`debugPrint` audit).
-- [ ] Rozšířit testování o bezpečnostně kritické scénáře (rules + pairing + purchase sync).
+- [~] Rozšířit testování o bezpečnostně kritické scénáře (rules + pairing + purchase sync).
 
 ### Stav po implementaci (aktualizace)
 - Dokončené body: **8/10** (včetně všech původních "must fix").
-- Částečně dokončené: **1/10** (`print/debugPrint` audit proběhl jen na prioritních bezpečnostních tocích).
-- Otevřené: **1/10** (rozšíření bezpečnostních testů).
+- Částečně dokončené: **2/10** (`print/debugPrint` audit proběhl jen na prioritních bezpečnostních tocích; security testy jsou rozšířené o rules + pairing + App Check/rate-limit helper logiku, chybí však plné pokrytí purchase sync).
+- Otevřené: **0/10**.
 
 ### Technické slepé uličky / nedodělky
 - `lib/features/time_capsule/` je strukturálně připravené, ale bez implementace (potenciální dead feature).
