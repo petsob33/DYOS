@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'app.dart';
+import 'core/services/app_logger.dart';
 
 /// Background handler for FCM – runs when app is terminated/background.
 /// Must be top-level. Notification is shown by system if message has notification payload.
@@ -37,22 +38,40 @@ const String _appCheckWebRecaptchaKey = String.fromEnvironment(
   defaultValue: '',
 );
 
+String _sanitizeLogMessage(String message) {
+  return message
+      .replaceAll(
+        RegExp(r'([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+\.[A-Za-z]{2,})'),
+        '[REDACTED_EMAIL]',
+      )
+      .replaceAll(RegExp(r'\b(coupleId|userId|uid|token):\s*[^,\s]+'), r'$1:[REDACTED]')
+      .replaceAll(RegExp(r'\bmessage:\s*.+$'), 'message:[REDACTED]');
+}
+
+void _configureSafeDebugLogging() {
+  final sink = debugPrintSynchronously;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (!kDebugMode || message == null || message.isEmpty) return;
+    sink(_sanitizeLogMessage(message), wrapWidth: wrapWidth);
+  };
+}
+
 Future<void> _configureAppCheck() async {
   if (!_enableAppCheck) {
-    debugPrint('App Check disabled (ENABLE_APP_CHECK=false).');
+    AppLogger.debug('App Check disabled (ENABLE_APP_CHECK=false).');
     return;
   }
 
   try {
     if (kIsWeb) {
       if (_appCheckWebRecaptchaKey.isEmpty) {
-        debugPrint('App Check skipped on web: APP_CHECK_WEB_RECAPTCHA_KEY is empty.');
+        AppLogger.debug('App Check skipped on web: APP_CHECK_WEB_RECAPTCHA_KEY is empty.');
         return;
       }
       await FirebaseAppCheck.instance.activate(
         webProvider: ReCaptchaV3Provider(_appCheckWebRecaptchaKey),
       );
-      debugPrint('App Check activated for web.');
+      AppLogger.debug('App Check activated for web.');
       return;
     }
 
@@ -60,7 +79,7 @@ Future<void> _configureAppCheck() async {
       await FirebaseAppCheck.instance.activate(
         androidProvider: AndroidProvider.playIntegrity,
       );
-      debugPrint('App Check activated for Android (Play Integrity).');
+      AppLogger.debug('App Check activated for Android (Play Integrity).');
       return;
     }
 
@@ -69,18 +88,19 @@ Future<void> _configureAppCheck() async {
       await FirebaseAppCheck.instance.activate(
         appleProvider: AppleProvider.deviceCheck,
       );
-      debugPrint('App Check activated for Apple platforms (DeviceCheck).');
+      AppLogger.debug('App Check activated for Apple platforms (DeviceCheck).');
       return;
     }
 
-    debugPrint('App Check: platform not configured, skipping activation.');
+    AppLogger.debug('App Check: platform not configured, skipping activation.');
   } catch (e) {
-    debugPrint('App Check activation failed: $e');
+    AppLogger.debug('App Check activation failed: $e');
   }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _configureSafeDebugLogging();
   await Firebase.initializeApp();
   await _configureAppCheck();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -91,7 +111,7 @@ Future<void> main() async {
         PurchasesConfiguration(_revenueCatApiKey)..appUserID = uid,
       );
     } catch (e) {
-      debugPrint('RevenueCat configure failed: $e');
+      AppLogger.debug('RevenueCat configure failed: $e');
     }
   }
   runApp(const ProviderScope(child: OurOSRoot()));

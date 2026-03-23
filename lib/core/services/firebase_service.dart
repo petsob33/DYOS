@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/auth/domain/user_model.dart';
 import '../../features/auth/domain/couple_model.dart';
+import 'app_logger.dart';
 import 'pairing_exceptions.dart';
 
 part 'firebase_service.g.dart';
@@ -241,8 +242,8 @@ final partnerUserDoc = results[1];
       return CoupleModel.fromFirestore(doc);
     } catch (e, stackTrace) {
       // Log error for debugging but don't throw to prevent app crashes
-      debugPrint('Error loading couple data for coupleId $coupleId: $e');
-      debugPrint('Stack trace: $stackTrace');
+      AppLogger.debug('Error loading couple data for coupleId $coupleId: $e');
+      AppLogger.debug('Stack trace: $stackTrace');
       return null;
     }
   }

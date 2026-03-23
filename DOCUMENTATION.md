@@ -232,12 +232,12 @@ Níže jsou konkrétní nálezy z tohoto kódu, seřazené podle závažnosti.
 - [x] Zúžit read přístup v `storage.rules` pro `profile_pictures`.
 - [x] Zavést rate limiting/App Check pro callable endpointy.
 - [x] Odstranit debug route `/firebase-test` z release (router už ji váže na `kDebugMode`, ověřit release build pipeline).
-- [~] Sanitizovat produkční logování (`print`/`debugPrint` audit).
+- [x] Sanitizovat produkční logování (`print`/`debugPrint` audit).
 - [x] Rozšířit testování o bezpečnostně kritické scénáře (rules + pairing + purchase sync).
 
 ### Stav po implementaci (aktualizace)
-- Dokončené body: **9/10** (včetně všech původních "must fix" + security testů pro rules/pairing/purchase sync).
-- Částečně dokončené: **1/10** (`print/debugPrint` audit proběhl jen na prioritních bezpečnostních tocích).
+- Dokončené body: **10/10** (včetně všech původních "must fix", security testů i logovacího hardeningu).
+- Částečně dokončené: **0/10**.
 - Otevřené: **0/10**.
 
 ### Technické slepé uličky / nedodělky
