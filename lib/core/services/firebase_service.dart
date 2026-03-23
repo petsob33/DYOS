@@ -11,6 +11,28 @@ import 'pairing_exceptions.dart';
 
 part 'firebase_service.g.dart';
 
+PairingException mapPairingFunctionsException(FirebaseFunctionsException e) {
+  switch (e.code) {
+    case 'invalid-argument':
+      return GenericPairingException('Invalid invite code format.');
+    case 'not-found':
+      return PartnerNotFoundException();
+    case 'failed-precondition':
+      if ((e.message ?? '').contains('yourself')) {
+        return SelfPairingException();
+      }
+      if ((e.message ?? '').contains('already paired')) {
+        if ((e.message ?? '').contains('Your account')) {
+          return UserAlreadyPairedException();
+        }
+        return PartnerAlreadyPairedException();
+      }
+      return GenericPairingException(e.message ?? 'Pairing failed.');
+    default:
+      return GenericPairingException(e.message ?? 'Pairing failed.');
+  }
+}
+
 @riverpod
 FirebaseService firebaseService(FirebaseServiceRef ref) {
   return FirebaseService();
@@ -208,25 +230,7 @@ final partnerUserDoc = results[1];
       }
       return null;
     } on FirebaseFunctionsException catch (e) {
-      switch (e.code) {
-        case 'invalid-argument':
-          throw GenericPairingException('Invalid invite code format.');
-        case 'not-found':
-          throw PartnerNotFoundException();
-        case 'failed-precondition':
-          if ((e.message ?? '').contains('yourself')) {
-            throw SelfPairingException();
-          }
-          if ((e.message ?? '').contains('already paired')) {
-            if ((e.message ?? '').contains('Your account')) {
-              throw UserAlreadyPairedException();
-            }
-            throw PartnerAlreadyPairedException();
-          }
-          throw GenericPairingException(e.message ?? 'Pairing failed.');
-        default:
-          throw GenericPairingException(e.message ?? 'Pairing failed.');
-      }
+      throw mapPairingFunctionsException(e);
     }
   }
 
