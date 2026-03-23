@@ -44,6 +44,8 @@ import '../../models/note_item.dart';
 
 part 'app_router.g.dart';
 
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
+
 /// Debug routes must be explicitly enabled with:
 /// --dart-define=ENABLE_DEBUG_ROUTES=true
 const bool _enableDebugRoutes = bool.fromEnvironment(
@@ -101,6 +103,7 @@ GoRouter appRouter(AppRouterRef ref) {
   final userState = ref.watch(userProvider);
 
   return GoRouter(
+    navigatorKey: appNavigatorKey,
     initialLocation: '/login',
     redirect: (context, state) {
       // Get current auth state

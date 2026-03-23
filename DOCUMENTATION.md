@@ -251,13 +251,13 @@ Níže jsou konkrétní nálezy z tohoto kódu, seřazené podle závažnosti.
 
 ### Funkční roadmap
 - Implementovat `time_capsule` nebo feature explicitně odstranit ze scope.
-- Dokončit notifikační deep links (navigace podle payload v `_onNotificationTapped` a `_handleNotificationTap`).
+- ✅ Dokončeno: notifikační deep links (navigace podle payload v `_onNotificationTapped` a `_handleNotificationTap`).
 - Dovybudovat groceries / checklist feature (v `lists` je zatím jen základ UI rámec).
 - Dovyřešit cycle partner messaging end-to-end v UI (`cycle_calculator.dart` + presentation).
 
 ### Výkon a technický dluh
 - Konsolidovat duplicitu generování invite kódu (`AuthService` vs `FirebaseService`).
-- Refaktor `FirebaseService` (aktuálně velmi široký "god service"): rozdělit na pairing/subscription/gamification/account lifecycle.
+- ✅ Dokončeno: refaktor `FirebaseService` na menší doménové služby (`PairingService`, `SubscriptionService`, `ProfileService`, `CoupleNotificationService`) při zachování kompatibilní facade.
 - Omezit in-memory sorty v repository vrstvách tam, kde lze použít indexované query (`notes_repository.dart`, `memory_repository.dart`).
 - Zajistit robustnější error taxonomy (místo obecného `Exception(...)`) pro lepší UX a monitoring.
 - Sjednotit logging strategii (structured logs, severity, redaction).

@@ -1,38 +1,21 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/auth/domain/user_model.dart';
 import '../../features/auth/domain/couple_model.dart';
 import 'app_logger.dart';
+import 'couple_notification_service.dart';
+import 'profile_service.dart';
+import 'pairing_service.dart' as pairing;
 import 'pairing_exceptions.dart';
+import 'subscription_service.dart';
 
 part 'firebase_service.g.dart';
 
-PairingException mapPairingFunctionsException(FirebaseFunctionsException e) {
-  switch (e.code) {
-    case 'invalid-argument':
-      return GenericPairingException('Invalid invite code format.');
-    case 'not-found':
-      return PartnerNotFoundException();
-    case 'failed-precondition':
-      if ((e.message ?? '').contains('yourself')) {
-        return SelfPairingException();
-      }
-      if ((e.message ?? '').contains('already paired')) {
-        if ((e.message ?? '').contains('Your account')) {
-          return UserAlreadyPairedException();
-        }
-        return PartnerAlreadyPairedException();
-      }
-      return GenericPairingException(e.message ?? 'Pairing failed.');
-    default:
-      return GenericPairingException(e.message ?? 'Pairing failed.');
-  }
-}
+PairingException mapPairingFunctionsException(FirebaseFunctionsException e) =>
+    pairing.mapPairingFunctionsException(e);
 
 @riverpod
 FirebaseService firebaseService(FirebaseServiceRef ref) {
@@ -43,22 +26,27 @@ class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
+  late final pairing.PairingService _pairingService = pairing.PairingService(
+    auth: _auth,
+    firestore: _firestore,
+    functions: _functions,
+  );
+  late final ProfileService _profileService = ProfileService(
+    auth: _auth,
+    firestore: _firestore,
+    pairingService: _pairingService,
+  );
+  late final SubscriptionService _subscriptionService =
+      SubscriptionService(firestore: _firestore);
+  late final CoupleNotificationService _coupleNotificationService =
+      CoupleNotificationService(firestore: _firestore);
 
   // Get current user
   User? get currentUser => _auth.currentUser;
 
   // Check if user exists and has a couple
   Future<UserModel?> getUserData() async {
-    final user = currentUser;
-    if (user == null) return null;
-
-    try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
-      if (!doc.exists) return null;
-      return UserModel.fromFirestore(doc);
-    } catch (e, stackTrace) {
-      return null;
-    }
+    return _profileService.getUserData();
   }
 
   // Create or update user document
@@ -68,60 +56,17 @@ class FirebaseService {
     required String displayName,
     String? photoUrl,
   }) async {
-    final userRef = _firestore.collection('users').doc(uid);
-    final userDoc = await userRef.get();
-
-    String inviteCode;
-    UserModel? existingUser;
-    if (userDoc.exists) {
-      existingUser = UserModel.fromFirestore(userDoc);
-      inviteCode = existingUser.inviteCode ?? _generateInviteCode(displayName);
-    } else {
-      // Generate unique invite code
-      inviteCode = _generateInviteCode(displayName);
-    }
-
-    final userData = UserModel(
+    return _profileService.createOrUpdateUser(
       uid: uid,
       email: email,
       displayName: displayName,
       photoUrl: photoUrl,
-      inviteCode: inviteCode,
-      createdAt: existingUser?.createdAt ?? DateTime.now(),
-      coupleId: existingUser?.coupleId,
     );
-
-    await userRef.set(userData.toJson(), SetOptions(merge: true));
-    return userData;
-  }
-
-  // Generate unique invite code (e.g., "PETR-8821")
-  String _generateInviteCode(String displayName) {
-    final prefix = displayName.toUpperCase().substring(
-        0, displayName.length > 4 ? 4 : displayName.length);
-    final random = Random();
-    final number = random.nextInt(9000) + 1000; // 1000-9999
-    return '$prefix-$number';
   }
 
   // Find user by invite code (minimal payload from secured callable)
   Future<UserModel?> findUserByInviteCode(String inviteCode) async {
-    try {
-      final callable = _functions.httpsCallable('getUserByInviteCode');
-      final result = await callable.call({'inviteCode': inviteCode});
-      final payload = result.data;
-      if (payload == null) return null;
-      final map = Map<String, dynamic>.from(payload as Map);
-      return UserModel(
-        uid: map['uid'] as String? ?? '',
-        email: map['email'] as String? ?? '',
-        displayName: map['displayName'] as String?,
-        inviteCode: map['inviteCode'] as String?,
-        coupleId: map['coupleId'] as String?,
-      );
-    } catch (e) {
-      return null;
-    }
+    return _pairingService.findUserByInviteCode(inviteCode);
   }
 
   /// Pair two users together
@@ -137,115 +82,21 @@ class FirebaseService {
   /// Returns the created CoupleModel.
   /// Throws an exception if pairing fails.
   Future<CoupleModel> pairUsers(String currentUserId, String partnerUserId) async {
-    // Safety check: prevent pairing with yourself
-    if (currentUserId == partnerUserId) {
-      throw SelfPairingException();
-    }
-
-    // Safety check: verify both users exist
-// Stáhne oba naráz
-final results = await Future.wait([
-  _firestore.collection('users').doc(currentUserId).get(),
-  _firestore.collection('users').doc(partnerUserId).get(),
-]);
-
-final currentUserDoc = results[0];
-final partnerUserDoc = results[1];    
-    if (!currentUserDoc.exists) {
-      throw UserNotFoundException();
-    }
-    if (!partnerUserDoc.exists) {
-      throw PartnerNotFoundException();
-    }
-
-    // Safety check: verify neither user is already paired
-    final currentUser = UserModel.fromFirestore(currentUserDoc);
-    final partnerUser = UserModel.fromFirestore(partnerUserDoc);
-    
-    if (currentUser.coupleId != null && currentUser.coupleId!.isNotEmpty) {
-      throw UserAlreadyPairedException();
-    }
-    if (partnerUser.coupleId != null && partnerUser.coupleId!.isNotEmpty) {
-      throw PartnerAlreadyPairedException();
-    }
-
-    final batch = _firestore.batch();
-
-    // Create couple document with new structure
-    final coupleId = 'couple_${DateTime.now().millisecondsSinceEpoch}';
-    final coupleRef = _firestore.collection('couples').doc(coupleId);
-
-    // Initialize status map with empty statuses for both users
-    // This allows the dashboard to display status without reading additional documents
-    final statusMap = <String, CoupleStatus>{
-      currentUserId: CoupleStatus(
-        emoji: '😊',
-        text: 'Ready to connect',
-        updatedAt: DateTime.now(),
-      ),
-      partnerUserId: CoupleStatus(
-        emoji: '😊',
-        text: 'Ready to connect',
-        updatedAt: DateTime.now(),
-      ),
-    };
-
-    final couple = CoupleModel(
-      id: coupleId,
-      members: [currentUserId, partnerUserId],
-      anniversaryDate: DateTime.now(), // Can be updated later by users
-      createdAt: DateTime.now(),
-      subscriptionTier: 'free', // Default to free tier
-      subscriptionExpiry: null, // No expiry for free tier
-      status: statusMap,
-    );
-
-    // Debug: print what we're saving
-    final coupleJson = couple.toJson();
-
-    // Set the couple document
-    batch.set(coupleRef, coupleJson);
-
-    // Update both users with coupleId
-    final currentUserRef = _firestore.collection('users').doc(currentUserId);
-    final partnerUserRef = _firestore.collection('users').doc(partnerUserId);
-
-    batch.update(currentUserRef, {'coupleId': coupleId});
-    batch.update(partnerUserRef, {'coupleId': coupleId});
-
-    // Commit all changes atomically
-    await batch.commit();
-    return couple;
+    return _pairingService.pairUsers(currentUserId, partnerUserId);
   }
 
   /// Secure, server-side pairing flow.
   /// Uses callable Cloud Function with transaction to avoid race conditions.
   Future<String?> pairWithInviteCode(String inviteCode) async {
-    try {
-      final callable = _functions.httpsCallable('pairWithInviteCode');
-      final result = await callable.call({'inviteCode': inviteCode});
-      final payload = Map<String, dynamic>.from(result.data as Map);
-      final partner = payload['partner'];
-      if (partner is Map) {
-        return Map<String, dynamic>.from(partner)['displayName'] as String?;
-      }
-      return null;
-    } on FirebaseFunctionsException catch (e) {
-      throw mapPairingFunctionsException(e);
-    }
+    return _pairingService.pairWithInviteCode(inviteCode);
   }
 
   Future<CoupleModel?> getCoupleData(String coupleId) async {
-    try {
-      final doc = await _firestore.collection('couples').doc(coupleId).get();
-      if (!doc.exists) return null;
-      return CoupleModel.fromFirestore(doc);
-    } catch (e, stackTrace) {
-      // Log error for debugging but don't throw to prevent app crashes
-      AppLogger.debug('Error loading couple data for coupleId $coupleId: $e');
-      AppLogger.debug('Stack trace: $stackTrace');
-      return null;
+    final result = await _pairingService.getCoupleData(coupleId);
+    if (result == null) {
+      AppLogger.debug('Could not load couple data for coupleId $coupleId');
     }
+    return result;
   }
 
   /// Update subscription fields on the couple document.
@@ -255,58 +106,28 @@ final partnerUserDoc = results[1];
     required String subscriptionTier,
     DateTime? subscriptionExpiry,
   }) async {
-    final coupleRef = _firestore.collection('couples').doc(coupleId);
-    final updates = <String, dynamic>{
-      'subscriptionTier': subscriptionTier,
-    };
-    if (subscriptionExpiry != null) {
-      updates['subscriptionExpiry'] = Timestamp.fromDate(subscriptionExpiry);
-    } else {
-      updates['subscriptionExpiry'] = FieldValue.delete();
-    }
-    await coupleRef.update(updates);
+    await _subscriptionService.updateCoupleSubscription(
+      coupleId,
+      subscriptionTier: subscriptionTier,
+      subscriptionExpiry: subscriptionExpiry,
+    );
   }
 
   // Check if user is paired
   Future<bool> isUserPaired() async {
-    final userData = await getUserData();
-    return userData?.coupleId != null && userData!.coupleId!.isNotEmpty;
+    return _pairingService.isUserPaired(getUserData);
   }
 
   Future<UserModel?> getPartner() async {
-    final user = currentUser;
-    if (user == null) return null;
-
-    try {
-      final userData = await getUserData();
-      if (userData?.coupleId == null || userData!.coupleId!.isEmpty) {
-        return null;
-      }
-
-      final couple = await getCoupleData(userData.coupleId!);
-      if (couple == null) return null;
-
-      final partnerUid = couple.members.firstWhere(
-        (uid) => uid != user.uid,
-        orElse: () => '',
-      );
-
-      if (partnerUid.isEmpty) return null;
-
-      final partnerDoc = await _firestore.collection('users').doc(partnerUid).get();
-      if (!partnerDoc.exists) return null;
-
-      return UserModel.fromFirestore(partnerDoc);
-    } catch (e, stackTrace) {
-      return null;
-    }
+    return _pairingService.getPartner(
+      getUserData: getUserData,
+      getCoupleData: getCoupleData,
+    );
   }
 
   /// Add XP to the couple (gamification). Persisted in Firestore.
   Future<void> addCoupleXp(String coupleId, int amount) async {
-    if (amount <= 0) return;
-    final ref = _firestore.collection('couples').doc(coupleId);
-    await ref.update({'xp': FieldValue.increment(amount)});
+    await _subscriptionService.addCoupleXp(coupleId, amount);
   }
 
   /// Save blueprint answers for a section and user. Merges into couple.blueprintAnswers.
@@ -316,25 +137,22 @@ final partnerUserDoc = results[1];
     required String userId,
     required Map<String, dynamic> answers,
   }) async {
-    final ref = _firestore.collection('couples').doc(coupleId);
-    final path = 'blueprintAnswers.$sectionId.$userId';
-    await ref.update({path: answers});
+    await _subscriptionService.saveBlueprintAnswers(
+      coupleId: coupleId,
+      sectionId: sectionId,
+      userId: userId,
+      answers: answers,
+    );
   }
 
   /// Mark a blueprint section as completed for XP (so +100 XP is only given once per section).
   Future<void> addCompletedBlueprintSection(String coupleId, String sectionId) async {
-    final ref = _firestore.collection('couples').doc(coupleId);
-    await ref.update({
-      'completedBlueprintSections': FieldValue.arrayUnion([sectionId]),
-    });
+    await _subscriptionService.addCompletedBlueprintSection(coupleId, sectionId);
   }
 
   /// Set last date XP was granted for a quest (for "once per day" logic).
   Future<void> setQuestXpGrantedAt(String coupleId, String questId, String dateString) async {
-    final ref = _firestore.collection('couples').doc(coupleId);
-    await ref.update({
-      'questXpLastGrantedAt.$questId': dateString,
-    });
+    await _subscriptionService.setQuestXpGrantedAt(coupleId, questId, dateString);
   }
 
   /// Update user's status in the couple document
@@ -348,21 +166,12 @@ final partnerUserDoc = results[1];
     required String emoji,
     required String text,
   }) async {
-    try {
-      final coupleRef = _firestore.collection('couples').doc(coupleId);
-      
-      // Update the status map in the couple document
-      await coupleRef.update({
-        'status.$userId': {
-          'emoji': emoji,
-          'text': text,
-          'updatedAt': Timestamp.now(),
-        },
-      });
-      
-    } catch (e, stackTrace) {
-      rethrow;
-    }
+    await _coupleNotificationService.updateStatus(
+      coupleId: coupleId,
+      userId: userId,
+      emoji: emoji,
+      text: text,
+    );
   }
 
   /// Send haptic touch signal to partner
@@ -374,23 +183,11 @@ final partnerUserDoc = results[1];
     required String fromUserId,
     required int durationMs,
   }) async {
-    try {
-      final signalsRef = _firestore
-          .collection('couples')
-          .doc(coupleId)
-          .collection('haptic_signals')
-          .doc();
-      
-      await signalsRef.set({
-        'fromUserId': fromUserId,
-        'durationMs': durationMs,
-        'timestamp': Timestamp.now(),
-        'read': false,
-      });
-      
-    } catch (e, stackTrace) {
-      rethrow;
-    }
+    await _coupleNotificationService.sendHapticTouch(
+      coupleId: coupleId,
+      fromUserId: fromUserId,
+      durationMs: durationMs,
+    );
   }
 
   /// Send quick message to partner
@@ -402,23 +199,11 @@ final partnerUserDoc = results[1];
     required String fromUserId,
     required String message,
   }) async {
-    try {
-      final messagesRef = _firestore
-          .collection('couples')
-          .doc(coupleId)
-          .collection('quick_messages')
-          .doc();
-      
-      await messagesRef.set({
-        'fromUserId': fromUserId,
-        'message': message,
-        'timestamp': Timestamp.now(),
-        'read': false,
-      });
-      
-    } catch (e, stackTrace) {
-      rethrow;
-    }
+    await _coupleNotificationService.sendQuickMessage(
+      coupleId: coupleId,
+      fromUserId: fromUserId,
+      message: message,
+    );
   }
 
   /// Delete user account and all associated data
@@ -444,103 +229,6 @@ final partnerUserDoc = results[1];
   /// 
   /// Throws: Exception if deletion fails at any step
   Future<void> deleteAccount() async {
-    final user = currentUser;
-    if (user == null) {
-      throw Exception('No user is currently signed in');
-    }
-
-    try {
-      // Step 1: Get user data
-      final userData = await getUserData();
-      if (userData == null) {
-        throw Exception('User data not found');
-      }
-
-      final batch = _firestore.batch();
-
-      // Step 2: Handle couple deletion if user is paired
-      if (userData.coupleId != null && userData.coupleId!.isNotEmpty) {
-        final couple = await getCoupleData(userData.coupleId!);
-        
-        if (couple != null) {
-          // Find partner
-          final partnerUid = couple.members.firstWhere(
-            (uid) => uid != user.uid,
-            orElse: () => '',
-          );
-
-          // Delete all subcollections
-          // Note: Firestore batch operations have a limit of 500 operations
-          // We delete subcollections in separate batches to handle large amounts of data
-          final subcollections = [
-            'memories',
-            'intimacy_logs',
-            'notes',
-            'cycle_logs',
-            'cycle_settings',
-            'haptic_signals',
-            'quick_messages',
-          ];
-
-          // Delete each subcollection in batches
-          for (final subcollection in subcollections) {
-            final subcollectionRef = _firestore
-                .collection('couples')
-                .doc(userData.coupleId!)
-                .collection(subcollection);
-            
-            // Delete documents in batches of 500 (Firestore batch limit)
-            QuerySnapshot? snapshot;
-            do {
-              snapshot = await subcollectionRef
-                  .limit(500)
-                  .get();
-              
-              if (snapshot.docs.isNotEmpty) {
-                final deleteBatch = _firestore.batch();
-                for (final doc in snapshot.docs) {
-                  deleteBatch.delete(doc.reference);
-                }
-                await deleteBatch.commit();
-              }
-            } while (snapshot.docs.length == 500);
-          }
-
-          // Create final batch for couple and user documents
-          final finalBatch = _firestore.batch();
-
-          // Delete couple document
-          final coupleRef = _firestore.collection('couples').doc(userData.coupleId!);
-          finalBatch.delete(coupleRef);
-
-          // Remove coupleId from partner's user document
-          if (partnerUid.isNotEmpty) {
-            final partnerRef = _firestore.collection('users').doc(partnerUid);
-            finalBatch.update(partnerRef, {'coupleId': FieldValue.delete()});
-          }
-
-          // Delete user document
-          final userRef = _firestore.collection('users').doc(user.uid);
-          finalBatch.delete(userRef);
-
-          // Commit final batch
-          await finalBatch.commit();
-        } else {
-          // User not paired - just delete user document
-          final userRef = _firestore.collection('users').doc(user.uid);
-          await userRef.delete();
-        }
-      } else {
-        // User not paired - just delete user document
-        final userRef = _firestore.collection('users').doc(user.uid);
-        await userRef.delete();
-      }
-
-      // Step 4: Delete Firebase Auth account
-      await user.delete();
-
-    } catch (e, stackTrace) {
-      rethrow;
-    }
+    await _profileService.deleteAccount(getCoupleData: getCoupleData);
   }
 }
