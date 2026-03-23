@@ -19,6 +19,7 @@ import '../../../events/presentation/event_provider.dart';
 import '../../../tracker/presentation/intimacy_provider.dart';
 import '../../../tracker/domain/intimacy_log_model.dart';
 import '../../../../core/services/firebase_service.dart';
+import '../../../../core/services/app_logger.dart';
 import '../../../../core/services/notification_service.dart';
 import 'package:flutter/services.dart';
 import '../haptic_listener_provider.dart';
@@ -52,18 +53,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _initializeNotifications() async {
     try {
-      debugPrint('Initializing notifications in home screen...');
+      AppLogger.debug('Initializing notifications in home screen...');
       final notificationService = ref.read(notificationServiceProvider);
       await notificationService.initialize();
       final granted = await notificationService.requestPermissions();
-      debugPrint('Notification permissions granted: $granted');
+      AppLogger.debug('Notification permissions granted: $granted');
       if (!granted) {
-        debugPrint('WARNING: Notification permissions not granted. Notifications may not work.');
+        AppLogger.debug('WARNING: Notification permissions not granted. Notifications may not work.');
       }
     } catch (e, stackTrace) {
-      debugPrint('Error initializing notifications: $e');
-      debugPrint('Stack trace: $stackTrace');
-      debugPrint('NOTE: This might be because the app needs a full restart (not hot reload) after adding flutter_local_notifications');
+      AppLogger.debug('Error initializing notifications: $e');
+      AppLogger.debug('Stack trace: $stackTrace');
+      AppLogger.debug('NOTE: This might be because the app needs a full restart (not hot reload) after adding flutter_local_notifications');
     }
   }
 
