@@ -55,7 +55,20 @@ service firebase.storage {
       function isOwner() {
         return request.auth.uid == userId;
       }
-      allow read: if isAuthenticated();
+      function hasUserDoc(uid) {
+        return exists(/databases/(default)/documents/users/$(uid));
+      }
+      function userCoupleId(uid) {
+        return get(/databases/(default)/documents/users/$(uid)).data.coupleId;
+      }
+      function isPartnerInSameCouple() {
+        return isAuthenticated() &&
+          hasUserDoc(request.auth.uid) &&
+          hasUserDoc(userId) &&
+          userCoupleId(request.auth.uid) != null &&
+          userCoupleId(request.auth.uid) == userCoupleId(userId);
+      }
+      allow read: if isOwner() || isPartnerInSameCouple();
       allow create, update: if isOwner() &&
         request.resource.size < 2 * 1024 * 1024 &&
         (request.resource.contentType.matches('image/.*') || fileName.matches('.*\\.(jpg|jpeg|png|gif|webp)$'));

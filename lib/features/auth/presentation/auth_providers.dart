@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/firebase_service.dart';
@@ -271,26 +272,26 @@ Stream<CoupleModel?> couple(CoupleRef ref) {
           .map((doc) {
         // Check if document exists
         if (!doc.exists) {
-          print('Couple document ${user.coupleId} does not exist');
+          debugPrint('Couple document ${user.coupleId} does not exist');
           return null;
         }
         try {
           // Convert to CoupleModel using fromFirestore which handles Timestamp conversion
           final couple = CoupleModel.fromFirestore(doc);
-          print('Successfully loaded couple ${couple.id} with ${couple.members.length} members');
+          debugPrint('Successfully loaded couple ${couple.id} with ${couple.members.length} members');
           return couple;
         } catch (e, stackTrace) {
           // Log error for debugging
-          print('Error loading couple data from stream for coupleId ${user.coupleId}: $e');
-          print('Stack trace: $stackTrace');
-          print('Document exists: ${doc.exists}, data: ${doc.data()}');
+          debugPrint('Error loading couple data from stream for coupleId ${user.coupleId}: $e');
+          debugPrint('Stack trace: $stackTrace');
+          debugPrint('Document exists: ${doc.exists}, data: ${doc.data()}');
           return null;
         }
       });
     },
     loading: () => Stream<CoupleModel?>.value(null),
     error: (error, stackTrace) {
-      print('Error in userProvider: $error');
+      debugPrint('Error in userProvider: $error');
       return Stream<CoupleModel?>.value(null);
     },
   );
