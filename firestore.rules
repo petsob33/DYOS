@@ -8,12 +8,10 @@ service cloud.firestore {
     // ============================================
     match /users/{userId} {
       allow read: if request.auth != null;
-      
-      // Povolit zápis, pokud:
-      // 1. Jsem vlastník účtu (klasika)
-      // 2. NEBO pokud měním jen pole 'coupleId' (to je ten hack pro párování)
-      allow write: if request.auth.uid == userId 
-                   || (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coupleId']));
+
+      // Zápis pouze vlastníkem účtu.
+      // Párování probíhá server-side přes Cloud Function (Admin SDK bypass rules).
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
     
     // ============================================
@@ -72,8 +70,8 @@ service cloud.firestore {
         // Update: Kterýkoliv člen páru
         allow update: if isCoupleMember();
         
-        // Smazat může jen autor
-        allow delete: if isCoupleMember() && isAuthor();
+        // Smazat může kterýkoliv člen páru
+        allow delete: if isCoupleMember();
       }
       
       // --------------------------------------------

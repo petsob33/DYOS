@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/auth/domain/user_model.dart';
@@ -17,6 +19,7 @@ FirebaseService firebaseService(FirebaseServiceRef ref) {
 class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -78,17 +81,21 @@ class FirebaseService {
     return '$prefix-$number';
   }
 
-  // Find user by invite code
+  // Find user by invite code (minimal payload from secured callable)
   Future<UserModel?> findUserByInviteCode(String inviteCode) async {
     try {
-      final query = await _firestore
-          .collection('users')
-          .where('inviteCode', isEqualTo: inviteCode.toUpperCase())
-          .limit(1)
-          .get();
-
-      if (query.docs.isEmpty) return null;
-      return UserModel.fromFirestore(query.docs.first);
+      final callable = _functions.httpsCallable('getUserByInviteCode');
+      final result = await callable.call({'inviteCode': inviteCode});
+      final payload = result.data;
+      if (payload == null) return null;
+      final map = Map<String, dynamic>.from(payload as Map);
+      return UserModel(
+        uid: map['uid'] as String? ?? '',
+        email: map['email'] as String? ?? '',
+        displayName: map['displayName'] as String?,
+        inviteCode: map['inviteCode'] as String?,
+        coupleId: map['coupleId'] as String?,
+      );
     } catch (e) {
       return null;
     }
@@ -188,6 +195,41 @@ final partnerUserDoc = results[1];
     return couple;
   }
 
+  /// Secure, server-side pairing flow.
+  /// Uses callable Cloud Function with transaction to avoid race conditions.
+  Future<String?> pairWithInviteCode(String inviteCode) async {
+    try {
+      final callable = _functions.httpsCallable('pairWithInviteCode');
+      final result = await callable.call({'inviteCode': inviteCode});
+      final payload = Map<String, dynamic>.from(result.data as Map);
+      final partner = payload['partner'];
+      if (partner is Map) {
+        return Map<String, dynamic>.from(partner)['displayName'] as String?;
+      }
+      return null;
+    } on FirebaseFunctionsException catch (e) {
+      switch (e.code) {
+        case 'invalid-argument':
+          throw GenericPairingException('Invalid invite code format.');
+        case 'not-found':
+          throw PartnerNotFoundException();
+        case 'failed-precondition':
+          if ((e.message ?? '').contains('yourself')) {
+            throw SelfPairingException();
+          }
+          if ((e.message ?? '').contains('already paired')) {
+            if ((e.message ?? '').contains('Your account')) {
+              throw UserAlreadyPairedException();
+            }
+            throw PartnerAlreadyPairedException();
+          }
+          throw GenericPairingException(e.message ?? 'Pairing failed.');
+        default:
+          throw GenericPairingException(e.message ?? 'Pairing failed.');
+      }
+    }
+  }
+
   Future<CoupleModel?> getCoupleData(String coupleId) async {
     try {
       final doc = await _firestore.collection('couples').doc(coupleId).get();
@@ -195,8 +237,8 @@ final partnerUserDoc = results[1];
       return CoupleModel.fromFirestore(doc);
     } catch (e, stackTrace) {
       // Log error for debugging but don't throw to prevent app crashes
-      print('Error loading couple data for coupleId $coupleId: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error loading couple data for coupleId $coupleId: $e');
+      debugPrint('Stack trace: $stackTrace');
       return null;
     }
   }

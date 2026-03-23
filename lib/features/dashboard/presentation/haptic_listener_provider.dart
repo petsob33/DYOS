@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/presentation/auth_providers.dart';
@@ -17,7 +18,7 @@ Stream<DateTime?> hapticSignalsStream(HapticSignalsStreamRef ref) {
   }
   
   if (userAsync.hasError) {
-    print('Error in hapticSignalsStream - userProvider error: ${userAsync.error}');
+    debugPrint('Error in hapticSignalsStream - userProvider error: ${userAsync.error}');
     return Stream.value(null);
   }
   
@@ -31,7 +32,7 @@ Stream<DateTime?> hapticSignalsStream(HapticSignalsStreamRef ref) {
   final coupleId = user.coupleId!;
   final currentUserId = user.uid;
   
-  print('Setting up hapticSignalsStream for coupleId: $coupleId, userId: $currentUserId');
+  debugPrint('Setting up hapticSignalsStream for coupleId: $coupleId, userId: $currentUserId');
   
   try {
     // Listen to all unread signals, then filter in memory
@@ -43,7 +44,7 @@ Stream<DateTime?> hapticSignalsStream(HapticSignalsStreamRef ref) {
         .where('read', isEqualTo: false)
         .snapshots(includeMetadataChanges: false)
         .asyncMap((snapshot) async {
-      print('Haptic signals snapshot received: ${snapshot.docs.length} documents');
+      debugPrint('Haptic signals snapshot received: ${snapshot.docs.length} documents');
       
       if (snapshot.docs.isEmpty) {
         return null;
@@ -73,31 +74,31 @@ Stream<DateTime?> hapticSignalsStream(HapticSignalsStreamRef ref) {
         final fromUserId = data['fromUserId'] as String? ?? '';
         final durationMs = data['durationMs'] as int? ?? 200;
         
-        print('Processing haptic signal from partner: $fromUserId, duration: $durationMs');
+        debugPrint('Processing haptic signal from partner: $fromUserId, duration: $durationMs');
         
         // Trigger haptic feedback
         HapticFeedback.mediumImpact();
         
         // Mark as read (async to avoid blocking)
         latestSignal.reference.update({'read': true}).catchError((e) {
-          print('Error marking haptic signal as read: $e');
+          debugPrint('Error marking haptic signal as read: $e');
         });
         
-        print('Haptic signal processed successfully');
+        debugPrint('Haptic signal processed successfully');
         // Return timestamp to trigger notification
         return DateTime.now();
       }
       
       return null;
     }).handleError((error) {
-      print('Error in hapticSignalsStream query: $error');
-      print('Error stack: ${error.toString()}');
+      debugPrint('Error in hapticSignalsStream query: $error');
+      debugPrint('Error stack: ${error.toString()}');
       // Return null on error to prevent stream from crashing
       return null;
     });
   } catch (e, stackTrace) {
-    print('Error setting up hapticSignalsStream: $e');
-    print('Stack trace: $stackTrace');
+    debugPrint('Error setting up hapticSignalsStream: $e');
+    debugPrint('Stack trace: $stackTrace');
     return Stream.value(null);
   }
 }
@@ -113,7 +114,7 @@ Stream<Map<String, dynamic>?> quickMessagesStream(QuickMessagesStreamRef ref) {
   }
   
   if (userAsync.hasError) {
-    print('Error in quickMessagesStream - userProvider error: ${userAsync.error}');
+    debugPrint('Error in quickMessagesStream - userProvider error: ${userAsync.error}');
     return Stream.value(null);
   }
   
@@ -127,7 +128,7 @@ Stream<Map<String, dynamic>?> quickMessagesStream(QuickMessagesStreamRef ref) {
   final coupleId = user.coupleId!;
   final currentUserId = user.uid;
   
-  print('Setting up quickMessagesStream for coupleId: $coupleId, userId: $currentUserId');
+  debugPrint('Setting up quickMessagesStream for coupleId: $coupleId, userId: $currentUserId');
   
   try {
     // Listen to all unread messages, then filter in memory
@@ -139,7 +140,7 @@ Stream<Map<String, dynamic>?> quickMessagesStream(QuickMessagesStreamRef ref) {
         .where('read', isEqualTo: false)
         .snapshots(includeMetadataChanges: false)
         .map((snapshot) {
-      print('Quick messages snapshot received: ${snapshot.docs.length} documents');
+      debugPrint('Quick messages snapshot received: ${snapshot.docs.length} documents');
       
       if (snapshot.docs.isEmpty) {
         return null;
@@ -168,14 +169,14 @@ Stream<Map<String, dynamic>?> quickMessagesStream(QuickMessagesStreamRef ref) {
         final data = latestMessage.data() as Map<String, dynamic>;
         final messageText = data['message'] as String? ?? '';
         
-        print('Processing quick message from partner: $messageText');
+        debugPrint('Processing quick message from partner: $messageText');
         
         // Mark as read
         latestMessage.reference.update({'read': true}).catchError((e) {
-          print('Error marking quick message as read: $e');
+          debugPrint('Error marking quick message as read: $e');
         });
         
-        print('Quick message processed successfully');
+        debugPrint('Quick message processed successfully');
         return {
           'message': messageText,
           'timestamp': data['timestamp'] as Timestamp?,
@@ -184,14 +185,14 @@ Stream<Map<String, dynamic>?> quickMessagesStream(QuickMessagesStreamRef ref) {
       
       return null;
     }).handleError((error) {
-      print('Error in quickMessagesStream query: $error');
-      print('Error stack: ${error.toString()}');
+      debugPrint('Error in quickMessagesStream query: $error');
+      debugPrint('Error stack: ${error.toString()}');
       // Return null on error to prevent stream from crashing
       return null;
     });
   } catch (e, stackTrace) {
-    print('Error setting up quickMessagesStream: $e');
-    print('Stack trace: $stackTrace');
+    debugPrint('Error setting up quickMessagesStream: $e');
+    debugPrint('Stack trace: $stackTrace');
     return Stream.value(null);
   }
 }

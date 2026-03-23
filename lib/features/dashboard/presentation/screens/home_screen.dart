@@ -52,18 +52,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _initializeNotifications() async {
     try {
-      print('Initializing notifications in home screen...');
+      debugPrint('Initializing notifications in home screen...');
       final notificationService = ref.read(notificationServiceProvider);
       await notificationService.initialize();
       final granted = await notificationService.requestPermissions();
-      print('Notification permissions granted: $granted');
+      debugPrint('Notification permissions granted: $granted');
       if (!granted) {
-        print('WARNING: Notification permissions not granted. Notifications may not work.');
+        debugPrint('WARNING: Notification permissions not granted. Notifications may not work.');
       }
     } catch (e, stackTrace) {
-      print('Error initializing notifications: $e');
-      print('Stack trace: $stackTrace');
-      print('NOTE: This might be because the app needs a full restart (not hot reload) after adding flutter_local_notifications');
+      debugPrint('Error initializing notifications: $e');
+      debugPrint('Stack trace: $stackTrace');
+      debugPrint('NOTE: This might be because the app needs a full restart (not hot reload) after adding flutter_local_notifications');
     }
   }
 
@@ -79,23 +79,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _hapticSubscription = ref.listenManual(
       hapticSignalsStreamProvider,
       (previous, next) {
-        print('Haptic signal stream update: ${next.valueOrNull}');
+        debugPrint('Haptic signal stream update: ${next.valueOrNull}');
         next.when(
           data: (timestamp) {
-            print('Haptic signal received, timestamp: $timestamp, mounted: $mounted');
+            debugPrint('Haptic signal received, timestamp: $timestamp, mounted: $mounted');
             if (timestamp != null && mounted) {
               // Show visual notification for haptic signal
-              print('Showing haptic notification');
+              debugPrint('Showing haptic notification');
               _showHapticNotification();
             } else {
-              print('Not showing haptic notification - timestamp: $timestamp, mounted: $mounted');
+              debugPrint('Not showing haptic notification - timestamp: $timestamp, mounted: $mounted');
             }
           },
           loading: () {
-            print('Haptic signal stream loading');
+            debugPrint('Haptic signal stream loading');
           },
           error: (error, stack) {
-            print('Error in haptic signal stream: $error');
+            debugPrint('Error in haptic signal stream: $error');
           },
         );
       },
@@ -105,23 +105,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _messageSubscription = ref.listenManual(
       quickMessagesStreamProvider,
       (previous, next) {
-        print('Quick message stream update: ${next.valueOrNull}');
+        debugPrint('Quick message stream update: ${next.valueOrNull}');
         next.when(
           data: (message) {
-            print('Quick message received: $message, mounted: $mounted');
+            debugPrint('Quick message received: $message, mounted: $mounted');
             if (message != null && mounted) {
               final messageText = message['message'] as String? ?? '';
-              print('Showing quick message notification: $messageText');
+              debugPrint('Showing quick message notification: $messageText');
               _showQuickMessageNotification(messageText);
             } else {
-              print('Not showing quick message - message: $message, mounted: $mounted');
+              debugPrint('Not showing quick message - message: $message, mounted: $mounted');
             }
           },
           loading: () {
-            print('Quick message stream loading');
+            debugPrint('Quick message stream loading');
           },
           error: (error, stack) {
-            print('Error in quick message stream: $error');
+            debugPrint('Error in quick message stream: $error');
           },
         );
       },
@@ -129,15 +129,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showHapticNotification() {
-    print('_showHapticNotification called');
+    debugPrint('_showHapticNotification called');
     
     // Show system notification
     try {
       final notificationService = ref.read(notificationServiceProvider);
       notificationService.showHapticNotification();
-      print('Haptic system notification shown');
+      debugPrint('Haptic system notification shown');
     } catch (e) {
-      print('Error showing haptic system notification: $e');
+      debugPrint('Error showing haptic system notification: $e');
     }
     
     // Also show overlay if app is in foreground
@@ -148,14 +148,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           barrierColor: Colors.transparent,
           barrierDismissible: true,
           builder: (dialogContext) {
-            print('Building haptic notification overlay');
+            debugPrint('Building haptic notification overlay');
             return _HapticNotificationOverlay();
           },
         );
-        print('Haptic notification overlay shown');
+        debugPrint('Haptic notification overlay shown');
       } catch (e, stackTrace) {
-        print('Error showing haptic notification overlay: $e');
-        print('Stack trace: $stackTrace');
+        debugPrint('Error showing haptic notification overlay: $e');
+        debugPrint('Stack trace: $stackTrace');
       }
     }
   }
@@ -214,13 +214,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 try {
-                  print('Sending haptic touch - coupleId: $coupleId, fromUserId: $userId');
+                  debugPrint('Sending haptic touch - coupleId: $coupleId, fromUserId: $userId');
                   await firebaseService.sendHapticTouch(
                     coupleId: coupleId,
                     fromUserId: userId,
                     durationMs: 200,
                   );
-                  print('Haptic touch sent successfully');
+                  debugPrint('Haptic touch sent successfully');
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -232,8 +232,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     );
                   }
                 } catch (e, stackTrace) {
-                  print('Error sending haptic touch: $e');
-                  print('Stack trace: $stackTrace');
+                  debugPrint('Error sending haptic touch: $e');
+                  debugPrint('Stack trace: $stackTrace');
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -258,14 +258,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 try {
-                  final testMessage = 'Test zpráva - ${DateTime.now().toString().substring(11, 19)}';
-                  print('Sending quick message - coupleId: $coupleId, fromUserId: $userId, message: $testMessage');
+                  final testMessage = 'Test message - ${DateTime.now().toString().substring(11, 19)}';
+                  debugPrint('Sending quick message - coupleId: $coupleId, fromUserId: $userId, message: $testMessage');
                   await firebaseService.sendQuickMessage(
                     coupleId: coupleId,
                     fromUserId: userId,
                     message: testMessage,
                   );
-                  print('Quick message sent successfully');
+                  debugPrint('Quick message sent successfully');
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -277,8 +277,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     );
                   }
                 } catch (e, stackTrace) {
-                  print('Error sending quick message: $e');
-                  print('Stack trace: $stackTrace');
+                  debugPrint('Error sending quick message: $e');
+                  debugPrint('Stack trace: $stackTrace');
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -311,15 +311,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showQuickMessageNotification(String message) {
-    print('_showQuickMessageNotification called with message: $message');
+    debugPrint('_showQuickMessageNotification called with message: $message');
     
     // Show system notification
     try {
       final notificationService = ref.read(notificationServiceProvider);
       notificationService.showQuickMessageNotification(message);
-      print('Quick message system notification shown');
+      debugPrint('Quick message system notification shown');
     } catch (e) {
-      print('Error showing quick message system notification: $e');
+      debugPrint('Error showing quick message system notification: $e');
     }
     
     // Also show overlay if app is in foreground
@@ -330,14 +330,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           barrierColor: Colors.transparent,
           barrierDismissible: true,
           builder: (dialogContext) {
-            print('Building quick message notification overlay');
+            debugPrint('Building quick message notification overlay');
             return _QuickMessageNotificationOverlay(message: message);
           },
         );
-        print('Quick message notification overlay shown');
+        debugPrint('Quick message notification overlay shown');
       } catch (e, stackTrace) {
-        print('Error showing quick message notification overlay: $e');
-        print('Stack trace: $stackTrace');
+        debugPrint('Error showing quick message notification overlay: $e');
+        debugPrint('Stack trace: $stackTrace');
       }
     }
   }
@@ -1587,7 +1587,7 @@ class _TapticTouchCardState extends ConsumerState<_TapticTouchCard> {
                     if (!unlocked) ...[
                       const SizedBox(height: 8),
                       Text(
-                        'Odemkni s DYOS+ nebo na Roadmapě',
+                        'Unlock with DYOS+ or via the Roadmap',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppTheme.colors.textSecondary,
                             ),

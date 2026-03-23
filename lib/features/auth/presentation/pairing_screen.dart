@@ -142,20 +142,10 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
 
     try {
       final firebaseService = ref.read(firebaseServiceProvider);
-      final currentUser = firebaseService.currentUser;
-
-      if (currentUser == null) {
-        throw Exception('User is not signed in');
-      }
-
       final partnerCode = _codeController.text.trim().toUpperCase();
-      final partnerUser = await firebaseService.findUserByInviteCode(partnerCode);
-
-      if (partnerUser == null) {
-        throw PartnerNotFoundException();
-      }
-
-      await firebaseService.pairUsers(currentUser.uid, partnerUser.uid);
+      final partnerDisplayName = await firebaseService.pairWithInviteCode(
+        partnerCode,
+      );
 
       // Wait a bit for Firestore to sync and router to see the change
       await Future.delayed(const Duration(milliseconds: 500));
@@ -163,7 +153,9 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Successfully paired with ${partnerUser.displayName ?? partnerCode}!'),
+            content: Text(
+              'Successfully paired with ${partnerDisplayName?.isNotEmpty == true ? partnerDisplayName : partnerCode}!',
+            ),
             backgroundColor: AppTheme.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
