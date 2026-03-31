@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../tracker/presentation/widgets/add_intimacy_sheet.dart';
@@ -16,11 +17,36 @@ import '../user_stats_provider.dart';
 import '../widgets/level_up_unlock_sheet.dart';
 
 /// Level / rewards screen in loyalty-style layout. Uses app template: Inter, primary #5E5CE6, Bento cards.
-class LevelScreen extends ConsumerWidget {
+class LevelScreen extends ConsumerStatefulWidget {
   const LevelScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LevelScreen> createState() => _LevelScreenState();
+}
+
+class _LevelScreenState extends ConsumerState<LevelScreen> {
+  bool _rewarding = false;
+
+  Future<void> _watchAdForSp() async {
+    if (_rewarding) return;
+    setState(() => _rewarding = true);
+    final rewarded = await ref.read(adServiceProvider).showRewardedAdForSp();
+    if (rewarded) {
+      await addCoupleXp(ref, 30);
+    }
+    if (!mounted) return;
+    setState(() => _rewarding = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(rewarded ? 'Reward received: +30 SP' : 'No reward granted this time'),
+        backgroundColor: rewarded ? AppTheme.colors.success : AppTheme.colors.warning,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final c = AppTheme.colors;
     final currentSp = ref.watch(currentXpProvider); // SP stored as xp in Firestore
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
@@ -233,13 +259,57 @@ class LevelScreen extends ConsumerWidget {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+            if (!isPremium)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: BentoCard(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      children: [
+                        Icon(
+                          PhosphorIconsBold.videoCamera,
+                          color: c.primary,
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Text(
+                            'Watch an ad and get +30 SP',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: c.text,
+                            ),
+                          ),
+                        ),
+                        FilledButton(
+                          onPressed: _rewarding ? null : _watchAdForSp,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: c.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: _rewarding
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text('Watch'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            if (!isPremium) const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: FilledButton.icon(
+                child: FilledButton(
                   onPressed: () => context.push('/blueprints'),
-                  icon: const Icon(PhosphorIconsBold.clipboardText, size: 22),
-                  label: const Text('Open Blueprints'),
                   style: FilledButton.styleFrom(
                     backgroundColor: c.primary,
                     foregroundColor: Colors.white,
@@ -248,6 +318,7 @@ class LevelScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
+                  child: const Icon(PhosphorIconsBold.clipboardText, size: 22),
                 ),
               ),
             ),
@@ -354,7 +425,7 @@ class _MilestoneRow extends StatelessWidget {
   final double lineWidth;
   final double trackWidth;
 
-  /// Version string for level-up milestones (e.g. "v2.0" from "Přechod na v2.0").
+  /// Version string for level-up milestones (e.g. "v2.0" from "Upgrade to v2.0").
   String get _versionShort {
     final d = milestone.description;
     final match = RegExp(r'v\d+\.\d+').firstMatch(d);
@@ -550,7 +621,7 @@ class _QuestRow extends StatelessWidget {
                   ),
                   if (completedToday)
                     Text(
-                      'Splněno dnes',
+                      'Completed today',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: c.success,

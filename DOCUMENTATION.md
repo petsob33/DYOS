@@ -1,6 +1,6 @@
-# DYOS - Hloubková technicka dokumentace a security audit
+# DYOS – Hloubková technická dokumentace a security audit
 
-Datum auditu: 2026-03-23  
+Datum auditu: 2026-03-28  
 Repozitář: `DYOS` (Flutter + Firebase + RevenueCat)
 
 ## 1) Přehled projektu a architektura
@@ -12,21 +12,26 @@ Repozitář: `DYOS` (Flutter + Firebase + RevenueCat)
 - tracker intimity, cyklu, událostí a poznámek,
 - gamifikaci (SP/XP, levely, unlocky),
 - premium monetizaci přes RevenueCat sdílenou na úrovni páru,
+- volitelné reklamní bannery přes Google AdMob (primárně Android; iOS dle nastavení v kódu),
 - notifikace přes FCM + lokální notifikace.
 
 ### Mapa projektu (kde co je)
 #### Top-level
-- `lib/main.dart` - bootstrap aplikace (Firebase init, FCM background handler, RevenueCat configure).
-- `lib/app.dart` - root widget (`MaterialApp.router`, theme, font).
-- `lib/core/router/app_router.dart` - routing, redirect logika auth/pairing/protected, shell navigace.
-- `lib/core/services/` - klíčové služby (`auth_service.dart`, `firebase_service.dart`, `storage_service.dart`, `notification_service.dart`).
-- `lib/features/` - feature-first moduly:
-  - `auth`, `timeline`, `tracker`, `cycle`, `events`, `notes`, `premium`, `gamification`, `blueprints`, `dashboard`, `lists`, `time_capsule`.
-- `lib/models/` - sdílené modely/repository mimo `features` (zejména notes).
-- `functions/index.js` - Firebase Cloud Functions (invite lookup, FCM triggers, image compression).
-- `firestore.rules`, `storage.rules` - bezpečnostní pravidla backendu.
-- `docs/` - existující interní dokumentace (architektura, push, revenuecat, kritický report).
-- `test/` - omezené testy (widget smoke test + pairing scénáře).
+- `lib/main.dart` – bootstrap (Firebase, FCM background handler, RevenueCat, App Check, AdMob SDK, bezpečné debug logování).
+- `lib/app.dart` – root widget (`MaterialApp.router`, theme, font Inter).
+- `lib/core/router/app_router.dart` – GoRouter, redirecty auth / pairing / chráněné routy, shell; debug routy jen při `ENABLE_DEBUG_ROUTES` a mimo release.
+- `lib/core/services/` – služby: `auth_service`, `firebase_service` (facade nad `pairing_service`, `profile_service`, `subscription_service`, `couple_notification_service`), `storage_service`, `notification_service`, `ad_service`, `app_logger`, výjimky párování v `pairing_exceptions.dart`.
+- `lib/core/firebase/` – továrna na `FirebaseFunctions` (region / emulator).
+- `lib/features/` – feature-first moduly:
+  - `auth`, `timeline`, `tracker`, `cycle`, `events`, `notes`, `premium`, `gamification`, `blueprints`, `dashboard`, `lists` (time capsule není v aktuálním stromu `features/`).
+- `lib/models/` – sdílené modely / repository (notes).
+- `functions/index.js` – Cloud Functions (invite lookup, pairing, FCM triggery, komprese obrázků).
+- `firestore.rules`, `storage.rules`, `firestore.indexes.json` – backend pravidla a indexy.
+- `public/` – **Firebase Hosting**: marketing landing (`index.html`), `privacy-policy.html` (waitlist + statické stránky).
+- `web/` – Flutter web (`index.html`, `manifest.json`, `privacy-policy.html` pro build).
+- `docs/` – interní dokumentace (architektura, push, RevenueCat, Android klíč, reporty).
+- `assets/icon/` – ikona aplikace (launcher).
+- `test/` – widget smoke test + `test/pairing/*`.
 
 #### Detail modulu `lib/features`
 - `auth`:
@@ -36,7 +41,7 @@ Repozitář: `DYOS` (Flutter + Firebase + RevenueCat)
 - `timeline`:
   - `data/memory_repository.dart`
   - `domain/memory_model.dart`
-  - `presentation/memory_provider.dart`, `screens/add_memory_screen.dart`, `timeline_screen.dart`, `memories_map_screen.dart`
+  - `presentation/memory_provider.dart`, obrazovky `timeline_screen`, `add_memory_screen`, `memory_screen`, `memory_detail_screen`, `memories_map_screen`, widgety pro detail / mapu
 - `tracker`:
   - `data/intimacy_repository.dart`
   - `domain/intimacy_log_model.dart`
@@ -54,11 +59,19 @@ Repozitář: `DYOS` (Flutter + Firebase + RevenueCat)
   - `presentation/premium_provider.dart`, `presentation/widgets/paywall_modal.dart`
 - `gamification`:
   - `domain/progression_plan.dart`, `domain/level_manager.dart`
-  - `presentation/user_stats_provider.dart`, `presentation/screens/level_screen.dart`
+  - `presentation/user_stats_provider.dart`, `screens/level_screen.dart`, `system_status_demo_screen.dart`, widgety level-up / status
+- `blueprints`:
+  - `domain/blueprint_question.dart`, mock data, seznam a detail blueprintů, otázkové karty
+- `dashboard`:
+  - `home_screen.dart`, insight providery, haptic listener (sdílené signály páru)
+- `lists`:
+  - `lists_screen.dart`, `settings_screen.dart`
+- `notes`:
+  - `secret_notes_screen.dart`, `add_note_screen.dart` (+ sdílené modely v `lib/models/`)
 
 ### Architektura a logika (datové toky)
 #### Aplikační runtime
-1. `main()` v `lib/main.dart` inicializuje Firebase, registruje FCM background handler, podmíněně inicializuje RevenueCat přes `REVENUECAT_API_KEY` a volitelně aktivuje App Check (`ENABLE_APP_CHECK`).
+1. `main()` v `lib/main.dart` inicializuje Firebase, registruje FCM background handler, podmíněně inicializuje RevenueCat (`REVENUECAT_API_KEY`), App Check (`ENABLE_APP_CHECK` + web reCAPTCHA při potřeby), Google Mobile Ads SDK (mimo web) a nastaví redakci debug logů.
 2. `OurOSRoot` (`lib/app.dart`) načte `appRouterProvider`.
 3. `appRouter` (`lib/core/router/app_router.dart`) sleduje:
    - `authStateProvider` (Firebase Auth stream),
@@ -92,6 +105,10 @@ Repozitář: `DYOS` (Flutter + Firebase + RevenueCat)
 - `PurchaseService._syncCustomerInfoToFirestore()` při aktivním entitlementu `premium` zapisuje `subscriptionTier` + `subscriptionExpiry` do `couples/{coupleId}` přes `FirebaseService.updateCoupleSubscription()`.
 - `isPremiumProvider` derivuje stav z `coupleProvider`.
 
+#### Reklamy (AdMob)
+- `AdService` + `AdaptiveBannerAd` – bannery na podporovaných platformách; web bez AdMob; iOS dle konfigurace v `ad_service.dart`.
+- Produční / vlastní ad unit ID lze předat přes `--dart-define` (viz sekce 7).
+
 ---
 
 ## 2) Funkční dokumentace
@@ -114,12 +131,15 @@ Repozitář: `DYOS` (Flutter + Firebase + RevenueCat)
 #### Backend setup
 - Firestore rules: `firestore.rules`
 - Storage rules: `storage.rules`
-- Functions deploy: `cd functions && npm install && firebase deploy --only functions`
+- Functions deploy: `cd functions && npm ci` (nebo `npm install`) && `firebase deploy --only functions`
 
 #### Důležité env/secret body
 - `REVENUECAT_API_KEY` (dart-define).
-- `GOOGLE_PLACES_API_KEY` (xcconfig / platform config).
-- service account credentials pro skript `scripts/export-waitlist.js` (`GOOGLE_APPLICATION_CREDENTIALS`).
+- `GOOGLE_PLACES_API_KEY` (xcconfig / Android manifest placeholder podle `docs/ANDROID_GOOGLE_API_KEY.md`).
+- App Check: `ENABLE_APP_CHECK`, `APP_CHECK_WEB_RECAPTCHA_KEY`, volitelně `APP_CHECK_ALLOW_INTEGRITY_IN_DEBUG`.
+- AdMob: `ADS_ANDROID_BANNER_ID`, `ADS_IOS_BANNER_ID`, případně interstitial/rewarded (viz `lib/core/services/ad_service.dart`).
+- Debug routy: `ENABLE_DEBUG_ROUTES=true` pouze pro vývoj (např. Firebase test screen).
+- Service account pro skript `scripts/export-waitlist.js`: `GOOGLE_APPLICATION_CREDENTIALS`.
 
 ### Klíčové funkce/třídy/API
 - `AuthService.registerWithEmailAndPassword()` - vytvoření Auth účtu + Firestore user dokumentu.
@@ -127,6 +147,7 @@ Repozitář: `DYOS` (Flutter + Firebase + RevenueCat)
 - `UserDataSource.getUserByInviteCode()` - volá Cloud Function `getUserByInviteCode`.
 - `MemoryRepository.createMemory()` - upload médií + transakční uživatelská akce přidání memory.
 - `NotificationService.initialize()` - setup local notif + FCM token persistence.
+- `PairingService` / `pairing_service.dart` – lookup invite kódu a volání callable pairing (mapování `PairingException`).
 - Cloud Functions:
   - `exports.getUserByInviteCode`
   - `exports.pairWithInviteCode`
@@ -231,7 +252,7 @@ Níže jsou konkrétní nálezy z tohoto kódu, seřazené podle závažnosti.
 ### Vysoká priorita před produkcí
 - [x] Zúžit read přístup v `storage.rules` pro `profile_pictures`.
 - [x] Zavést rate limiting/App Check pro callable endpointy.
-- [x] Odstranit debug route `/firebase-test` z release (router už ji váže na `kDebugMode`, ověřit release build pipeline).
+- [x] Debug route `/firebase-test` jen v ne-release buildu a pouze při `--dart-define=ENABLE_DEBUG_ROUTES=true`.
 - [x] Sanitizovat produkční logování (`print`/`debugPrint` audit).
 - [x] Rozšířit testování o bezpečnostně kritické scénáře (rules + pairing + purchase sync).
 
@@ -241,8 +262,8 @@ Níže jsou konkrétní nálezy z tohoto kódu, seřazené podle závažnosti.
 - Otevřené: **0/10**.
 
 ### Technické slepé uličky / nedodělky
-- `lib/features/time_capsule/` je strukturálně připravené, ale bez implementace (potenciální dead feature).
-- `notification_service.dart` obsahuje TODO pro deep-link handling při tapu na notifikaci.
+- Time capsule jako modul v `lib/features/` v tomto stavu repozitáře **není** (jen historická zmínka v `docs/APP_REPORT_CRITICAL.md`).
+- Notifikace: lokální tap handler je v `notification_service.dart` (bez otevřeného TODO u deep linků – ověřit pokrytí všech typů payloadů v produkci).
 - test coverage je minimální a převážně pairing-centric (`test/pairing/*`, `test/widget_test.dart`).
 
 ---
@@ -250,7 +271,7 @@ Níže jsou konkrétní nálezy z tohoto kódu, seřazené podle závažnosti.
 ## 5) Návrhy na vylepšení (Roadmap / Nice-to-haves)
 
 ### Funkční roadmap
-- Implementovat `time_capsule` nebo feature explicitně odstranit ze scope.
+- Rozhodnout o time capsule: znovu založit modul ve `features/` nebo vyřadit z produktové roadmapy.
 - ✅ Dokončeno: notifikační deep links (navigace podle payload v `_onNotificationTapped` a `_handleNotificationTap`).
 - Dovybudovat groceries / checklist feature (v `lists` je zatím jen základ UI rámec).
 - Dovyřešit cycle partner messaging end-to-end v UI (`cycle_calculator.dart` + presentation).
@@ -272,8 +293,71 @@ Níže jsou konkrétní nálezy z tohoto kódu, seřazené podle závažnosti.
 ---
 
 ## Doporučený další postup (prakticky)
-1. Security hardening sprint (5 blockerů výše).
-2. Rules + Functions audit testy v Firebase Emulator Suite.
-3. Refactor pairing na server-side transaction.
-4. Až potom feature roadmap (time capsule, groceries, notification deep-links).
+1. Udržovat `public/` a `web/privacy-policy.html` v souladu při změnách právního textu.
+2. Pravidelně `flutter analyze`, `flutter test`, deploy rules/functions před releasem.
+3. Emulator Suite pro regresi pravidel a callable funkcí.
+4. Feature roadmap: time capsule rozhodnutí, rozšíření `lists`, případně větší entropie invite kódů.
 
+---
+
+## 6) Statické assety: Firebase Hosting a Flutter Web
+
+### Firebase Hosting (`firebase.json`)
+- `hosting.public` ukazuje na adresář **`public/`**.
+- `public/index.html` – marketing landing (waitlist do kolekce Firestore dle pravidel projektu), relativní odkazy na `privacy-policy.html`.
+- `public/privacy-policy.html` – zásady ochrany osobních údajů pro statický hosting.
+
+### Flutter Web
+- `web/index.html` – šablona pro `flutter build web` (meta, téma, navigace na `/privacy-policy.html`).
+- `web/privacy-policy.html` – stejný právní obsah jako v `public/`; při úpravách aktualizovat **obě** kopie.
+
+**Bezpečnost a údržba dokumentace:** neukládejte do gitové dokumentace celé HTML snapshoty produkčního webu ani kompletní Firebase web `firebaseConfig` s klíči. Konfigurace patří do Firebase Console / CI tajných proměnných; klíče omezte v Google Cloud Console.
+
+---
+
+## 7) Reklamy (Google AdMob)
+
+- Implementace: `lib/core/services/ad_service.dart`, widget `lib/core/widgets/adaptive_banner_ad.dart`.
+- Na **webu** se AdMob neinicializuje. **iOS** je v kódu podmíněné (`GADApplicationIdentifier` v `Info.plist`, případně zapnutí v `ad_service.dart`).
+- Testovací unit ID používá vývoj; vlastní jednotky přes `--dart-define`:
+  - `ADS_ANDROID_BANNER_ID`, `ADS_IOS_BANNER_ID`
+  - `ADS_ANDROID_INTERSTITIAL_ID`, `ADS_IOS_INTERSTITIAL_ID`
+  - `ADS_ANDROID_REWARDED_ID`, `ADS_IOS_REWARDED_ID`
+
+---
+
+## 8) Přehled dart-defines (rozšíření)
+
+| Proměnná | Účel |
+|----------|------|
+| `REVENUECAT_API_KEY` | RevenueCat (prázdné = přeskočení init). |
+| `ENABLE_APP_CHECK` | Zapnutí Firebase App Check. |
+| `APP_CHECK_WEB_RECAPTCHA_KEY` | reCAPTCHA v3 pro web a App Check. |
+| `APP_CHECK_ALLOW_INTEGRITY_IN_DEBUG` | Play Integrity i na fyzickém zařízení v debug/profile. |
+| `ENABLE_DEBUG_ROUTES` | Spolu s ne-release buildem povolí debug obrazovky v routeru. |
+| `ADS_*` | Vlastní AdMob unit ID (viz sekce 7). |
+
+V debug režimu je `debugPrint` přepnutý přes `_configureSafeDebugLogging()` s redakcí citlivých vzorů.
+
+---
+
+## 9) Interní dokumentace v `docs/`
+
+| Soubor | Obsah |
+|--------|--------|
+| `ARCHITECTURE.md` | Přehled architektury |
+| `PUSH_NOTIFICATIONS.md` | Push notifikace |
+| `IMAGE_COMPRESSION.md` | Komprese obrázků ve Functions |
+| `REVENUECAT_REAL_PURCHASES.md` | RevenueCat / nákupy |
+| `ANDROID_GOOGLE_API_KEY.md` | Android / Google API klíče |
+| `APP_REPORT_CRITICAL.md` | Kritický technický report |
+
+---
+
+## 10) Cloud Functions – lokální závislosti
+
+Závislosti se **necommitují**: po klonu repozitáře spusťte v `functions/` příkaz `npm ci` nebo `npm install`. Adresář `functions/node_modules/` je v `.gitignore`.
+
+---
+
+*Konec dokumentu. Sekce 1–5 výše zahrnují architekturu, funkční popis, security audit, release checklist a roadmap; sekce 6–10 doplňují hosting, reklamy, konfiguraci a odkazy.*

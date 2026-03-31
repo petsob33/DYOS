@@ -9,7 +9,7 @@ enum MilestoneType {
   reward,
 }
 
-/// Feature gates for UI locking (Memories, Blueprints, Quick Messages, Map View).
+/// Feature gates for UI locking (Memories, Daily Questions, Quick Messages, Map View).
 enum FeatureID {
   memories,
   blueprints,
@@ -132,7 +132,7 @@ class ProgressionPlan {
       spRequired: 50,
       type: MilestoneType.reward,
       title: 'Blueprint Protocol',
-      description: 'Unlock Blueprints',
+      description: 'Unlock Daily Questions',
       rewardKind: RewardKind.blueprintPack,
       emoji: '🔓',
     ),
@@ -143,6 +143,14 @@ class ProgressionPlan {
       description: 'First milestone badge',
       rewardKind: RewardKind.badge,
       emoji: '🏅',
+    ),
+    ProgressionMilestone(
+      spRequired: 150,
+      type: MilestoneType.reward,
+      title: 'Taptic Touch',
+      description: 'Unlock Haptic Touch',
+      rewardKind: RewardKind.taptic,
+      emoji: '🔓',
     ),
     ProgressionMilestone(
       spRequired: 200,
@@ -373,7 +381,7 @@ class ProgressionPlan {
   /// Whether the milestone at [spRequired] is unlocked for given [sp].
   static bool isMilestoneUnlocked(int sp, int spRequired) => sp >= spRequired;
 
-  /// Functional unlocks (Map, Blueprints pack, Taptic, Widget) are
+  /// Functional unlocks (Map, Daily Questions pack, Taptic, Widget) are
   /// unlocked immediately with DYOS+; otherwise they follow SP milestones.
   /// Cosmetic rewards (badges, icons, wallpapers) and Lifetime are SP-only.
   static const Set<RewardKind> functionalRewardKinds = {
@@ -385,7 +393,7 @@ class ProgressionPlan {
 
   /// True if the reward for [kind] is unlocked: premium unlocks all functional
   /// features; otherwise uses [currentSp] vs milestone threshold.
-  /// For feature gates (Memories, Blueprints, Quick Messages, Map View) use [isFeatureUnlocked] with [FeatureID].
+  /// For feature gates (Memories, Daily Questions, Quick Messages, Map View) use [isFeatureUnlocked] with [FeatureID].
   static bool isRewardUnlocked(RewardKind kind, int currentSp, bool isPremium) {
     if (isPremium && functionalRewardKinds.contains(kind)) return true;
     final list = milestones.where((m) => m.rewardKind == kind).toList();

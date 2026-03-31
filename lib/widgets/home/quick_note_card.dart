@@ -17,10 +17,10 @@ class QuickNoteCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   static const List<String> _placeholderPrompts = [
-    'Napiš mi něco hezkého...',
-    'Nezapomeň na...',
-    'Kód ke vchodu je...',
-    'Dnešní heslo dne?',
+    'Write me something nice...',
+    'Don\'t forget...',
+    'The door code is...',
+    'Today\'s secret phrase?',
   ];
 
   String _getDisplayText() {
@@ -94,8 +94,6 @@ class QuickNoteCard extends StatelessWidget {
                 color: textColor,
                 height: 1.4,
               ),
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

@@ -6,12 +6,6 @@ import 'package:ouros_app/features/auth/domain/couple_model.dart';
 
 void main() {
   group('FirebaseService Pairing Tests', () {
-    late FakeFirebaseFirestore fakeFirestore;
-
-    setUp(() {
-      fakeFirestore = FakeFirebaseFirestore();
-    });
-
     group('Invite Code Generation', () {
       test('generateInviteCode creates code with name prefix and numbers', () {
         // This tests the invite code format
@@ -175,7 +169,7 @@ void main() {
         // Verify couple was created
         final coupleDoc = await firestore.collection('couples').doc(coupleId).get();
         expect(coupleDoc.exists, true);
-        final createdCouple = CoupleModel.fromJson(coupleDoc.data()!);
+        final createdCouple = CoupleModel.fromFirestore(coupleDoc);
         expect(createdCouple.members, containsAll(['user1', 'user2']));
         expect(createdCouple.members.length, 2);
         
@@ -288,7 +282,7 @@ void main() {
         final coupleDoc = await firestore.collection('couples').doc('couple_123').get();
         expect(coupleDoc.exists, true);
         
-        final coupleData = CoupleModel.fromJson(coupleDoc.data()!);
+        final coupleData = CoupleModel.fromFirestore(coupleDoc);
         expect(coupleData.id, 'couple_123');
         expect(coupleData.members, containsAll(['user1', 'user2']));
       });

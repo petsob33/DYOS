@@ -1,11 +1,11 @@
 {
-    "name": "dyos_app",
-    "short_name": "dyos_app",
+    "name": "DYOS",
+    "short_name": "DYOS",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "DYOS is a relationship operating system for couples: timeline, memories, quests and tools to strengthen your relationship.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

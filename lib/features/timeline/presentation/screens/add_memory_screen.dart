@@ -208,7 +208,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
-              'Překročil jsi free limit 30 vzpomínek. Odemkni neomezené Memories v DYOS+.',
+              'You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.',
             ),
             backgroundColor: AppTheme.colors.warning,
             behavior: SnackBarBehavior.floating,

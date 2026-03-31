@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'app.dart';
+import 'core/services/ad_service.dart';
 import 'core/services/app_logger.dart';
 
 /// Background handler for FCM – runs when app is terminated/background.
@@ -25,8 +29,10 @@ const String _revenueCatApiKey = String.fromEnvironment(
   defaultValue: '',
 );
 
-/// Enable App Check client-side attestation.
-/// Set via --dart-define=ENABLE_APP_CHECK=true in production.
+/// Enable Firebase App Check (requires the API enabled in Google Cloud for the project).
+/// Android/iOS debug & profile always use the **debug** provider so native Firebase does not
+/// log `No AppCheckProvider installed`. Release builds skip App Check unless this is true
+/// (then Android uses Play Integrity).
 const bool _enableAppCheck = bool.fromEnvironment(
   'ENABLE_APP_CHECK',
   defaultValue: false,
@@ -36,6 +42,12 @@ const bool _enableAppCheck = bool.fromEnvironment(
 const String _appCheckWebRecaptchaKey = String.fromEnvironment(
   'APP_CHECK_WEB_RECAPTCHA_KEY',
   defaultValue: '',
+);
+
+/// On a physical device, allow Play Integrity even in debug/profile (rare testing only).
+const bool _appCheckAllowIntegrityInDebug = bool.fromEnvironment(
+  'APP_CHECK_ALLOW_INTEGRITY_IN_DEBUG',
+  defaultValue: false,
 );
 
 String _sanitizeLogMessage(String message) {
@@ -48,6 +60,18 @@ String _sanitizeLogMessage(String message) {
       .replaceAll(RegExp(r'\bmessage:\s*.+$'), 'message:[REDACTED]');
 }
 
+/// Some emulators wrongly report [AndroidDeviceInfo.isPhysicalDevice] == true.
+bool _androidLooksLikeEmulator(AndroidDeviceInfo info) {
+  final blob =
+      '${info.model} ${info.manufacturer} ${info.product} ${info.device} ${info.fingerprint}'
+          .toLowerCase();
+  return blob.contains('sdk_gphone') ||
+      blob.contains('generic') ||
+      blob.contains('emulator') ||
+      blob.contains('ranchu') ||
+      blob.contains('google_sdk');
+}
+
 void _configureSafeDebugLogging() {
   final sink = debugPrintSynchronously;
   debugPrint = (String? message, {int? wrapWidth}) {
@@ -57,13 +81,15 @@ void _configureSafeDebugLogging() {
 }
 
 Future<void> _configureAppCheck() async {
-  if (!_enableAppCheck) {
-    AppLogger.debug('App Check disabled (ENABLE_APP_CHECK=false).');
-    return;
-  }
-
   try {
     if (kIsWeb) {
+      if (!_enableAppCheck) {
+        AppLogger.debug(
+          'App Check off on web (default). Set ENABLE_APP_CHECK=true and '
+          'APP_CHECK_WEB_RECAPTCHA_KEY when ready.',
+        );
+        return;
+      }
       if (_appCheckWebRecaptchaKey.isEmpty) {
         AppLogger.debug('App Check skipped on web: APP_CHECK_WEB_RECAPTCHA_KEY is empty.');
         return;
@@ -76,19 +102,60 @@ Future<void> _configureAppCheck() async {
     }
 
     if (defaultTargetPlatform == TargetPlatform.android) {
+      // `kReleaseMode` is true for profile too; only skip for real product release builds.
+      final isProductRelease = kReleaseMode && !kProfileMode;
+      if (isProductRelease && !_enableAppCheck) {
+        AppLogger.debug(
+          'App Check off (Android product release). Pass --dart-define=ENABLE_APP_CHECK=true '
+          'for Play Integrity when backend enforcement is on.',
+        );
+        return;
+      }
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final onRealDevice =
+          androidInfo.isPhysicalDevice && !_androidLooksLikeEmulator(androidInfo);
+      // Play Integrity fails on emulators (403 App attestation failed); always use debug there.
+      final usePlayIntegrity = onRealDevice &&
+          _enableAppCheck &&
+          (isProductRelease || _appCheckAllowIntegrityInDebug);
       await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.playIntegrity,
+        androidProvider:
+            usePlayIntegrity ? AndroidProvider.playIntegrity : AndroidProvider.debug,
       );
-      AppLogger.debug('App Check activated for Android (Play Integrity).');
+      AppLogger.debug(
+        usePlayIntegrity
+            ? 'App Check: Android Play Integrity.'
+            : 'App Check: Android debug provider '
+                '(emulator or non-release; register token in Firebase Console → App Check if enforced).',
+      );
       return;
     }
 
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.macOS) {
+      final isProductRelease = kReleaseMode && !kProfileMode;
+      if (isProductRelease && !_enableAppCheck) {
+        AppLogger.debug(
+          'App Check off (Apple product release). Pass --dart-define=ENABLE_APP_CHECK=true to enable.',
+        );
+        return;
+      }
+      var onPhysicalApple = defaultTargetPlatform != TargetPlatform.iOS;
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        onPhysicalApple = (await DeviceInfoPlugin().iosInfo).isPhysicalDevice;
+      }
+      final useProductionApple = onPhysicalApple &&
+          _enableAppCheck &&
+          (isProductRelease || _appCheckAllowIntegrityInDebug);
       await FirebaseAppCheck.instance.activate(
-        appleProvider: AppleProvider.deviceCheck,
+        appleProvider:
+            useProductionApple ? AppleProvider.deviceCheck : AppleProvider.debug,
       );
-      AppLogger.debug('App Check activated for Apple platforms (DeviceCheck).');
+      AppLogger.debug(
+        useProductionApple
+            ? 'App Check: Apple DeviceCheck.'
+            : 'App Check: Apple debug provider (simulator or non-release; register token if enforced).',
+      );
       return;
     }
 
@@ -102,17 +169,21 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _configureSafeDebugLogging();
   await Firebase.initializeApp();
-  await _configureAppCheck();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  if (_revenueCatApiKey.isNotEmpty) {
-    try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      await Purchases.configure(
-        PurchasesConfiguration(_revenueCatApiKey)..appUserID = uid,
-      );
-    } catch (e) {
-      AppLogger.debug('RevenueCat configure failed: $e');
-    }
-  }
   runApp(const ProviderScope(child: OurOSRoot()));
+  unawaited(_initializeNonBlockingStartupServices());
+}
+
+Future<void> _initializeNonBlockingStartupServices() async {
+  await _configureAppCheck();
+  await initializeGoogleMobileAdsSdk();
+  if (_revenueCatApiKey.isEmpty) return;
+  try {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    await Purchases.configure(
+      PurchasesConfiguration(_revenueCatApiKey)..appUserID = uid,
+    );
+  } catch (e) {
+    AppLogger.debug('RevenueCat configure failed: $e');
+  }
 }

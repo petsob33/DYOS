@@ -107,7 +107,7 @@ class TimelineScreen extends ConsumerWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text(
-                  'Překročil jsi free limit 30 vzpomínek. Odemkni neomezené Memories v DYOS+.',
+                  'You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.',
                 ),
                 backgroundColor: AppTheme.colors.warning,
                 behavior: SnackBarBehavior.floating,
@@ -223,7 +223,7 @@ class _MemoriesLimitBar extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              '$currentCount / $limit vzpomínek v rámci free plánu',
+              '$currentCount / $limit memories on the free plan',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: c.textSecondary,
                   ),

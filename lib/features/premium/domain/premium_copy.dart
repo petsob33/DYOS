@@ -5,31 +5,31 @@ class PremiumCopy {
   PremiumCopy._();
 
   /// Display price for monthly (when store price not available).
-  static const String monthlyPrice = '99 Kč / \$4.99';
+  static const String monthlyPrice = '\$4.99 / month';
 
   /// Display price for yearly (when store price not available).
-  static const String yearlyPrice = '890 Kč / \$39.99';
+  static const String yearlyPrice = '\$39.99 / year';
 
-  /// Yearly savings note (e.g. "2 měsíce zdarma").
-  static const String yearlySavings = '2 měsíce zdarma';
+  /// Yearly savings note (e.g. "2 months free").
+  static const String yearlySavings = '2 months free';
 
   /// Instant unlock benefits (same on landing and paywall).
   static const List<(String, String)> instantBenefits = [
     (
-      'Odemkne VŠECHNY funkční bloky z Roadmapy ihned',
-      'Mapy, Blueprints, Taptic',
+      'Unlocks ALL functional blocks from the Roadmap instantly',
+      'Maps, Daily Questions, Taptic',
     ),
     (
       'Unlimited History',
-      'Celá historie fotek a chatu navždy',
+      'Your full photo and chat history forever',
     ),
     (
       'Priority Support',
-      'Přednostní řešení bugů',
+      'Priority bug fixes and support',
     ),
   ];
 
   /// Footer note: with Premium users still collect SP for cosmetics and Lifetime.
   static const String footerNoteWithRoadmap =
-      'I s Premium účtem stále sbíráte body na Roadmapě pro kosmetické odměny (odznaky, ikony) a pro finální cíl – Lifetime účtu.';
+      'Even with a Premium account you still collect SP on the Roadmap for cosmetic rewards (badges, icons) and the final goal – Lifetime account.';
 }

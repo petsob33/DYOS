@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../firebase/firebase_functions_factory.dart';
 import '../../features/auth/domain/user_model.dart';
 import '../../features/auth/domain/couple_model.dart';
 import 'app_logger.dart';
@@ -14,9 +15,6 @@ import 'subscription_service.dart';
 
 part 'firebase_service.g.dart';
 
-PairingException mapPairingFunctionsException(FirebaseFunctionsException e) =>
-    pairing.mapPairingFunctionsException(e);
-
 @riverpod
 FirebaseService firebaseService(FirebaseServiceRef ref) {
   return FirebaseService();
@@ -25,7 +23,7 @@ FirebaseService firebaseService(FirebaseServiceRef ref) {
 class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseFunctions _functions = FirebaseFunctions.instance;
+  final FirebaseFunctions _functions = createFirebaseFunctions();
   late final pairing.PairingService _pairingService = pairing.PairingService(
     auth: _auth,
     firestore: _firestore,
@@ -45,8 +43,8 @@ class FirebaseService {
   User? get currentUser => _auth.currentUser;
 
   // Check if user exists and has a couple
-  Future<UserModel?> getUserData() async {
-    return _profileService.getUserData();
+  Future<UserModel?> getUserData({GetOptions? getOptions}) async {
+    return _profileService.getUserData(getOptions: getOptions);
   }
 
   // Create or update user document
@@ -85,9 +83,8 @@ class FirebaseService {
     return _pairingService.pairUsers(currentUserId, partnerUserId);
   }
 
-  /// Secure, server-side pairing flow.
-  /// Uses callable Cloud Function with transaction to avoid race conditions.
-  Future<String?> pairWithInviteCode(String inviteCode) async {
+  /// Pair by invite code directly via Firestore lookup + transaction.
+  Future<PairInviteCodeResult> pairWithInviteCode(String inviteCode) async {
     return _pairingService.pairWithInviteCode(inviteCode);
   }
 

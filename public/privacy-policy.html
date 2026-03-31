@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DYOS Privacy Policy</title>
+  <style>
+    :root {
+      --dyos-bg: #f2f2f7;
+      --dyos-card: #ffffff;
+      --dyos-primary: #5e5ce6;
+      --dyos-text: #1c1c1e;
+      --dyos-secondary: #8e8e93;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--dyos-bg);
+      color: var(--dyos-text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(142, 142, 147, 0.25);
+    }
+
+    .nav__inner {
+      max-width: 920px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+
+    .brand,
+    .back {
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand { color: var(--dyos-text); }
+
+    .back {
+      color: var(--dyos-primary);
+    }
+
+    .brand__logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+
+    .card {
+      background: var(--dyos-card);
+      border-radius: 24px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 8px 0;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      margin: 24px 0 8px;
+      font-size: 22px;
+    }
+
+    h3 {
+      margin: 18px 0 6px;
+      font-size: 18px;
+    }
+
+    .muted {
+      color: var(--dyos-secondary);
+      margin: 0 0 18px;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="nav" aria-label="Top navigation">
+    <div class="nav__inner">
+      <a class="brand" href="index.html">
+        <img class="brand__logo" src="assets/icon/app_icon.png" alt="DYOS logo">
+        <span>DYOS</span>
+      </a>
+      <a class="back" href="index.html">Back</a>
+    </div>
+  </nav>
+  <main class="wrap">
+    <article class="card">
+      <h1>Privacy Policy for DYOS</h1>
+      <p class="muted">Effective Date: March 23, 2026</p>
+
+      <p>Welcome to DYOS. We are committed to protecting your privacy and ensuring that your most personal memories,
+        notes, and relationship data remain secure. This Privacy Policy explains how we collect, use, disclose, and
+        safeguard your information when you use our mobile application and related services (collectively, the "App").
+      </p>
+
+      <h2>1. Information We Collect</h2>
+      <p>Because DYOS is designed to be a private space for you and your partner, we collect information necessary to
+        connect you and provide our features.</p>
+
+      <h3>A. Information You Provide to Us</h3>
+      <p><strong>Account Data:</strong> When you register via email or Google Sign-In, we collect your email address,
+        password, name, and profile picture.</p>
+      <p><strong>Pairing Data:</strong> We generate and process inviteCodes and coupleIds to link your account securely
+        with your partner's account.</p>
+      <p><strong>User-Generated Content:</strong> This includes text, photos, and media you upload to your shared
+        timeline (Memories), as well as notes, lists, and calendar events.</p>
+      <p><strong>Sensitive Health and Personal Data:</strong> If you choose to use our tracking features, we collect
+        data regarding your intimacy logs and menstrual cycle (Cycle and Intimacy Trackers). This data is highly
+        sensitive and is only shared with your paired partner.</p>
+      <p><strong>Communication Data:</strong> Quick messages and haptic signals sent between you and your partner.</p>
+
+      <h3>B. Information Collected Automatically</h3>
+      <p><strong>Device and Usage Data:</strong> We collect push notification tokens (FCM tokens) to send you alerts, as
+        well as gamification data (XP, levels, and unlocks) based on your app usage.</p>
+      <p><strong>Location Data:</strong> If you add locations to your memories, we process geographic information via
+        the Google Places API to display your "Memories Map."</p>
+      <p><strong>Payment Information:</strong> If you upgrade to our Premium tier, your purchases are securely processed
+        through third-party app stores (Apple App Store / Google Play) and managed via RevenueCat. We do not collect or
+        store your actual credit card details, only your subscription status (subscriptionTier, subscriptionExpiry).</p>
+
+      <h2>2. How We Use Your Information</h2>
+      <p>We use the collected data strictly to provide and improve the DYOS experience:</p>
+      <ul>
+        <li>To provide the service: to authenticate your account, pair you with your partner, and synchronize your
+          shared timeline, trackers, and notes in real-time.</li>
+        <li>To communicate: to send you push notifications (e.g., when your partner adds a memory or sends a haptic
+          signal) and administrative emails.</li>
+        <li>To manage subscriptions: to unlock Premium features for your couple based on your purchase history.</li>
+        <li>To improve the app: to troubleshoot technical issues, monitor app performance, and prevent fraud or abuse
+          (e.g., via rate limiting and App Check).</li>
+      </ul>
+
+      <h2>3. How We Share Your Information</h2>
+      <p>We do not sell your personal data. Your data is shared only in the following ways:</p>
+      <ul>
+        <li><strong>With Your Partner:</strong> By entering an invite code, you explicitly consent to sharing your
+          profile, timeline, trackers, notes, and events with your paired partner.</li>
+        <li><strong>With Service Providers:</strong> We use trusted third-party infrastructure to run DYOS securely.
+          These include Google/Firebase, RevenueCat, and Google Places API.</li>
+        <li><strong>For Legal Reasons:</strong> We may disclose your information if required to do so by law or in
+          response to valid requests by public authorities.</li>
+      </ul>
+
+      <h2>4. Data Security</h2>
+      <p>We take the security of your intimate data very seriously. We employ industry-standard measures to protect your
+        information, including:</p>
+      <ul>
+        <li><strong>Access Control:</strong> Strict backend security rules (Firestore and Storage rules) ensure that
+          your data can only be read and modified by you and your paired partner.</li>
+        <li><strong>Encryption:</strong> All data is encrypted in transit and at rest using our cloud providers' native
+          encryption standards.</li>
+        <li><strong>Transaction Security:</strong> Crucial actions, like pairing accounts, are handled via secure,
+          server-side transactions to prevent unauthorized access.</li>
+      </ul>
+
+      <h2>5. Data Retention and Deletion</h2>
+      <p>We keep your personal information only for as long as your account is active or as needed to provide you the
+        App's services.</p>
+      <p><strong>Your Right to Delete:</strong> You can request the deletion of your account and all associated data at
+        any time through the App's settings or by contacting us. If you or your partner delete a shared memory or note,
+        it is permanently removed from our active servers. If a couple unpairs, shared access is immediately revoked.
+      </p>
+
+      <h2>6. Your Privacy Rights (GDPR &amp; CCPA)</h2>
+      <p>Depending on your location, you may have the right to:</p>
+      <ul>
+        <li>Access the personal information we hold about you.</li>
+        <li>Correct inaccurate or incomplete data.</li>
+        <li>Delete your personal data.</li>
+        <li>Withdraw Consent for processing sensitive data (e.g., cycle or intimacy tracking) at any time by stopping
+          the use of those features or deleting the data within the app.</li>
+      </ul>
+
+      <h2>7. Children's Privacy</h2>
+      <p>DYOS is designed for adults and couples. We do not knowingly collect personal information from anyone under the
+        age of 18. If we become aware that we have collected data from a minor, we will take steps to delete that
+        information immediately.</p>
+
+      <h2>8. Changes to this Privacy Policy</h2>
+      <p>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the
+        "Effective Date" at the top of this policy and, if the changes are significant, by providing a prominent notice
+        within the App.</p>
+
+      <h2>9. Contact Us</h2>
+      <p>If you have any questions, concerns, or requests regarding this Privacy Policy or your data, please contact us
+        at:</p>
+      <p>
+        Email: dyosapp@seznam.cz<br>
+        Website: petrsobol.eu<br>
+        Mailing Address: Farní 238 Šilheřovice Czech Republic
+      </p>
+    </article>
+  </main>
+</body>
+
+</html>

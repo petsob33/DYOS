@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/adaptive_banner_ad.dart';
 import '../../features/auth/presentation/auth_providers.dart';
 import '../../features/gamification/domain/progression_plan.dart';
 import '../../features/gamification/presentation/user_stats_provider.dart';
@@ -97,10 +98,29 @@ Page<T> buildPageWithSlideTransition<T extends Object?>(
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
+  ref.listen(authStateProvider, (prev, next) {
+    if (next.valueOrNull == null) {
+      ref.read(pairingConfirmedCoupleIdProvider.notifier).state = null;
+    }
+  });
+
+  ref.listen(userProvider, (prev, next) {
+    next.whenData((user) {
+      final pending = ref.read(pairingConfirmedCoupleIdProvider);
+      if (pending != null &&
+          pending.isNotEmpty &&
+          user?.coupleId != null &&
+          user!.coupleId == pending) {
+        ref.read(pairingConfirmedCoupleIdProvider.notifier).state = null;
+      }
+    });
+  });
+
   // Watch auth state - Stream<User?>
   final authState = ref.watch(authStateProvider);
   // Watch user data - Stream<UserModel?>
   final userState = ref.watch(userProvider);
+  ref.watch(pairingConfirmedCoupleIdProvider);
 
   return GoRouter(
     navigatorKey: appNavigatorKey,
@@ -112,7 +132,10 @@ GoRouter appRouter(AppRouterRef ref) {
       
       // Get current user data (UserModel from Firestore)
       final userModel = userState.valueOrNull;
-      final hasCoupleId = userModel?.coupleId != null && userModel!.coupleId!.isNotEmpty;
+      final pendingCoupleId = ref.read(pairingConfirmedCoupleIdProvider);
+      final hasCoupleId = (userModel?.coupleId != null &&
+              userModel!.coupleId!.isNotEmpty) ||
+          (pendingCoupleId != null && pendingCoupleId.isNotEmpty);
       
       // Define public routes (don't require authentication)
       final isPublicRoute = state.matchedLocation == '/login' || 
@@ -136,9 +159,10 @@ GoRouter appRouter(AppRouterRef ref) {
         return null; // Wait for user data to load
       }
 
-      // If user but no coupleId, redirect to pairing (unless already on pairing/login/register)
+      // If user but no coupleId, always redirect to pairing
+      // (only allow staying on the pairing screen itself).
       if (!hasCoupleId) {
-        return (isPairingRoute || isPublicRoute) ? null : '/pairing';
+        return isPairingRoute ? null : '/pairing';
       }
 
       // User has coupleId - if on login/register/pairing, redirect to home shell
@@ -495,6 +519,7 @@ class RootShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
     final items = [
       _NavItem('Home', PhosphorIconsBold.house),
       _NavItem('Memory', PhosphorIconsBold.clockCounterClockwise),
@@ -519,66 +544,72 @@ class RootShell extends ConsumerWidget {
         child: navigationShell,
       ),
       bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.sm,
-          ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!isPremium) const AdaptiveBannerAd(),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                for (int i = 0; i < items.length + 1; i++)
-                  if (i == 2)
-                    // Insert the add button as a big round button in the center, in line with other nav items
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0),
-                      child: Material(
-                        color: AppTheme.colors.primary,
-                        shape: const CircleBorder(),
-                        elevation: 4,
-                        shadowColor: AppTheme.colors.shadow,
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-                          onTap: () {
-                            showQuickAddSheet(context, ref);
-                          },
-                          child: SizedBox(
-                            width: 56,
-                            height: 56,
-                            child: Icon(
-                              PhosphorIconsBold.plus,
-                              color: Colors.white,
-                              size: 32,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    for (int i = 0; i < items.length + 1; i++)
+                      if (i == 2)
+                        // Insert the add button as a big round button in the center, in line with other nav items
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: Material(
+                            color: AppTheme.colors.primary,
+                            shape: const CircleBorder(),
+                            elevation: 4,
+                            shadowColor: AppTheme.colors.shadow,
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () {
+                                showQuickAddSheet(context, ref);
+                              },
+                              child: SizedBox(
+                                width: 56,
+                                height: 56,
+                                child: Icon(
+                                  PhosphorIconsBold.plus,
+                                  color: Colors.white,
+                                  size: 32,
+                                ),
+                              ),
                             ),
                           ),
+                        )
+                      else
+                        // Render the nav item (skip slot 2 for add btn)
+                        Expanded(
+                          child: _BottomNavItem(
+                            item: items[i > 2 ? i - 1 : i],
+                            index: i > 2 ? i - 1 : i,
+                            selected: navigationShell.currentIndex == (i > 2 ? i - 1 : i),
+                            onTap: () => _onTabSelected(context, ref, i > 2 ? i - 1 : i),
+                          ),
                         ),
-                      ),
-                    )
-                  else
-                    // Render the nav item (skip slot 2 for add btn)
-                    Expanded(
-                      child: _BottomNavItem(
-                        item: items[i > 2 ? i - 1 : i],
-                        index: i > 2 ? i - 1 : i,
-                        selected: navigationShell.currentIndex == (i > 2 ? i - 1 : i),
-                        onTap: () => _onTabSelected(context, ref, i > 2 ? i - 1 : i),
-                      ),
-                    ),
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

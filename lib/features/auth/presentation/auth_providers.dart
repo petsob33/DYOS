@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/firebase_service.dart';
@@ -101,11 +102,16 @@ User? currentUser(CurrentUserRef ref) {
 Future<bool?> isUserPaired(IsUserPairedRef ref) async {
   // Get the FirebaseService instance
   final firebaseService = ref.watch(firebaseServiceProvider);
-  
+
   // Check if user is authenticated first
   final user = firebaseService.currentUser;
   if (user == null) {
     return null; // Not authenticated
+  }
+
+  final pending = ref.watch(pairingConfirmedCoupleIdProvider);
+  if (pending != null && pending.isNotEmpty) {
+    return true;
   }
 
   try {
@@ -296,3 +302,7 @@ Stream<CoupleModel?> couple(CoupleRef ref) {
     },
   );
 }
+
+/// Bridges callable pairing success and Firestore user stream updates so routing
+/// does not bounce back to /pairing before [coupleId] appears on the user doc.
+final pairingConfirmedCoupleIdProvider = StateProvider<String?>((ref) => null);

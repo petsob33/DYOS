@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,6 +28,7 @@ NotificationService notificationService(NotificationServiceRef ref) {
 class NotificationService {
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  StreamSubscription<User?>? _authSubscription;
 
   NotificationService();
 
@@ -97,6 +99,13 @@ class NotificationService {
 
       FirebaseMessaging.instance.onTokenRefresh.listen((token) {
         _saveFcmTokenToFirestore(token);
+      });
+
+      // Keep token in sync when user logs in after app start.
+      _authSubscription ??= FirebaseAuth.instance.authStateChanges().listen((user) {
+        if (user != null) {
+          _saveFcmTokenIfLoggedIn();
+        }
       });
 
       FirebaseMessaging.onMessage.listen(_handleForegroundMessage);

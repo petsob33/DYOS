@@ -4,12 +4,27 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'core/services/notification_service.dart';
 
-class OurOSRoot extends ConsumerWidget {
+class OurOSRoot extends ConsumerStatefulWidget {
   const OurOSRoot({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OurOSRoot> createState() => _OurOSRootState();
+}
+
+class _OurOSRootState extends ConsumerState<OurOSRoot> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initialize push/local notifications globally (not only on Home screen).
+      ref.read(notificationServiceProvider).initialize();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

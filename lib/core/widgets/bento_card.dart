@@ -23,10 +23,14 @@ class BentoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: background ?? AppTheme.colors.card,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: AppTheme.colors.shadow.withValues(alpha: 0.08),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.colors.shadow,
-            blurRadius: 20,
+            color: AppTheme.colors.shadow.withValues(alpha: 0.16),
+            blurRadius: 26,
             offset: const Offset(0, 10),
           ),
         ],
