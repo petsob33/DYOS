@@ -19,6 +19,13 @@ val googleMapsApiKey =
         ?: System.getenv("GOOGLE_MAPS_API_KEY")
         ?: ""
 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+}
+
 android {
     namespace = "com.example.dyos_app"
     compileSdk = flutter.compileSdkVersion
@@ -46,11 +53,35 @@ android {
         manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = googleMapsApiKey
     }
 
+    signingConfigs {
+        create("release") {
+            if (hasReleaseKeystore) {
+                keyAlias = checkNotNull(keystoreProperties.getProperty("keyAlias")) {
+                    "android/key.properties: missing keyAlias"
+                }
+                keyPassword = checkNotNull(keystoreProperties.getProperty("keyPassword")) {
+                    "android/key.properties: missing keyPassword"
+                }
+                storeFile = rootProject.file(
+                    checkNotNull(keystoreProperties.getProperty("storeFile")) {
+                        "android/key.properties: missing storeFile"
+                    },
+                )
+                storePassword = checkNotNull(keystoreProperties.getProperty("storePassword")) {
+                    "android/key.properties: missing storePassword"
+                }
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig =
+                if (hasReleaseKeystore) {
+                    signingConfigs.getByName("release")
+                } else {
+                    signingConfigs.getByName("debug")
+                }
         }
     }
 }

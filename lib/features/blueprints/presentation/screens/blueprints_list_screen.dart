@@ -25,7 +25,7 @@ class BlueprintsListScreen extends StatelessWidget {
         foregroundColor: c.text,
         elevation: 0,
         title: Text(
-          'Blueprints',
+          'Daily Questions',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w600,

@@ -24,13 +24,14 @@ class PairingService {
   User? get currentUser => _auth.currentUser;
 
   String generateInviteCode(String displayName) {
-    final prefix = displayName.toUpperCase().substring(
-          0,
-          displayName.length > 4 ? 4 : displayName.length,
-        );
+    // Keep only A-Z so code format matches backend validation.
+    final cleaned = displayName.toUpperCase().replaceAll(RegExp(r'[^A-Z]'), '');
+    final seed = cleaned.isEmpty ? 'USER' : cleaned;
+    final prefix = seed.substring(0, seed.length > 4 ? 4 : seed.length);
+    final normalizedPrefix = prefix.length >= 2 ? prefix : '${prefix}X';
     final random = Random();
     final number = random.nextInt(9000) + 1000;
-    return '$prefix-$number';
+    return '$normalizedPrefix-$number';
   }
 
   Future<UserModel?> findUserByInviteCode(String inviteCode) async {
@@ -126,18 +127,98 @@ class PairingService {
     return couple;
   }
 
-  Future<String?> pairWithInviteCode(String inviteCode) async {
+  Future<PairInviteCodeResult> pairWithInviteCode(String inviteCode) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      throw GenericPairingException('Please sign in again and retry pairing.');
+    }
+
+    final normalizedCode = inviteCode.trim().toUpperCase();
+    if (!RegExp(r'^[A-Z]{2,10}-\d{4}$').hasMatch(normalizedCode)) {
+      throw GenericPairingException('Invalid invite code format.');
+    }
+
     try {
-      final callable = _functions.httpsCallable('pairWithInviteCode');
-      final result = await callable.call({'inviteCode': inviteCode});
-      final payload = Map<String, dynamic>.from(result.data as Map);
-      final partner = payload['partner'];
-      if (partner is Map) {
-        return Map<String, dynamic>.from(partner)['displayName'] as String?;
+      final partnerQuery = await _firestore
+          .collection('users')
+          .where('inviteCode', isEqualTo: normalizedCode)
+          .limit(1)
+          .get();
+
+      if (partnerQuery.docs.isEmpty) {
+        throw PartnerNotFoundException();
       }
-      return null;
-    } on FirebaseFunctionsException catch (e) {
-      throw mapPairingFunctionsException(e);
+
+      final partnerDoc = partnerQuery.docs.first;
+      final partnerUserId = partnerDoc.id;
+      if (partnerUserId == currentUser.uid) {
+        throw SelfPairingException();
+      }
+
+      final coupleRef = _firestore.collection('couples').doc();
+      await _firestore.runTransaction((tx) async {
+        final currentUserRef = _firestore.collection('users').doc(currentUser.uid);
+        final partnerRef = _firestore.collection('users').doc(partnerUserId);
+
+        final snapshots = await Future.wait([
+          tx.get(currentUserRef),
+          tx.get(partnerRef),
+        ]);
+
+        final currentSnap = snapshots[0];
+        final partnerSnap = snapshots[1];
+
+        if (!currentSnap.exists) {
+          throw UserNotFoundException();
+        }
+        if (!partnerSnap.exists) {
+          throw PartnerNotFoundException();
+        }
+
+        final currentData = currentSnap.data()!;
+        final partnerData = partnerSnap.data()!;
+        if ((currentData['coupleId'] as String?)?.isNotEmpty == true) {
+          throw UserAlreadyPairedException();
+        }
+        if ((partnerData['coupleId'] as String?)?.isNotEmpty == true) {
+          throw PartnerAlreadyPairedException();
+        }
+
+        final now = FieldValue.serverTimestamp();
+        tx.set(coupleRef, {
+          'members': [currentUser.uid, partnerUserId],
+          'anniversaryDate': now,
+          'createdAt': now,
+          'subscriptionTier': 'free',
+          'status': {
+            currentUser.uid: {
+              'emoji': '😊',
+              'text': 'Ready to connect',
+              'updatedAt': now,
+            },
+            partnerUserId: {
+              'emoji': '😊',
+              'text': 'Ready to connect',
+              'updatedAt': now,
+            },
+          },
+          'xp': 0,
+        });
+        tx.update(currentUserRef, {'coupleId': coupleRef.id});
+        tx.update(partnerRef, {'coupleId': coupleRef.id});
+      });
+
+      final partnerName = partnerDoc.data()['displayName'] as String?;
+      return PairInviteCodeResult(
+        coupleId: coupleRef.id,
+        partnerDisplayName: partnerName,
+      );
+    } on PairingException {
+      rethrow;
+    } on FirebaseException catch (_) {
+      throw GenericPairingException('Unable to complete pairing right now.');
+    } catch (_) {
+      throw GenericPairingException('Unable to complete pairing right now.');
     }
   }
 
@@ -178,24 +259,3 @@ class PairingService {
   }
 }
 
-PairingException mapPairingFunctionsException(FirebaseFunctionsException e) {
-  switch (e.code) {
-    case 'invalid-argument':
-      return GenericPairingException('Invalid invite code format.');
-    case 'not-found':
-      return PartnerNotFoundException();
-    case 'failed-precondition':
-      if ((e.message ?? '').contains('yourself')) {
-        return SelfPairingException();
-      }
-      if ((e.message ?? '').contains('already paired')) {
-        if ((e.message ?? '').contains('Your account')) {
-          return UserAlreadyPairedException();
-        }
-        return PartnerAlreadyPairedException();
-      }
-      return GenericPairingException(e.message ?? 'Pairing failed.');
-    default:
-      return GenericPairingException(e.message ?? 'Pairing failed.');
-  }
-}

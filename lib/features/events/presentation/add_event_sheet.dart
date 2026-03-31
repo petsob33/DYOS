@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/constants/app_spacing.dart';
+import '../../../core/services/ad_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../gamification/presentation/user_stats_provider.dart';
+import '../../premium/presentation/premium_provider.dart';
 import '../data/event_repository.dart';
 import '../domain/event_model.dart';
 
@@ -186,6 +188,10 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
 
         if (!isEditing) {
           grantQuestXpIfEligible(ref, 'event', 15);
+          final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
+          await ref.read(adServiceProvider).maybeShowAdAfterIntimacyOrEventAdded(
+                isPremium: isPremium,
+              );
         }
 
         if (mounted) {

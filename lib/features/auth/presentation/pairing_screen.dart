@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
@@ -19,6 +21,7 @@ class PairingScreen extends ConsumerStatefulWidget {
 }
 
 class _PairingScreenState extends ConsumerState<PairingScreen> {
+  static final RegExp _inviteCodePattern = RegExp(r'^[A-Z]{2,10}-\d{4}$');
   final _codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
@@ -30,19 +33,6 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
   void initState() {
     super.initState();
     _loadUserData();
-    _checkPairingStatus();
-  }
-
-  void _checkPairingStatus() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.listen(isUserPairedProvider, (previous, next) {
-        next.whenData((isPaired) {
-          if (isPaired == true && mounted) {
-            context.go('/home');
-          }
-        });
-      });
-    });
   }
 
   @override
@@ -76,7 +66,11 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           displayName: displayName,
           photoUrl: currentUser.photoURL,
         );
-      } else if (userData.inviteCode == null || userData.inviteCode!.isEmpty) {
+      } else if (
+          userData.inviteCode == null ||
+          userData.inviteCode!.isEmpty ||
+          !RegExp(r'^[A-Z]{2,10}-\d{4}$')
+              .hasMatch(userData.inviteCode!.trim().toUpperCase())) {
         userData = await firebaseService.createOrUpdateUser(
           uid: currentUser.uid,
           email: userData.email,
@@ -130,6 +124,28 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     );
   }
 
+  /// After Cloud Functions pairing, the user doc updates on the server. The router
+  /// reads [userProvider] (Firestore stream); if we navigate before that stream emits
+  /// the new [coupleId], redirect sends the user back to /pairing.
+  Future<void> _waitForCoupleIdOnProfile(
+    FirebaseService firebaseService, {
+    required String expectedCoupleId,
+  }) async {
+    const maxAttempts = 40;
+    const delay = Duration(milliseconds: 200);
+    for (var i = 0; i < maxAttempts; i++) {
+      final u = await firebaseService.getUserData(
+        getOptions: const GetOptions(source: Source.server),
+      );
+      if (u?.coupleId != null &&
+          u!.coupleId!.isNotEmpty &&
+          u.coupleId == expectedCoupleId) {
+        return;
+      }
+      await Future.delayed(delay);
+    }
+  }
+
   Future<void> _submitCode() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -143,14 +159,20 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     try {
       final firebaseService = ref.read(firebaseServiceProvider);
       final partnerCode = _codeController.text.trim().toUpperCase();
-      final partnerDisplayName = await firebaseService.pairWithInviteCode(
-        partnerCode,
-      );
 
-      // Wait a bit for Firestore to sync and router to see the change
-      await Future.delayed(const Duration(milliseconds: 500));
+      final pairingResult = await firebaseService.pairWithInviteCode(partnerCode);
+      ref.read(pairingConfirmedCoupleIdProvider.notifier).state =
+          pairingResult.coupleId;
+
+      await _waitForCoupleIdOnProfile(
+        firebaseService,
+        expectedCoupleId: pairingResult.coupleId,
+      );
+      ref.invalidate(userProvider);
+      ref.invalidate(isUserPairedProvider);
 
       if (mounted) {
+        final partnerDisplayName = pairingResult.partnerDisplayName;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -165,6 +187,9 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           ),
         );
 
+        setState(() {
+          _isSubmitting = false;
+        });
         context.go('/home');
       }
     } on PairingException catch (e) {
@@ -177,7 +202,8 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error pairing. Please try again.';
+          _errorMessage =
+              'Unable to complete pairing right now. Check connection and try again.';
           _isSubmitting = false;
         });
       }
@@ -200,6 +226,14 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(isUserPairedProvider, (previous, next) {
+      next.whenData((isPaired) {
+        if (isPaired == true && mounted) {
+          context.go('/home');
+        }
+      });
+    });
+
     if (_isLoading) {
       return Scaffold(
         backgroundColor: AppTheme.colors.background,
@@ -444,8 +478,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                     if (_userCode != null && normalizedValue == _userCode) {
                       return 'You cannot pair with yourself';
                     }
-                    final pattern = RegExp(r'^[A-Z]+-\d+$');
-                    if (!pattern.hasMatch(normalizedValue)) {
+                    if (!_inviteCodePattern.hasMatch(normalizedValue)) {
                       return 'Invalid code format (e.g. PETR-8821)';
                     }
                     return null;

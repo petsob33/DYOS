@@ -29,7 +29,7 @@ String _featureDisplayName(FeatureID feature) {
     case FeatureID.memories:
       return 'Memories';
     case FeatureID.blueprints:
-      return 'Blueprints';
+      return 'Daily Questions';
     case FeatureID.quickMessages:
       return 'Quick Messages';
     case FeatureID.mapView:

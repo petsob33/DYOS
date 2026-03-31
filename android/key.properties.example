@@ -1,0 +1,11 @@
+# Copy to android/key.properties (gitignored) and fill in real values.
+# Generate keystore once, then keep a secure backup (Play cannot recover a lost upload key).
+#
+#   keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Put upload-keystore.jks in this android/ folder (also gitignored) or set storeFile to another path.
+
+storePassword=P2006Shokej
+keyPassword=P2006Shokej
+keyAlias=upload
+storeFile=upload-keystore.jks

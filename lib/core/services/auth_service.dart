@@ -117,10 +117,11 @@ class AuthService {
     required String password,
     required String displayName,
   }) async {
+    UserCredential? credential;
     try {
       // Step 1: Create the Firebase Auth account
       // This validates email format and password strength
-      final credential = await _auth.createUserWithEmailAndPassword(
+      credential = await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
@@ -153,6 +154,18 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       // Convert Firebase error codes to user-friendly messages
       throw _handleAuthException(e);
+    } catch (e) {
+      // If profile/Firestore setup fails after auth account creation,
+      // remove the just-created auth user to avoid half-created accounts.
+      if (credential?.user != null) {
+        try {
+          await credential!.user!.delete();
+        } catch (_) {
+          // Ignore cleanup errors and continue with fallback sign-out.
+        }
+      }
+      await _auth.signOut();
+      throw 'We could not finish creating your account. Please try again.';
     }
   }
 
@@ -274,13 +287,15 @@ class AuthService {
   /// [displayName] - User's display name to use as prefix
   /// Returns: Unique invite code string
   String _generateInviteCode(String displayName) {
-    // Get first 4 characters of name (or all if shorter than 4)
-    final prefix = displayName.toUpperCase().substring(
-        0, displayName.length > 4 ? 4 : displayName.length);
+    // Keep only A-Z so backend callable validation accepts the code.
+    final cleaned = displayName.toUpperCase().replaceAll(RegExp(r'[^A-Z]'), '');
+    final seed = cleaned.isEmpty ? 'USER' : cleaned;
+    final prefix = seed.substring(0, seed.length > 4 ? 4 : seed.length);
+    final normalizedPrefix = prefix.length >= 2 ? prefix : '${prefix}X';
     // Generate random 4-digit number (1000-9999)
     final random = Random();
     final number = random.nextInt(9000) + 1000;
-    return '$prefix-$number';
+    return '$normalizedPrefix-$number';
   }
 
   /// Handle Firebase Auth exceptions and return user-friendly messages
@@ -310,6 +325,9 @@ class AuthService {
         return 'No user found for that email.';
       case 'wrong-password':
         return 'Wrong password provided.';
+      case 'invalid-credential':
+      case 'invalid-login-credentials':
+        return 'Invalid email or password.';
       case 'invalid-email':
         return 'The email address is invalid.';
       case 'user-disabled':

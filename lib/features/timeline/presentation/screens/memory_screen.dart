@@ -42,7 +42,7 @@ class _FilterChips extends StatefulWidget {
 class _FilterChipsState extends State<_FilterChips> {
   int _selectedIndex = 0;
 
-  final _filters = ['Vše', 'Rande', 'Výlety', 'Milestones'];
+  final _filters = ['All', 'Date Nights', 'Trips', 'Milestones'];
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +97,30 @@ class _FilterChipsState extends State<_FilterChips> {
     );
   }
 }
+
+/// Placeholder feed until timeline is wired to Firestore.
+const _mockMemories = <MemoryItem>[
+  MemoryItem(
+    caption: 'First date night',
+    date: 'Feb 14, 2024',
+    monthYear: 'February 2024',
+    location: 'Downtown',
+    tags: ['Date Nights'],
+  ),
+  MemoryItem(
+    caption: 'Weekend trip',
+    date: 'Mar 2, 2024',
+    monthYear: 'March 2024',
+    location: 'Mountains',
+    tags: ['Trips'],
+  ),
+  MemoryItem(
+    caption: 'One year together',
+    date: 'Jan 10, 2024',
+    monthYear: 'January 2024',
+    tags: ['Milestones'],
+  ),
+];
 
 class _TimelineFeed extends StatelessWidget {
   @override
@@ -299,10 +323,10 @@ class _TimelineMemoryCard extends StatelessWidget {
   Color _getTagColor(String tag) {
     switch (tag.toLowerCase()) {
       case 'date':
-      case 'rande':
+      case 'date nights':
         return AppTheme.colors.love;
       case 'trip':
-      case 'výlety':
+      case 'trips':
         return AppTheme.colors.primary;
       case 'milestone':
         return AppTheme.colors.warning;

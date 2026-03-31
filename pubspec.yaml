@@ -1,5 +1,5 @@
 name: ouros_app
-description: "A new Flutter project."
+description: "DYOS – relationship OS for couples (Flutter, Firebase, RevenueCat)."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -59,6 +59,8 @@ dependencies:
   google_places_autocomplete: ^2.1.1
   device_info_plus: ^11.4.0
   firebase_app_check: ^0.3.2+10
+  google_mobile_ads: ^7.0.0
+  shared_preferences: ^2.5.4
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +74,7 @@ dev_dependencies:
   mockito: ^5.4.4
   fake_cloud_firestore: ^3.0.2
   firebase_auth_mocks: ^0.14.2
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -113,3 +116,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/icon/app_icon.png
+  adaptive_icon_background: "#F2F2F7"
+  adaptive_icon_foreground: assets/icon/app_icon.png

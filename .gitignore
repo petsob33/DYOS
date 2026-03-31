@@ -46,3 +46,9 @@ app.*.map.json
 
 # Local secrets
 ios/Runner/Secrets.xcconfig
+
+# Cloud Functions dependencies (install with npm ci in functions/)
+functions/node_modules/
+
+# Scratch / local snapshots
+tmp/

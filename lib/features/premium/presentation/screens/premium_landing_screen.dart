@@ -323,7 +323,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Okamžité benefity',
+            'Instant benefits',
             style: GoogleFonts.inter(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -468,8 +468,8 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       ),
                       Text(
                         isYearly
-                            ? 'Roční platba'
-                            : 'Měsíční platba',
+                            ? 'Yearly billing'
+                            : 'Monthly billing',
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: c.textSecondary,

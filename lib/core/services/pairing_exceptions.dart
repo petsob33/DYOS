@@ -1,3 +1,14 @@
+/// Result of a successful [PairingService.pairWithInviteCode] call.
+class PairInviteCodeResult {
+  const PairInviteCodeResult({
+    required this.coupleId,
+    this.partnerDisplayName,
+  });
+
+  final String coupleId;
+  final String? partnerDisplayName;
+}
+
 /// Base class for all pairing-related exceptions.
 abstract class PairingException implements Exception {
   final String message;

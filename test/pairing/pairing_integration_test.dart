@@ -108,7 +108,7 @@ void main() {
       // Check couple document
       final coupleDoc = await firestore.collection('couples').doc(coupleId).get();
       expect(coupleDoc.exists, true);
-      final coupleData = CoupleModel.fromJson(coupleDoc.data()!);
+      final coupleData = CoupleModel.fromFirestore(coupleDoc);
       expect(coupleData.members, containsAll(['user1', 'user2']));
       expect(coupleData.members.length, 2);
       expect(coupleData.subscriptionTier, 'free');
@@ -212,7 +212,7 @@ void main() {
 
       // Get couple data
       final coupleDoc = await firestore.collection('couples').doc(coupleId).get();
-      final coupleData = CoupleModel.fromJson(coupleDoc.data()!);
+      final coupleData = CoupleModel.fromFirestore(coupleDoc);
 
       // Find partner (the other member)
       final partnerUid = coupleData.members.firstWhere(

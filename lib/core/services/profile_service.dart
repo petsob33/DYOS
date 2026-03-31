@@ -20,12 +20,15 @@ class ProfileService {
 
   User? get currentUser => _auth.currentUser;
 
-  Future<UserModel?> getUserData() async {
+  Future<UserModel?> getUserData({GetOptions? getOptions}) async {
     final user = currentUser;
     if (user == null) return null;
 
     try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .get(getOptions ?? const GetOptions());
       if (!doc.exists) return null;
       return UserModel.fromFirestore(doc);
     } catch (_) {
@@ -46,7 +49,12 @@ class ProfileService {
     UserModel? existingUser;
     if (userDoc.exists) {
       existingUser = UserModel.fromFirestore(userDoc);
-      inviteCode = existingUser.inviteCode ?? _pairingService.generateInviteCode(displayName);
+      final existingInviteCode = existingUser.inviteCode;
+      if (existingInviteCode != null && _isValidInviteCode(existingInviteCode)) {
+        inviteCode = existingInviteCode;
+      } else {
+        inviteCode = _pairingService.generateInviteCode(displayName);
+      }
     } else {
       inviteCode = _pairingService.generateInviteCode(displayName);
     }
@@ -63,6 +71,10 @@ class ProfileService {
 
     await userRef.set(userData.toJson(), SetOptions(merge: true));
     return userData;
+  }
+
+  bool _isValidInviteCode(String value) {
+    return RegExp(r'^[A-Z]{2,10}-\d{4}$').hasMatch(value.trim().toUpperCase());
   }
 
   Future<void> deleteAccount({

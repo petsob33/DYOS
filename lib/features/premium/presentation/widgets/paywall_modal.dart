@@ -297,8 +297,8 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
     return Column(
       children: packages.map((package) {
         final isYearly = package.packageType == PackageType.annual;
-        final title = isYearly ? 'Roční' : 'Měsíční';
-        final subtitle = isYearly ? PremiumCopy.yearlySavings : 'Měsíční platba';
+        final title = isYearly ? 'Yearly' : 'Monthly';
+        final subtitle = isYearly ? PremiumCopy.yearlySavings : 'Monthly billing';
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: Material(

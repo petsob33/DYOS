@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+
+import '../../../core/firebase/firebase_functions_factory.dart';
 import '../domain/user_model.dart';
 
 /// Data source layer for user operations in Firebase Firestore
@@ -29,7 +31,7 @@ class UserDataSource {
   /// If not provided, uses the default Firebase Firestore instance
   UserDataSource({FirebaseFirestore? firestore, FirebaseFunctions? functions})
       : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+        _functions = functions ?? createFirebaseFunctions();
 
 
   /// Collection reference for users
