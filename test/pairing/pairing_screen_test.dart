@@ -17,6 +17,7 @@ void main() {
           ),
         ),
       );
+      await tester.pump(const Duration(milliseconds: 600));
 
       // The screen shows loading initially
       // Note: This test may need adjustment based on actual implementation

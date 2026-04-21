@@ -12,7 +12,20 @@
           "package_name": "com.example.dyos_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "112080403338-e8i4os9f9l9g9ue6kipvhogf5u6vcqi8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dyos_app",
+            "certificate_hash": "8726fa7f7c07d28b356c682e3fbcc7b81f1b355e"
+          }
+        },
+        {
+          "client_id": "112080403338-evu84vogva87fvee1rohdvmk2qsc2k2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyACRejU_OP5XI5LQaOTayZ1J3PVsk6wAPI"
@@ -20,7 +33,41 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112080403338-evu84vogva87fvee1rohdvmk2qsc2k2f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112080403338:android:0100e78e5d4e165f69a673",
+        "android_client_info": {
+          "package_name": "cz.soboltech.dyos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "112080403338-evu84vogva87fvee1rohdvmk2qsc2k2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACRejU_OP5XI5LQaOTayZ1J3PVsk6wAPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112080403338-evu84vogva87fvee1rohdvmk2qsc2k2f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

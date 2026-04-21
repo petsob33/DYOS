@@ -31,119 +31,80 @@ User? currentUser(CurrentUserRef ref) {
 }
 
 @riverpod
-Future<bool?> isUserPaired(IsUserPairedRef ref) async {
-  final firebaseService = ref.watch(firebaseServiceProvider);
-
-  final user = firebaseService.currentUser;
-  if (user == null) {
-    return null;
-  }
-
-  try {
-    final isPaired = await firebaseService.isUserPaired();
-    return isPaired;
-  } catch (e) {
-    return false;
-  }
-}
-
-@riverpod
-Future<CoupleModel?> currentCouple(CurrentCoupleRef ref) async {
-  // Depend on the currentUserData provider to get the user's data
-  final userData = await ref.watch(currentUserDataProvider.future);
-  
-  if (userData?.coupleId == null || userData!.coupleId!.isEmpty) {
-    return null;
-  }
-  
-  final firebaseService = ref.watch(firebaseServiceProvider);
-  return await firebaseService.getCoupleData(userData.coupleId!);
-}
-
-@riverpod
-Stream<UserModel?> partner(PartnerRef ref) async* {
-  final coupleAsync = ref.watch(coupleProvider);
-
-  final couple = coupleAsync.valueOrNull;
-  if (couple == null) {
-    yield null;
-    return;
-  }
-
-  final user = ref.watch(currentUserProvider);
-  if (user == null) {
-    yield null;
-    return;
-  }
-
-  final partnerUid = couple.members.firstWhere(
-    (uid) => uid != user.uid,
-    orElse: () => '',
-  );
-
-  if (partnerUid.isEmpty) {
-    yield null;
-    return;
-  }
-
-  final userRepository = ref.watch(userRepositoryProvider);
-  yield await userRepository.getUserById(partnerUid);
-}
-
-@riverpod
-Future<UserModel?> currentUserData(CurrentUserDataRef ref) async {
-  final firebaseService = ref.watch(firebaseServiceProvider);
-  return await firebaseService.getUserData();
-}
-
-@riverpod
 Stream<UserModel?> user(UserRef ref) {
-  return ref.watch(authStateProvider.stream).asyncExpand((firebaseUser) {
-    if (firebaseUser == null) {
-      return Stream<UserModel?>.value(null);
-    }
-    
-    final userRepository = ref.read(userRepositoryProvider);
-    return userRepository.streamUser(firebaseUser.uid);
+  final firebaseUser = ref.watch(authStateProvider).valueOrNull;
+  if (firebaseUser == null) {
+    return Stream.value(null);
+  }
+  final userRepository = ref.read(userRepositoryProvider);
+  return userRepository.streamUser(firebaseUser.uid);
+}
+
+@riverpod
+Stream<bool?> isUserPaired(IsUserPairedRef ref) {
+  return ref.watch(userProvider.stream).map((user) {
+    if (user == null) return null;
+    return user.coupleId != null && user.coupleId!.isNotEmpty;
   });
 }
 
 @riverpod
-Stream<CoupleModel?> couple(CoupleRef ref) {
-  return ref.watch(userProvider).when(
-    data: (user) {
-      if (user?.coupleId == null || user!.coupleId!.isEmpty) {
-        return Stream<CoupleModel?>.value(null);
-      }
-      
-      final firestore = FirebaseFirestore.instance;
-      return firestore
-          .collection('couples')
-          .doc(user.coupleId!)
-          .snapshots()
-          .map((doc) {
-        if (!doc.exists) {
-          debugPrint('Couple document ${user.coupleId} does not exist');
-          return null;
-        }
-        try {
-          final couple = CoupleModel.fromFirestore(doc);
-          debugPrint('Successfully loaded couple ${couple.id} with ${couple.members.length} members');
-          return couple;
-        } catch (e, stackTrace) {
-          debugPrint('Error loading couple data from stream for coupleId ${user.coupleId}: $e');
-          debugPrint('Stack trace: $stackTrace');
-          debugPrint('Document exists: ${doc.exists}, data: ${doc.data()}');
-          return null;
-        }
-      });
-    },
-    loading: () => Stream<CoupleModel?>.value(null),
-    error: (error, stackTrace) {
-      debugPrint('Error in userProvider: $error');
-      return Stream<CoupleModel?>.value(null);
-    },
+Stream<CoupleModel?> currentCouple(CurrentCoupleRef ref) {
+  final userData = ref.watch(userProvider).valueOrNull;
+  
+  if (userData?.coupleId == null || userData!.coupleId!.isEmpty) {
+    return Stream.value(null);
+  }
+  
+  final firestore = FirebaseFirestore.instance;
+  return firestore
+      .collection('couples')
+      .doc(userData.coupleId!)
+      .snapshots()
+      .map((doc) {
+    if (!doc.exists) return null;
+    try {
+      return CoupleModel.fromFirestore(doc);
+    } catch (e) {
+      debugPrint('Error parsing couple data: $e');
+      return null;
+    }
+  });
+}
+
+@riverpod
+Stream<UserModel?> currentUserData(CurrentUserDataRef ref) {
+  return ref.watch(userProvider.stream);
+}
+
+@riverpod
+Stream<UserModel?> partner(PartnerRef ref) {
+  final couple = ref.watch(currentCoupleProvider).valueOrNull;
+  if (couple == null) {
+    return Stream.value(null);
+  }
+  
+  final firebaseUser = ref.watch(currentUserProvider);
+  if (firebaseUser == null) {
+    return Stream.value(null);
+  }
+  
+  final partnerUid = couple.members.firstWhere(
+    (uid) => uid != firebaseUser.uid,
+    orElse: () => '',
   );
+  
+  if (partnerUid.isEmpty) {
+    return Stream.value(null);
+  }
+  
+  final userRepository = ref.read(userRepositoryProvider);
+  return userRepository.streamUser(partnerUid);
+}
+
+@riverpod
+Stream<CoupleModel?> couple(CoupleRef ref) {
+  return ref.watch(currentCoupleProvider.stream);
 }
 
 @riverpod
