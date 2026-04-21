@@ -96,7 +96,8 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
         userId: user!.uid,
         answers: serialized,
       );
-      final xpGranted = await grantQuestXpIfEligible(ref, 'blueprint_$sectionId', 100);
+      final xpGranted = await grantQuestXpIfEligible(
+          ref, 'blueprint_$sectionId', 100, couple);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
