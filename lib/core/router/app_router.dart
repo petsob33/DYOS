@@ -107,11 +107,15 @@ GoRouter appRouter(AppRouterRef ref) {
   ref.listen(userProvider, (prev, next) {
     next.whenData((user) {
       final pending = ref.read(pairingConfirmedCoupleIdProvider);
+      // Only clear pending state once the user profile actually reflects the pairing
       if (pending != null &&
           pending.isNotEmpty &&
           user?.coupleId != null &&
           user!.coupleId == pending) {
-        ref.read(pairingConfirmedCoupleIdProvider.notifier).state = null;
+        // Delay clearing slightly to allow the UI to settle on the new state
+        Future.delayed(const Duration(milliseconds: 500), () {
+          ref.read(pairingConfirmedCoupleIdProvider.notifier).state = null;
+        });
       }
     });
   });
@@ -120,57 +124,84 @@ GoRouter appRouter(AppRouterRef ref) {
   final authState = ref.watch(authStateProvider);
   // Watch user data - Stream<UserModel?>
   final userState = ref.watch(userProvider);
-  ref.watch(pairingConfirmedCoupleIdProvider);
+  // Watch temporary pairing state from PairingScreen to prevent race conditions during redirect
+  final pendingCoupleId = ref.watch(pairingConfirmedCoupleIdProvider);
 
   return GoRouter(
     navigatorKey: appNavigatorKey,
     initialLocation: '/login',
     redirect: (context, state) {
-      // Get current auth state
+      // Get auth state and check if user is on a public page
+      final authState = ref.watch(authStateProvider);
       final firebaseUser = authState.valueOrNull;
       final isAuthenticated = firebaseUser != null;
-      
-      // Get current user data (UserModel from Firestore)
-      final userModel = userState.valueOrNull;
-      final pendingCoupleId = ref.read(pairingConfirmedCoupleIdProvider);
-      final hasCoupleId = (userModel?.coupleId != null &&
-              userModel!.coupleId!.isNotEmpty) ||
-          (pendingCoupleId != null && pendingCoupleId.isNotEmpty);
-      
-      // Define public routes (don't require authentication)
-      final isPublicRoute = state.matchedLocation == '/login' || 
-                           state.matchedLocation == '/register' ||
-                           (_isFirebaseTestRouteEnabled &&
-                               state.matchedLocation == '/firebase-test');
-      
-      // Define pairing route (requires auth but not pairing)
-      final isPairingRoute = state.matchedLocation == '/pairing';
-      
-      // Define protected routes (require both auth and pairing)
-      final isProtectedRoute = !isPublicRoute && !isPairingRoute;
+      final onPublicRoute = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+      debugPrint('[Router] location=${state.matchedLocation} auth=${authState.runtimeType}(${firebaseUser?.uid}) isAuthenticated=$isAuthenticated');
 
-      // If no user, redirect to login (unless already on public route)
+      // 1. Handle unauthenticated users
       if (!isAuthenticated) {
-        return isPublicRoute ? null : '/login';
+        return onPublicRoute ? null : '/login';
       }
 
-      // User is authenticated - check if still loading user data
-      if (userState.isLoading) {
-        return null; // Wait for user data to load
+      // --- User is authenticated ---
+
+      // Get user profile state from Firestore and temporary pairing state
+      final userState = ref.watch(userProvider);
+      final userModel = userState.valueOrNull;
+      final pendingCoupleId = ref.watch(pairingConfirmedCoupleIdProvider);
+
+      // Check if critical data is still loading
+      final isLoading = authState.isLoading || userState.isLoading;
+      debugPrint('[Router] userState=${userState.runtimeType} userModel=${userModel?.uid} coupleId=${userModel?.coupleId} isLoading=$isLoading hasError=${userState.hasError}');
+
+      // 2. Handle loading state
+      if (isLoading) {
+        // If on login/register, a successful auth just happened. Redirect to /home
+        // to show progress. The router will re-evaluate once loading is done.
+        if (onPublicRoute) {
+          return '/home';
+        }
+        // If already in the app, stay put while loading to avoid screen flashing.
+        return null;
       }
 
-      // If user but no coupleId, always redirect to pairing
-      // (only allow staying on the pairing screen itself).
-      if (!hasCoupleId) {
-        return isPairingRoute ? null : '/pairing';
+      // --- Loading is finished ---
+
+      // 3. Check for UID mismatch (transient state after fast login/logout)
+      // If the loaded profile is for a different user, wait for the stream to catch up.
+      if (userModel != null && userModel.uid != firebaseUser.uid) {
+        return null; // Stay put and wait for the correct profile
       }
 
-      // User has coupleId - if on login/register/pairing, redirect to home shell
-      if (isPublicRoute || isPairingRoute) {
-        return '/home';
+      // 3b. If userModel is null while authenticated and no error, the stream is
+      // still transitioning (Firebase auth emits null → user, causing a brief
+      // AsyncData(null) before Firestore responds). Treat as loading.
+      if (userModel == null && !userState.hasError) {
+        return onPublicRoute ? '/home' : null;
       }
 
-      // Both user and coupleId exist, allow access to protected routes (home shell)
+      // 4. Determine the real pairing status
+      final hasCoupleId = (userModel?.coupleId != null && userModel!.coupleId!.isNotEmpty) ||
+                         (pendingCoupleId != null && pendingCoupleId.isNotEmpty);
+
+      final onPairingRoute = state.matchedLocation == '/pairing';
+
+      // 5. Enforce routing rules based on pairing status
+      if (hasCoupleId) {
+        // User is paired. They belong in the main app.
+        // If they are on a public or pairing page, send them to the home shell.
+        if (onPublicRoute || onPairingRoute) {
+          return '/home';
+        }
+      } else {
+        // User is NOT paired. They MUST go to the pairing screen.
+        // If they are not already on the pairing screen, redirect them.
+        if (!onPairingRoute) {
+          return '/pairing';
+        }
+      }
+
+      // 6. No redirect is necessary if all conditions are met
       return null;
     },
     routes: [

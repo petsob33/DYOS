@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_autocomplete/google_places_autocomplete.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../core/config/maps_api_config.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -48,7 +49,8 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
   final Set<Marker> _markers = {};
   bool _isSearching = false;
   bool _isGettingLocation = false;
-  bool _mapReady = false;
+  bool _mapsConfigResolved = false;
+  bool _mapsSdkAvailable = false;
   List<Prediction> _predictions = [];
   bool _placesLoading = false;
   bool _placesReady = false;
@@ -72,7 +74,28 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      setState(() => _mapReady = true);
+      final geoKey = await MapsApiConfig.resolveGeoApiKey();
+      if (!mounted) return;
+      final mapsOk = MapsApiConfig.isUsableKey(geoKey);
+      setState(() {
+        _mapsConfigResolved = true;
+        _mapsSdkAvailable = mapsOk;
+      });
+      if (!mapsOk) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Add GOOGLE_MAPS_API_KEY to android/local.properties (Android) or GOOGLE_PLACES_API_KEY in ios Secrets.xcconfig, then rebuild. You can still search by address.',
+              ),
+              backgroundColor: AppTheme.colors.warning,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 6),
+            ),
+          );
+        }
+        return;
+      }
       final deviceInfo = DeviceInfoPlugin();
       final isPhysicalDevice = Platform.isAndroid
           ? (await deviceInfo.androidInfo).isPhysicalDevice
@@ -360,25 +383,38 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  _mapReady
-                      ? GoogleMap(
-                          initialCameraPosition: initialCamera,
-                          markers: _markers,
-                          onTap: _onMapTap,
-                          onMapCreated: (GoogleMapController c) {
-                            _mapController = c;
-                            if (_selectedPosition != null) {
-                              _mapController?.animateCamera(
-                                CameraUpdate.newLatLng(_selectedPosition!),
-                              );
-                            }
-                          },
-                          myLocationEnabled: true,
-                          myLocationButtonEnabled: true,
-                          mapToolbarEnabled: false,
-                          liteModeEnabled: false,
-                        )
-                      : const Center(child: CircularProgressIndicator()),
+                  !_mapsConfigResolved
+                      ? const Center(child: CircularProgressIndicator())
+                      : _mapsSdkAvailable
+                          ? GoogleMap(
+                              initialCameraPosition: initialCamera,
+                              markers: _markers,
+                              onTap: _onMapTap,
+                              onMapCreated: (GoogleMapController c) {
+                                _mapController = c;
+                                if (_selectedPosition != null) {
+                                  _mapController?.animateCamera(
+                                    CameraUpdate.newLatLng(_selectedPosition!),
+                                  );
+                                }
+                              },
+                              myLocationEnabled: true,
+                              myLocationButtonEnabled: true,
+                              mapToolbarEnabled: false,
+                              liteModeEnabled: false,
+                            )
+                          : Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Text(
+                                  'Map preview needs a Google Maps API key in the native build (see docs/ANDROID_GOOGLE_API_KEY.md). Search by address works below.',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        color: AppTheme.colors.textSecondary,
+                                      ),
+                                ),
+                              ),
+                            ),
                   Positioned(
                     top: 8,
                     left: 8,
