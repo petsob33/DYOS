@@ -62,15 +62,10 @@ class CoupleModel with _$CoupleModel {
       // Handle anniversaryDate - it might be Timestamp or String
       final convertedData = <String, dynamic>{...data};
       
-      // Convert anniversaryDate from Timestamp to ISO string if needed
-      if (convertedData['anniversaryDate'] != null) {
-        final anniversaryValue = convertedData['anniversaryDate'];
-        if (anniversaryValue is Timestamp) {
-          convertedData['anniversaryDate'] = anniversaryValue.toDate().toIso8601String();
-        } else if (anniversaryValue is! String) {
-          // Try to convert to string if it's some other type
-          convertedData['anniversaryDate'] = anniversaryValue.toString();
-        }
+      // Convert anniversaryDate Timestamp → DateTime so TimestampConverter can handle it
+      if (convertedData['anniversaryDate'] is Timestamp) {
+        convertedData['anniversaryDate'] =
+            (convertedData['anniversaryDate'] as Timestamp).toDate();
       }
       
       // Convert status map values - ensure CoupleStatus objects are properly converted
@@ -116,7 +111,9 @@ class TimestampConverter implements JsonConverter<DateTime?, dynamic> {
   @override
   DateTime? fromJson(dynamic value) {
     if (value is Timestamp) return value.toDate();
-    return value as DateTime?;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
   }
 
   @override

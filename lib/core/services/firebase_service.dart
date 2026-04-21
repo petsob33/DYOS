@@ -88,6 +88,10 @@ class FirebaseService {
     return _pairingService.pairWithInviteCode(inviteCode);
   }
 
+  Future<PairInviteCodeResult> pairWithEmail(String email) async {
+    return _pairingService.pairWithEmail(email);
+  }
+
   Future<CoupleModel?> getCoupleData(String coupleId) async {
     final result = await _pairingService.getCoupleData(coupleId);
     if (result == null) {
