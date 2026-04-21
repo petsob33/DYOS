@@ -354,10 +354,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final coupleAsync = ref.watch(currentCoupleProvider);
     final partnerAsync = ref.watch(partnerProvider);
 
-    if (isPairedAsync.hasValue && isPairedAsync.value == false) {
-      return Scaffold(body: const Center(child: CircularProgressIndicator()));
-    }
-
     if (currentUserAsync.isLoading || coupleAsync.isLoading) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,

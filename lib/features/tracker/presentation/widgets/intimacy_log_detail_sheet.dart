@@ -7,6 +7,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
+import '../../data/intimacy_repository.dart';
 import '../../domain/intimacy_log_model.dart';
 import 'add_intimacy_sheet.dart';
 
@@ -360,28 +361,49 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     if (log.note != null && log.note!.isNotEmpty)
                       const SizedBox(height: AppSpacing.lg),
 
-                    // Edit button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          AddIntimacySheet.show(context, logToEdit: log);
-                        },
-                        icon: const Icon(PhosphorIconsBold.pencil),
-                        label: const Text('Edit'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.colors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.md,
+                    // Edit / delete actions
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => _confirmAndDelete(context, ref),
+                            icon: const Icon(PhosphorIconsBold.trash),
+                            label: const Text('Delete'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppTheme.colors.love,
+                              side: BorderSide(color: AppTheme.colors.love),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppSpacing.md,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
                         ),
-                      ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              AddIntimacySheet.show(context, logToEdit: log);
+                            },
+                            icon: const Icon(PhosphorIconsBold.pencil),
+                            label: const Text('Edit'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.colors.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppSpacing.md,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 0,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg),
                   ],
@@ -427,6 +449,51 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
     final minute = date.minute.toString().padLeft(2, '0');
 
     return '$weekday, $month $day, $year at $hour:$minute';
+  }
+
+  Future<void> _confirmAndDelete(BuildContext context, WidgetRef ref) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete intimacy log?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: AppTheme.colors.love),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+
+    try {
+      final user = ref.read(userProvider).valueOrNull;
+      final coupleId = user?.coupleId;
+      if (coupleId == null || coupleId.isEmpty) {
+        throw Exception('User is not paired.');
+      }
+
+      await ref.read(intimacyRepositoryProvider).deleteLog(log.id, coupleId);
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Intimacy log deleted')),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete log: ${e.toString()}')),
+      );
+    }
   }
 }
 

@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/constants/app_spacing.dart';
-import '../../../core/services/firebase_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/auth_service.dart';
+import 'auth_providers.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -43,8 +43,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       await authService.signInWithGoogle();
-      
-      // Router will automatically redirect based on pairing status
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -184,14 +182,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-
-      // Force post-login navigation so users are never stuck on login
-      // even if router redirect timing lags.
-      final firebaseService = ref.read(firebaseServiceProvider);
-      final isPaired = await firebaseService.isUserPaired();
-      if (mounted) {
-        context.go(isPaired ? '/home' : '/pairing');
-      }
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();

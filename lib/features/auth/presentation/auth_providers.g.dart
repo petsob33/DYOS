@@ -57,75 +57,7 @@ final currentUserProvider = AutoDisposeProvider<User?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserRef = AutoDisposeProviderRef<User?>;
-String _$isUserPairedHash() => r'099014ca29b8c27729b58d1992fedef34ebe5350';
-
-/// See also [isUserPaired].
-@ProviderFor(isUserPaired)
-final isUserPairedProvider = AutoDisposeFutureProvider<bool?>.internal(
-  isUserPaired,
-  name: r'isUserPairedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$isUserPairedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef IsUserPairedRef = AutoDisposeFutureProviderRef<bool?>;
-String _$currentCoupleHash() => r'0a481c67b9ac14be486d602ed700dfb1ab015286';
-
-/// See also [currentCouple].
-@ProviderFor(currentCouple)
-final currentCoupleProvider = AutoDisposeFutureProvider<CoupleModel?>.internal(
-  currentCouple,
-  name: r'currentCoupleProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentCoupleHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CurrentCoupleRef = AutoDisposeFutureProviderRef<CoupleModel?>;
-String _$partnerHash() => r'1bfe511ae992e7daf4c3b8cb17d78c056a9b235a';
-
-/// See also [partner].
-@ProviderFor(partner)
-final partnerProvider = AutoDisposeStreamProvider<UserModel?>.internal(
-  partner,
-  name: r'partnerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$partnerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PartnerRef = AutoDisposeStreamProviderRef<UserModel?>;
-String _$currentUserDataHash() => r'64155b0adda0d415ea426bace389b78b10601b9a';
-
-/// See also [currentUserData].
-@ProviderFor(currentUserData)
-final currentUserDataProvider = AutoDisposeFutureProvider<UserModel?>.internal(
-  currentUserData,
-  name: r'currentUserDataProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentUserDataHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CurrentUserDataRef = AutoDisposeFutureProviderRef<UserModel?>;
-String _$userHash() => r'843469f6e552d902ac4da1e691f71ff185b488ea';
+String _$userHash() => r'188df723fe8b7c4031230310764caaf9f876f84d';
 
 /// See also [user].
 @ProviderFor(user)
@@ -142,7 +74,75 @@ final userProvider = AutoDisposeStreamProvider<UserModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UserRef = AutoDisposeStreamProviderRef<UserModel?>;
-String _$coupleHash() => r'362b911412d78bdc6dcc7806822ca11fbc0142a5';
+String _$isUserPairedHash() => r'e53fef1beb3256996185bf4cf4d00a8429add202';
+
+/// See also [isUserPaired].
+@ProviderFor(isUserPaired)
+final isUserPairedProvider = AutoDisposeStreamProvider<bool?>.internal(
+  isUserPaired,
+  name: r'isUserPairedProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$isUserPairedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef IsUserPairedRef = AutoDisposeStreamProviderRef<bool?>;
+String _$currentCoupleHash() => r'65a628c11a1d6b36f251639f30090e6701e890ae';
+
+/// See also [currentCouple].
+@ProviderFor(currentCouple)
+final currentCoupleProvider = AutoDisposeStreamProvider<CoupleModel?>.internal(
+  currentCouple,
+  name: r'currentCoupleProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentCoupleHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CurrentCoupleRef = AutoDisposeStreamProviderRef<CoupleModel?>;
+String _$currentUserDataHash() => r'a3343640fa52ff5bb4ec44840fcc995db8858f21';
+
+/// See also [currentUserData].
+@ProviderFor(currentUserData)
+final currentUserDataProvider = AutoDisposeStreamProvider<UserModel?>.internal(
+  currentUserData,
+  name: r'currentUserDataProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$currentUserDataHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CurrentUserDataRef = AutoDisposeStreamProviderRef<UserModel?>;
+String _$partnerHash() => r'b56133c93de44dce052d2ae2698107abbf8a97d4';
+
+/// See also [partner].
+@ProviderFor(partner)
+final partnerProvider = AutoDisposeStreamProvider<UserModel?>.internal(
+  partner,
+  name: r'partnerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$partnerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PartnerRef = AutoDisposeStreamProviderRef<UserModel?>;
+String _$coupleHash() => r'3f43b2d6d06b16d1ff1f41f8ac060f30773385c3';
 
 /// See also [couple].
 @ProviderFor(couple)

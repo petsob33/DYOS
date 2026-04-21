@@ -258,19 +258,40 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           await repository.updateLog(log, userData.coupleId!);
         } else {
           await repository.addLog(log, userData.coupleId!);
-          grantQuestXpIfEligible(ref, 'intimacy', 20);
+          final xpGranted = await grantQuestXpIfEligible(ref, 'intimacy', 20);
           final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
           await ref.read(adServiceProvider).maybeShowAdAfterIntimacyOrEventAdded(
                 isPremium: isPremium,
               );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  xpGranted
+                      ? 'Intimacy log added! +20 XP'
+                      : 'Intimacy log added! XP for this activity is granted once per day.',
+                ),
+                backgroundColor: AppTheme.colors.success,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+            Navigator.of(context).pop();
+          }
+          return;
         }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(isEditing
-                  ? 'Intimacy log updated successfully!'
-                  : 'Intimacy log added! +20 XP'),
+              content: Text(
+                isEditing
+                    ? 'Intimacy log updated successfully!'
+                    : 'Intimacy log added successfully!',
+              ),
               backgroundColor: AppTheme.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(

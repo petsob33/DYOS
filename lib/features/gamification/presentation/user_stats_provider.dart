@@ -18,6 +18,16 @@ String _todayString() {
   return '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
 }
 
+/// [currentUserDataProvider] caches one snapshot and does not refresh after pairing.
+/// Gamification must use [userProvider] (Firestore user stream) so [coupleId] stays correct.
+String? _coupleIdForXp(dynamic ref) {
+  final fromStream = ref.read(userProvider).valueOrNull?.coupleId;
+  if (fromStream != null && fromStream.isNotEmpty) return fromStream;
+  final fromCached = ref.read(currentUserDataProvider).valueOrNull?.coupleId;
+  if (fromCached != null && fromCached.isNotEmpty) return fromCached;
+  return null;
+}
+
 /// True if this quest already granted XP today (once per day).
 bool isQuestCompletedToday(CoupleModel? couple, String questId) {
   if (couple?.questXpLastGrantedAt == null) return false;
@@ -32,9 +42,8 @@ bool isQuestCompletedToday(CoupleModel? couple, String questId) {
 /// Add [amount] XP to the couple (persisted). Call only when user is paired.
 Future<void> addCoupleXp(dynamic ref, int amount) async {
   if (amount <= 0) return;
-  final user = await ref.read(currentUserDataProvider.future);
-  final coupleId = user?.coupleId;
-  if (coupleId == null || coupleId.isEmpty) return;
+  final coupleId = _coupleIdForXp(ref);
+  if (coupleId == null) return;
   await ref.read(firebaseServiceProvider).addCoupleXp(coupleId, amount);
 }
 
@@ -42,9 +51,8 @@ Future<void> addCoupleXp(dynamic ref, int amount) async {
 /// Returns true if XP was granted, false if skipped (already done today or not paired).
 Future<bool> grantQuestXpIfEligible(dynamic ref, String questId, int amount) async {
   if (amount <= 0) return false;
-  final user = await ref.read(currentUserDataProvider.future);
-  final coupleId = user?.coupleId;
-  if (coupleId == null || coupleId.isEmpty) return false;
+  final coupleId = _coupleIdForXp(ref);
+  if (coupleId == null) return false;
   final firebase = ref.read(firebaseServiceProvider);
   final couple = await firebase.getCoupleData(coupleId);
   if (couple == null || isQuestCompletedToday(couple, questId)) return false;

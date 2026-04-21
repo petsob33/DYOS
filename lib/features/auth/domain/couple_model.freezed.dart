@@ -261,7 +261,7 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
 /// @nodoc
 
 @JsonSerializable(explicitToJson: true)
-class _$CoupleModelImpl extends _CoupleModel {
+class _$CoupleModelImpl extends _CoupleModel with DiagnosticableTreeMixin {
   const _$CoupleModelImpl({
     @JsonKey(includeFromJson: true, includeToJson: false) required this.id,
     required final List<String> members,
@@ -369,8 +369,31 @@ class _$CoupleModelImpl extends _CoupleModel {
   }
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'CoupleModel(id: $id, members: $members, anniversaryDate: $anniversaryDate, createdAt: $createdAt, subscriptionTier: $subscriptionTier, subscriptionExpiry: $subscriptionExpiry, status: $status, xp: $xp, blueprintAnswers: $blueprintAnswers, completedBlueprintSections: $completedBlueprintSections, questXpLastGrantedAt: $questXpLastGrantedAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CoupleModel'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('members', members))
+      ..add(DiagnosticsProperty('anniversaryDate', anniversaryDate))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('subscriptionTier', subscriptionTier))
+      ..add(DiagnosticsProperty('subscriptionExpiry', subscriptionExpiry))
+      ..add(DiagnosticsProperty('status', status))
+      ..add(DiagnosticsProperty('xp', xp))
+      ..add(DiagnosticsProperty('blueprintAnswers', blueprintAnswers))
+      ..add(
+        DiagnosticsProperty(
+          'completedBlueprintSections',
+          completedBlueprintSections,
+        ),
+      )
+      ..add(DiagnosticsProperty('questXpLastGrantedAt', questXpLastGrantedAt));
   }
 
   @override
@@ -621,7 +644,7 @@ class __$$CoupleStatusImplCopyWithImpl<$Res>
 /// @nodoc
 
 @JsonSerializable(explicitToJson: true)
-class _$CoupleStatusImpl implements _CoupleStatus {
+class _$CoupleStatusImpl with DiagnosticableTreeMixin implements _CoupleStatus {
   const _$CoupleStatusImpl({
     required this.emoji,
     required this.text,
@@ -640,8 +663,18 @@ class _$CoupleStatusImpl implements _CoupleStatus {
   final DateTime? updatedAt;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'CoupleStatus(emoji: $emoji, text: $text, updatedAt: $updatedAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'CoupleStatus'))
+      ..add(DiagnosticsProperty('emoji', emoji))
+      ..add(DiagnosticsProperty('text', text))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt));
   }
 
   @override

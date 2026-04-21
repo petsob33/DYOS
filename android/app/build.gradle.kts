@@ -27,7 +27,7 @@ if (hasReleaseKeystore) {
 }
 
 android {
-    namespace = "com.example.dyos_app"
+    namespace = "cz.soboltech.dyos"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -43,7 +43,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.dyos_app"
+        applicationId = "cz.soboltech.dyos"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 28  // Required by google_places_autocomplete (Android 9+)

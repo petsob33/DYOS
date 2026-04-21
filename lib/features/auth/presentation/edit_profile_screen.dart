@@ -52,7 +52,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
         // Update display name in Firestore
         final userRepository = ref.read(userRepositoryProvider);
-        final userData = await ref.read(currentUserDataProvider.future);
+        final userData = ref.read(userProvider).valueOrNull;
         if (userData != null) {
           await userRepository.updateUser(userData.copyWith(displayName: newName));
         }

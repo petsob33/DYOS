@@ -187,19 +187,38 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
         await repository.addOrUpdateEvent(event, userData.coupleId!);
 
         if (!isEditing) {
-          grantQuestXpIfEligible(ref, 'event', 15);
+          final xpGranted = await grantQuestXpIfEligible(ref, 'event', 15);
           final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
           await ref.read(adServiceProvider).maybeShowAdAfterIntimacyOrEventAdded(
                 isPremium: isPremium,
               );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  xpGranted
+                      ? 'Event added! +15 XP'
+                      : 'Event added! XP for this activity is granted once per day.',
+                ),
+                backgroundColor: AppTheme.colors.success,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+            Navigator.of(context).pop();
+          }
+          return;
         }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(isEditing
-                  ? 'Event updated successfully!'
-                  : 'Event added! +15 XP'),
+              content: Text(
+                isEditing ? 'Event updated successfully!' : 'Event added successfully!',
+              ),
               backgroundColor: AppTheme.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(

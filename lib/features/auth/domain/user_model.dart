@@ -24,8 +24,32 @@ class UserModel with _$UserModel {
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+
+  /// Parses Firestore user docs safely — cache/server may omit or null fields
+  /// that [fromJson] expects as non-null [String] (e.g. legacy or in-flight writes).
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    if (!doc.exists) {
+      throw StateError('User document does not exist');
+    }
+    final raw = doc.data();
+    if (raw == null) {
+      throw StateError('User document has no data');
+    }
+    final data = Map<String, dynamic>.from(raw as Map);
+    data['uid'] = doc.id;
+    final emailRaw = data['email'];
+    data['email'] = emailRaw is String
+        ? emailRaw
+        : (emailRaw == null ? '' : emailRaw.toString());
+
+    final statusRaw = data['status'];
+    if (statusRaw is Map) {
+      final sm = Map<String, dynamic>.from(statusRaw);
+      if (sm['emoji'] == null || sm['text'] == null) {
+        data.remove('status');
+      }
+    }
+
     return UserModel.fromJson(data).copyWith(uid: doc.id);
   }
 }

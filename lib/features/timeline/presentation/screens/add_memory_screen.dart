@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -260,16 +261,19 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     // Listen to state changes to handle success/error
     ref.listen<AddMemoryState>(
       addMemoryControllerProvider,
-      (previous, next) {
+      (previous, next) async {
         if (next is AddMemorySuccess) {
-          if (widget.initialMemory == null) {
-            grantQuestXpIfEligible(ref, 'memory', 25);
-          }
+          final isNewMemory = widget.initialMemory == null;
+          final xpGranted = isNewMemory
+              ? await grantQuestXpIfEligible(ref, 'memory', 25)
+              : false;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                widget.initialMemory == null
-                    ? 'Memory saved! +25 XP'
+                isNewMemory
+                    ? (xpGranted
+                        ? 'Memory saved! +25 XP'
+                        : 'Memory saved! XP for this activity is granted once per day.')
                     : 'Memory "${next.memory.caption.isEmpty ? 'Untitled' : next.memory.caption}" updated.',
               ),
               backgroundColor: AppTheme.colors.success,

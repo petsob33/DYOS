@@ -205,36 +205,26 @@ class AuthService {
       // Step 4: Sign in to Firebase with the Google credential
       final userCredential = await _auth.signInWithCredential(credential);
 
-      // Step 5: Check if user document exists in Firestore
-      // If not, create it (for new users)
+      // Step 5: Check if user document exists in Firestore.
+      // Login flow only accepts existing accounts — new accounts must register.
       if (userCredential.user != null) {
         final existingUser = await _userRepository.getUserById(userCredential.user!.uid);
-        
+
         if (existingUser == null) {
-          // New user - create Firestore document
-          final displayName = userCredential.user!.displayName ?? 
-                              googleUser.displayName ?? 
-                              'User';
-          final inviteCode = _generateInviteCode(displayName);
-          
-          final userModel = UserModel(
-            uid: userCredential.user!.uid,
-            email: userCredential.user!.email ?? '',
-            displayName: displayName,
-            photoUrl: userCredential.user!.photoURL,
-            inviteCode: inviteCode,
-            createdAt: DateTime.now(),
+          // No app account found — clean up the Firebase auth entry and reject login.
+          try {
+            await userCredential.user!.delete();
+          } catch (_) {}
+          await _googleSignIn.signOut();
+          throw 'No account found for this Google account. Please register first.';
+        }
+
+        // Existing user — update photo URL if it changed.
+        if (userCredential.user!.photoURL != null &&
+            existingUser.photoUrl != userCredential.user!.photoURL) {
+          await _userRepository.updateUser(
+            existingUser.copyWith(photoUrl: userCredential.user!.photoURL),
           );
-          
-          await _userRepository.createUser(userModel);
-        } else {
-          // Existing user - update photo URL if it changed
-          if (userCredential.user!.photoURL != null && 
-              existingUser.photoUrl != userCredential.user!.photoURL) {
-            await _userRepository.updateUser(
-              existingUser.copyWith(photoUrl: userCredential.user!.photoURL),
-            );
-          }
         }
       }
 
@@ -243,6 +233,58 @@ class AuthService {
       throw _handleAuthException(e);
     } catch (e) {
       // Handle other errors (e.g., sign-in cancelled, network errors)
+      throw e.toString();
+    }
+  }
+
+  /// Register with Google
+  ///
+  /// Creates a new app account using Google sign-in.
+  /// Throws if a Firestore account already exists for this Google account
+  /// (the user should use Login instead).
+  Future<UserCredential> registerWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) throw 'Sign in cancelled';
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        final existingUser = await _userRepository.getUserById(userCredential.user!.uid);
+
+        if (existingUser != null) {
+          // Account already exists — reject and send them to login.
+          await _googleSignIn.signOut();
+          await _auth.signOut();
+          throw 'An account already exists for this Google account. Please log in instead.';
+        }
+
+        // New user — create Firestore document.
+        final displayName = userCredential.user!.displayName ??
+            googleUser.displayName ??
+            'User';
+        final inviteCode = _generateInviteCode(displayName);
+        final userModel = UserModel(
+          uid: userCredential.user!.uid,
+          email: userCredential.user!.email ?? '',
+          displayName: displayName,
+          photoUrl: userCredential.user!.photoURL,
+          inviteCode: inviteCode,
+          createdAt: DateTime.now(),
+        );
+        await _userRepository.createUser(userModel);
+      }
+
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
       throw e.toString();
     }
   }

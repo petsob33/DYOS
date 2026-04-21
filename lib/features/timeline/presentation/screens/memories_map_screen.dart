@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_autocomplete/google_places_autocomplete.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../core/config/maps_api_config.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/memory_model.dart';
@@ -109,7 +110,8 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
   
   bool _isSearching = false;
   bool _isGettingLocation = false;
-  bool _mapReady = false;
+  bool _mapsConfigResolved = false;
+  bool _mapsSdkAvailable = false;
   List<Prediction> _predictions = [];
   bool _placesLoading = false;
   bool _placesReady = false;
@@ -120,13 +122,24 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      setState(() => _mapReady = true);
-      
+      final geoKey = await MapsApiConfig.resolveGeoApiKey();
+      if (!mounted) return;
+      final mapsOk = MapsApiConfig.isUsableKey(geoKey);
+      setState(() {
+        _mapsConfigResolved = true;
+        _mapsSdkAvailable = mapsOk;
+      });
+      if (!mapsOk) return;
+
       final deviceInfo = DeviceInfoPlugin();
       final isPhysicalDevice = Platform.isAndroid
           ? (await deviceInfo.androidInfo).isPhysicalDevice
           : (await deviceInfo.iosInfo).isPhysicalDevice;
-      
+      if (isPhysicalDevice) {
+        if (mounted) setState(() => _placesReady = false);
+        return;
+      }
+
       _places = GooglePlacesAutocomplete(
         predictionsListener: (p) {
           if (mounted) setState(() => _predictions = p);
@@ -135,7 +148,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
           if (mounted) setState(() => _placesLoading = loading);
         },
         onError: (error) {
-           // Error handling
+          // Error handling
         },
         debounceTime: 300,
       );
@@ -308,31 +321,37 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
         // 1. MAPA
         Container(
           color: AppTheme.colors.textSecondary.withValues(alpha: 0.12),
-          child: _mapReady
-              ? GoogleMap(
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(_defaultLat, _defaultLng),
-                    zoom: _defaultZoom,
-                  ),
-                  markers: _buildMarkers(),
-                  onTap: (_) {
-                    // Kliknutí do mapy zruší výběr (schová kartu)
-                    setState(() {
-                      _selectedMemory = null;
-                      _predictions = [];
-                    });
-                    FocusScope.of(context).unfocus();
-                  },
-                  onMapCreated: (GoogleMapController controller) {
-                    _mapController = controller;
-                    _fitBounds();
-                  },
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
-                  mapToolbarEnabled: false,
-                )
-              : const Center(child: CircularProgressIndicator()),
+          child: !_mapsConfigResolved
+              ? const Center(child: CircularProgressIndicator())
+              : _mapsSdkAvailable
+                  ? GoogleMap(
+                      initialCameraPosition: const CameraPosition(
+                        target: LatLng(_defaultLat, _defaultLng),
+                        zoom: _defaultZoom,
+                      ),
+                      markers: _buildMarkers(),
+                      onTap: (_) {
+                        setState(() {
+                          _selectedMemory = null;
+                          _predictions = [];
+                        });
+                        FocusScope.of(context).unfocus();
+                      },
+                      onMapCreated: (GoogleMapController controller) {
+                        _mapController = controller;
+                        _fitBounds();
+                      },
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
+                      zoomControlsEnabled: false,
+                      mapToolbarEnabled: false,
+                    )
+                  : _MapKeyMissingFallback(
+                      memories: widget.memories,
+                      onMemorySelected: (memory) {
+                        setState(() => _selectedMemory = memory);
+                      },
+                    ),
         ),
 
         // 2. VYHLEDÁVÁNÍ (Nahoře)
@@ -478,6 +497,71 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
               MemoryDetailDialog.show(context, memory: _selectedMemory!);
             },
           ),
+      ],
+    );
+  }
+}
+
+class _MapKeyMissingFallback extends StatelessWidget {
+  const _MapKeyMissingFallback({
+    required this.memories,
+    required this.onMemorySelected,
+  });
+
+  final List<Memory> memories;
+  final ValueChanged<Memory> onMemorySelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+          child: Text(
+            'Map preview needs a Google Maps API key (see docs/ANDROID_GOOGLE_API_KEY.md). Memories with a place are listed below.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.colors.textSecondary,
+                ),
+          ),
+        ),
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            itemCount: memories.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final m = memories[index];
+              final loc = m.location;
+              final subtitle = (loc?['name'] as String?)?.trim();
+              final lat = loc?['lat'] as num?;
+              final lng = loc?['lng'] as num?;
+              final placeLabel = (subtitle != null && subtitle.isNotEmpty)
+                  ? subtitle
+                  : (lat != null && lng != null)
+                      ? '${lat.toStringAsFixed(3)}, ${lng.toStringAsFixed(3)}'
+                      : 'Place';
+              return Material(
+                color: AppTheme.colors.card,
+                borderRadius: BorderRadius.circular(12),
+                child: ListTile(
+                  title: Text(
+                    m.caption.isEmpty ? 'Memory' : m.caption,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    placeLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  onTap: () => onMemorySelected(m),
+                ),
+              );
+            },
+          ),
+        ),
       ],
     );
   }
