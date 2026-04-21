@@ -183,9 +183,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         password: _passwordController.text,
       );
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      if (e.toString().contains('No user found for that email')) {
+        final result = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Account not found'),
+            content: const Text(
+                'No account was found for this email. Would you like to create a new account?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Register'),
+              ),
+            ],
+          ),
+        );
+
+        if (result == true) {
+          context.go('/register?email=${_emailController.text}');
+        }
+      } else {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {

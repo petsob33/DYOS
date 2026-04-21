@@ -217,11 +217,14 @@ GoRouter appRouter(AppRouterRef ref) {
       GoRoute(
         path: '/register',
         name: 'register',
-        pageBuilder: (context, state) => buildPageWithSlideTransition(
-          context,
-          state,
-          const RegisterScreen(),
-        ),
+        pageBuilder: (context, state) {
+          final email = state.uri.queryParameters['email'];
+          return buildPageWithSlideTransition(
+            context,
+            state,
+            RegisterScreen(email: email),
+          );
+        },
       ),
       if (_isFirebaseTestRouteEnabled)
         GoRoute(
