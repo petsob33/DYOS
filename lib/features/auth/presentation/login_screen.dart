@@ -22,9 +22,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordController = TextEditingController();
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
-  bool _isLoading = false;
   bool _obscurePassword = true;
-  String? _errorMessage;
   @override
   void dispose() {
     _emailController.dispose();
@@ -35,23 +33,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleGoogleSignIn() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    ref.read(authIsLoadingProvider.notifier).state = true;
+    ref.read(authErrorProvider.notifier).state = null;
 
     try {
       final authService = ref.read(authServiceProvider);
       await authService.signInWithGoogle();
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      ref.read(authErrorProvider.notifier).state = e.toString();
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        ref.read(authIsLoadingProvider.notifier).state = false;
       }
     }
   }
@@ -171,10 +163,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    ref.read(authIsLoadingProvider.notifier).state = true;
+    ref.read(authErrorProvider.notifier).state = null;
 
     try {
       final authService = ref.read(authServiceProvider);
@@ -183,14 +173,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         password: _passwordController.text,
       );
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      ref.read(authErrorProvider.notifier).state = e.toString();
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        ref.read(authIsLoadingProvider.notifier).state = false;
       }
     }
   }
@@ -201,6 +187,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authIsLoadingProvider);
+    final errorMessage = ref.watch(authErrorProvider);
+
+    ref.listen(authErrorProvider, (previous, next) {
+      if (next != null) {
+        // Clear the error after a few seconds
+        Future.delayed(const Duration(seconds: 5), () {
+          ref.read(authErrorProvider.notifier).state = null;
+        });
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppTheme.colors.background,
       resizeToAvoidBottomInset: true,
@@ -369,7 +367,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: _isLoading ? null : () => _showForgotPasswordDialog(context),
+                    onPressed: isLoading ? null : () => _showForgotPasswordDialog(context),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.sm,
@@ -387,7 +385,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 
-                if (_errorMessage != null)
+                if (errorMessage != null)
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
@@ -404,7 +402,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Text(
-                            _errorMessage!,
+                            errorMessage,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -419,7 +417,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppSpacing.lg),
                 
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
+                  onPressed: isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.colors.primary,
                     foregroundColor: Colors.white,
@@ -431,7 +429,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: _isLoading
+                  child: isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
@@ -479,7 +477,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppSpacing.lg),
                 
                 OutlinedButton.icon(
-                  onPressed: _isLoading ? null : _handleGoogleSignIn,
+                  onPressed: isLoading ? null : _handleGoogleSignIn,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.colors.text,
                     side: BorderSide(

@@ -116,3 +116,6 @@ Future<bool> hasSeenTutorial(HasSeenTutorialRef ref) async {
 }
 
 final pairingConfirmedCoupleIdProvider = StateProvider<String?>((ref) => null);
+final authErrorProvider = StateProvider<String?>((ref) => null);
+final authIsLoadingProvider = StateProvider<bool>((ref) => false);
+
