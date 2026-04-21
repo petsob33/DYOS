@@ -65,7 +65,7 @@ class CoupleModel with _$CoupleModel {
       // Convert anniversaryDate Timestamp → DateTime so TimestampConverter can handle it
       if (convertedData['anniversaryDate'] is Timestamp) {
         convertedData['anniversaryDate'] =
-            (convertedData['anniversaryDate'] as Timestamp).toDate().toIso8601String();
+            (convertedData['anniversaryDate'] as Timestamp).toDate();
       }
       
       // Convert status map values - ensure CoupleStatus objects are properly converted
@@ -77,7 +77,7 @@ class CoupleModel with _$CoupleModel {
             // Ensure updatedAt is properly converted if it's a Timestamp
             final statusData = Map<String, dynamic>.from(entry.value as Map);
             if (statusData['updatedAt'] != null && statusData['updatedAt'] is Timestamp) {
-              statusData['updatedAt'] = (statusData['updatedAt'] as Timestamp).toDate().toIso8601String();
+              statusData['updatedAt'] = (statusData['updatedAt'] as Timestamp).toDate();
             }
             convertedStatus[entry.key] = statusData;
           } else {
