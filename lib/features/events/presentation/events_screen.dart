@@ -72,109 +72,109 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Calendar
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: eventsAsync.when(
-                data: (events) {
-                  // Debug: print events count
-                  debugPrint('EventsScreen: Loaded ${events.length} events');
-                  
-                  // Create a map of events by date for faster lookup
-                  final eventsByDate = <DateTime, List<Event>>{};
-                  for (final event in events) {
-                    final normalizedDate = DateTime(
-                      event.date.year,
-                      event.date.month,
-                      event.date.day,
-                    );
-                    eventsByDate.putIfAbsent(normalizedDate, () => []).add(event);
-                    debugPrint('EventsScreen: Event ${event.title} on ${normalizedDate.toString()}');
-                  }
-                  
-                  return Column(
-                    children: [
-                      // Debug: show events count
-                      if (events.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: AppTheme.colors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            'Debug: ${events.length} events loaded',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppTheme.colors.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ),
-                      OurOSUniversalCalendar(
-                    key: ValueKey('calendar_${events.length}_${events.map((e) => '${e.id}_${e.date.millisecondsSinceEpoch}').join('_')}'),
-                    focusedDay: _focusedDay,
-                    selectedDay: _selectedDay,
-                    onDaySelected: (selectedDay, focusedDay) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-                    },
-                    onPageChanged: (focusedDay) {
-                      setState(() {
-                        _focusedDay = focusedDay;
-                      });
-                    },
-                    eventLoader: (date) {
-                      // Return event markers for this date
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Calendar
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: eventsAsync.when(
+                  data: (events) {
+                    // Debug: print events count
+                    debugPrint('EventsScreen: Loaded ${events.length} events');
+                    
+                    // Create a map of events by date for faster lookup
+                    final eventsByDate = <DateTime, List<Event>>{};
+                    for (final event in events) {
                       final normalizedDate = DateTime(
-                        date.year,
-                        date.month,
-                        date.day,
+                        event.date.year,
+                        event.date.month,
+                        event.date.day,
                       );
-                      
-                      final dayEvents = eventsByDate[normalizedDate] ?? [];
-                      final hasEvents = dayEvents.isNotEmpty;
-                      debugPrint('EventsScreen: eventLoader called for ${normalizedDate.toString()}, hasEvents: $hasEvents, eventsByDate keys: ${eventsByDate.keys.map((d) => d.toString()).join(", ")}');
-                      if (hasEvents) {
-                        debugPrint('EventsScreen: eventLoader for ${normalizedDate.toString()} found ${dayEvents.length} events');
-                      }
-                      return hasEvents ? ['event'] : [];
-                    },
-                    calendarBuilders: CalendarBuilders(
-                      markerBuilder: (context, date, events) {
-                        if (events.contains('event')) {
-                          debugPrint('EventsScreen: markerBuilder for ${date.toString()} - showing marker');
-                          return Positioned(
-                            bottom: 2,
-                            child: Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: AppTheme.colors.primary,
-                                shape: BoxShape.circle,
-                              ),
+                      eventsByDate.putIfAbsent(normalizedDate, () => []).add(event);
+                      debugPrint('EventsScreen: Event ${event.title} on ${normalizedDate.toString()}');
+                    }
+                    
+                    return Column(
+                      children: [
+                        // Debug: show events count
+                        if (events.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.only(bottom: 8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.colors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          );
-                        }
-                        return const SizedBox.shrink();
+                            child: Text(
+                              'Debug: ${events.length} events loaded',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppTheme.colors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ),
+                        OurOSUniversalCalendar(
+                      key: ValueKey('calendar_${events.length}_${events.map((e) => '${e.id}_${e.date.millisecondsSinceEpoch}').join('_')}'),
+                      focusedDay: _focusedDay,
+                      selectedDay: _selectedDay,
+                      onDaySelected: (selectedDay, focusedDay) {
+                        setState(() {
+                          _selectedDay = selectedDay;
+                          _focusedDay = focusedDay;
+                        });
                       },
-                    ),
+                      onPageChanged: (focusedDay) {
+                        setState(() {
+                          _focusedDay = focusedDay;
+                        });
+                      },
+                      eventLoader: (date) {
+                        // Return event markers for this date
+                        final normalizedDate = DateTime(
+                          date.year,
+                          date.month,
+                          date.day,
+                        );
+                        
+                        final dayEvents = eventsByDate[normalizedDate] ?? [];
+                        final hasEvents = dayEvents.isNotEmpty;
+                        debugPrint('EventsScreen: eventLoader called for ${normalizedDate.toString()}, hasEvents: $hasEvents, eventsByDate keys: ${eventsByDate.keys.map((d) => d.toString()).join(", ")}');
+                        if (hasEvents) {
+                          debugPrint('EventsScreen: eventLoader for ${normalizedDate.toString()} found ${dayEvents.length} events');
+                        }
+                        return hasEvents ? ['event'] : [];
+                      },
+                      calendarBuilders: CalendarBuilders(
+                        markerBuilder: (context, date, events) {
+                          if (events.contains('event')) {
+                            debugPrint('EventsScreen: markerBuilder for ${date.toString()} - showing marker');
+                            return Positioned(
+                              bottom: 2,
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.colors.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
                       ),
-                    ],
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const SizedBox.shrink(),
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
               ),
-            ),
 
-            // Events list - show all events or filtered by selected day
-            Expanded(
-              child: eventsAsync.when(
+              // Events list - show all events or filtered by selected day
+              eventsAsync.when(
                 data: (events) {
                   // Filter events by selected day if one is selected
                   final filteredEvents = _selectedDay != null
@@ -195,40 +195,44 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
 
                   if (filteredEvents.isEmpty) {
                     return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            PhosphorIconsBold.calendar,
-                            size: 64,
-                            color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          Text(
-                            _selectedDay != null
-                                ? 'No events on this day'
-                                : 'No events yet',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: AppTheme.colors.textSecondary,
-                                ),
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          TextButton(
-                            onPressed: () {
-                              AddEventSheet.show(
-                                context,
-                                eventToEdit: null,
-                                initialDate: _selectedDay,
-                              );
-                            },
-                            child: const Text('Add event'),
-                          ),
-                        ],
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              PhosphorIconsBold.calendar,
+                              size: 64,
+                              color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              _selectedDay != null
+                                  ? 'No events on this day'
+                                  : 'No events yet',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: AppTheme.colors.textSecondary,
+                                  ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            TextButton(
+                              onPressed: () {
+                                AddEventSheet.show(
+                                  context,
+                                  eventToEdit: null,
+                                  initialDate: _selectedDay,
+                                );
+                              },
+                              child: const Text('Add event'),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
 
                   return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.lg,
                       vertical: AppSpacing.md,
@@ -256,8 +260,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
