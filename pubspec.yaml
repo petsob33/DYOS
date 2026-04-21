@@ -62,7 +62,6 @@ dependencies:
   google_mobile_ads: ^7.0.0
   shared_preferences: ^2.5.4
   purchases_ui_flutter: ^9.16.1
-  stream_transform: ^2.1.1
 
 dev_dependencies:
   flutter_test:
