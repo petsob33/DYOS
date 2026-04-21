@@ -21,11 +21,7 @@ String _todayString() {
 /// [currentUserDataProvider] caches one snapshot and does not refresh after pairing.
 /// Gamification must use [userProvider] (Firestore user stream) so [coupleId] stays correct.
 String? _coupleIdForXp(dynamic ref) {
-  final fromStream = ref.read(userProvider).valueOrNull?.coupleId;
-  if (fromStream != null && fromStream.isNotEmpty) return fromStream;
-  final fromCached = ref.read(currentUserDataProvider).valueOrNull?.coupleId;
-  if (fromCached != null && fromCached.isNotEmpty) return fromCached;
-  return null;
+  return ref.read(userProvider).valueOrNull?.coupleId;
 }
 
 /// True if this quest already granted XP today (once per day).
@@ -49,12 +45,12 @@ Future<void> addCoupleXp(dynamic ref, int amount) async {
 
 /// Grant XP for a quest only if not already granted today. Persists the date.
 /// Returns true if XP was granted, false if skipped (already done today or not paired).
-Future<bool> grantQuestXpIfEligible(dynamic ref, String questId, int amount) async {
+Future<bool> grantQuestXpIfEligible(
+    dynamic ref, String questId, int amount, CoupleModel? couple) async {
   if (amount <= 0) return false;
   final coupleId = _coupleIdForXp(ref);
   if (coupleId == null) return false;
   final firebase = ref.read(firebaseServiceProvider);
-  final couple = await firebase.getCoupleData(coupleId);
   if (couple == null || isQuestCompletedToday(couple, questId)) return false;
   await firebase.addCoupleXp(coupleId, amount);
   await firebase.setQuestXpGrantedAt(coupleId, questId, _todayString());

@@ -264,8 +264,9 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       (previous, next) async {
         if (next is AddMemorySuccess) {
           final isNewMemory = widget.initialMemory == null;
+          final couple = ref.read(coupleProvider).valueOrNull;
           final xpGranted = isNewMemory
-              ? await grantQuestXpIfEligible(ref, 'memory', 25)
+              ? await grantQuestXpIfEligible(ref, 'memory', 25, couple)
               : false;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
