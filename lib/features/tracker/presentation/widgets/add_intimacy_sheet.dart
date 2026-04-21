@@ -258,7 +258,9 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           await repository.updateLog(log, userData.coupleId!);
         } else {
           await repository.addLog(log, userData.coupleId!);
-          final xpGranted = await grantQuestXpIfEligible(ref, 'intimacy', 20);
+          final couple = ref.read(coupleProvider).valueOrNull;
+          final xpGranted =
+              await grantQuestXpIfEligible(ref, 'intimacy', 20, couple);
           final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
           await ref.read(adServiceProvider).maybeShowAdAfterIntimacyOrEventAdded(
                 isPremium: isPremium,
