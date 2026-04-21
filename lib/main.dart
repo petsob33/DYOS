@@ -169,14 +169,14 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _configureSafeDebugLogging();
   await Firebase.initializeApp();
+  await _configureAppCheck();
+  await _configureRevenueCat();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const ProviderScope(child: OurOSRoot()));
-  unawaited(_initializeNonBlockingStartupServices());
+  unawaited(initializeGoogleMobileAdsSdk());
 }
 
-Future<void> _initializeNonBlockingStartupServices() async {
-  await _configureAppCheck();
-  await initializeGoogleMobileAdsSdk();
+Future<void> _configureRevenueCat() async {
   if (_revenueCatApiKey.isEmpty) return;
   try {
     final uid = FirebaseAuth.instance.currentUser?.uid;

@@ -15,8 +15,8 @@ import 'app_logger.dart';
 const String _androidBannerProductionId = 'ca-app-pub-2401883970086774/4696756730';
 
 /// Set when you create Interstitial / Rewarded units in AdMob (must be …/number, not …~app).
-const String _androidInterstitialProductionId = '';
-const String _androidRewardedProductionId = '';
+const String _androidInterstitialProductionId = 'ca-app-pub-2401883970086774/4776647787';
+const String _androidRewardedProductionId = 'ca-app-pub-2401883970086774/1603822988';
 
 const String _androidBannerTestId = 'ca-app-pub-3940256099942544/6300978111';
 const String _iosBannerTestId = 'ca-app-pub-3940256099942544/2934735716';

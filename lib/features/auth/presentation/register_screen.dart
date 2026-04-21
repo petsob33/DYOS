@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/auth_service.dart';
+import 'auth_providers.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -51,9 +52,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      await authService.signInWithGoogle();
-      
-      // Router will automatically redirect based on pairing status
+      await authService.registerWithGoogle();
+      ref.invalidate(userProvider);
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -80,7 +80,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// 4. Call AuthService to register with email/password
   ///    - Creates Firebase Auth account
   ///    - Creates Firestore user document
-  /// 5. On success: Navigate to home screen
+  /// 5. On success: Router sends user to pairing or home based on profile
   /// 6. On error: Display error message to user
   /// 7. Always: Reset loading state
   /// 
@@ -107,8 +107,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         password: _passwordController.text,
         displayName: _nameController.text,
       );
-      
-      // Router will automatically redirect based on pairing status
+
+      ref.invalidate(userProvider);
+      // Router redirects by profile [coupleId]; invalidate drops stale profile
+      // from a previous session so we do not open /home on the wrong user.
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
