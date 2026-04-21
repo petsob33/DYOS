@@ -132,6 +132,219 @@ exports.getUserByInviteCode = functions.https.onCall(async (data, context) => {
   }
 });
 
+exports.pairWithInviteCode = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "The function must be called while authenticated."
+    );
+  }
+  assertAppCheck(context);
+  await enforceRateLimit(context.auth.uid, "pair_invite_code", 10, 300);
+
+  const inviteCode = normalizeInviteCode(data.inviteCode);
+  if (!inviteCode || !isValidInviteCode(inviteCode)) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Invalid invite code format."
+    );
+  }
+
+  const currentUid = context.auth.uid;
+  const usersRef = db.collection("users");
+
+  const partnerQuery = await usersRef
+    .where("inviteCode", "==", inviteCode)
+    .limit(1)
+    .get();
+
+  if (partnerQuery.empty) {
+    throw new functions.https.HttpsError(
+      "not-found",
+      "User with this code was not found."
+    );
+  }
+
+  const partnerDoc = partnerQuery.docs[0];
+  const partnerUid = partnerDoc.id;
+
+  if (partnerUid === currentUid) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "You cannot pair with yourself."
+    );
+  }
+
+  const coupleRef = db.collection("couples").doc();
+  let partnerDisplayName = null;
+
+  try {
+    await db.runTransaction(async (tx) => {
+      const currentUserRef = usersRef.doc(currentUid);
+      const partnerRef = usersRef.doc(partnerUid);
+
+      const [currentSnap, partnerSnap] = await Promise.all([
+        tx.get(currentUserRef),
+        tx.get(partnerRef),
+      ]);
+
+      if (!currentSnap.exists) {
+        throw new functions.https.HttpsError("not-found", "Current user not found.");
+      }
+      if (!partnerSnap.exists) {
+        throw new functions.https.HttpsError("not-found", "Partner not found.");
+      }
+
+      const currentData = currentSnap.data() || {};
+      const partnerData = partnerSnap.data() || {};
+
+      if (currentData.coupleId) {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          "Your account is already paired.",
+          { type: "user_already_paired" }
+        );
+      }
+      if (partnerData.coupleId) {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          "This user is already paired.",
+          { type: "partner_already_paired" }
+        );
+      }
+
+      partnerDisplayName = partnerData.displayName || null;
+      const now = admin.firestore.FieldValue.serverTimestamp();
+
+      tx.set(coupleRef, {
+        members: [currentUid, partnerUid],
+        anniversaryDate: now,
+        createdAt: now,
+        subscriptionTier: "free",
+        status: {
+          [currentUid]: { emoji: "😊", text: "Ready to connect", updatedAt: now },
+          [partnerUid]: { emoji: "😊", text: "Ready to connect", updatedAt: now },
+        },
+        xp: 0,
+      });
+      tx.update(currentUserRef, { coupleId: coupleRef.id });
+      tx.update(partnerRef, { coupleId: coupleRef.id });
+    });
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+
+  return {
+    coupleId: coupleRef.id,
+    partnerDisplayName: partnerDisplayName,
+  };
+});
+
+exports.pairWithEmail = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "The function must be called while authenticated."
+    );
+  }
+  assertAppCheck(context);
+  await enforceRateLimit(context.auth.uid, "pair_email", 10, 300);
+
+  const email = (data.email || "").trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new functions.https.HttpsError("invalid-argument", "Invalid email address.");
+  }
+
+  const currentUid = context.auth.uid;
+  const usersRef = db.collection("users");
+
+  const partnerQuery = await usersRef
+    .where("email", "==", email)
+    .limit(1)
+    .get();
+
+  if (partnerQuery.empty) {
+    throw new functions.https.HttpsError("not-found", "No user found with that email.");
+  }
+
+  const partnerDoc = partnerQuery.docs[0];
+  const partnerUid = partnerDoc.id;
+
+  if (partnerUid === currentUid) {
+    throw new functions.https.HttpsError("invalid-argument", "You cannot pair with yourself.");
+  }
+
+  const coupleRef = db.collection("couples").doc();
+  let partnerDisplayName = null;
+
+  try {
+    await db.runTransaction(async (tx) => {
+      const currentUserRef = usersRef.doc(currentUid);
+      const partnerRef = usersRef.doc(partnerUid);
+
+      const [currentSnap, partnerSnap] = await Promise.all([
+        tx.get(currentUserRef),
+        tx.get(partnerRef),
+      ]);
+
+      if (!currentSnap.exists) {
+        throw new functions.https.HttpsError("not-found", "Current user not found.");
+      }
+      if (!partnerSnap.exists) {
+        throw new functions.https.HttpsError("not-found", "Partner not found.");
+      }
+
+      const currentData = currentSnap.data() || {};
+      const partnerData = partnerSnap.data() || {};
+
+      if (currentData.coupleId) {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          "Your account is already paired.",
+          { type: "user_already_paired" }
+        );
+      }
+      if (partnerData.coupleId) {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          "This user is already paired.",
+          { type: "partner_already_paired" }
+        );
+      }
+
+      partnerDisplayName = partnerData.displayName || null;
+      const now = admin.firestore.FieldValue.serverTimestamp();
+
+      tx.set(coupleRef, {
+        members: [currentUid, partnerUid],
+        anniversaryDate: now,
+        createdAt: now,
+        subscriptionTier: "free",
+        status: {
+          [currentUid]: { emoji: "😊", text: "Ready to connect", updatedAt: now },
+          [partnerUid]: { emoji: "😊", text: "Ready to connect", updatedAt: now },
+        },
+        xp: 0,
+      });
+      tx.update(currentUserRef, { coupleId: coupleRef.id });
+      tx.update(partnerRef, { coupleId: coupleRef.id });
+    });
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+
+  return {
+    coupleId: coupleRef.id,
+    partnerDisplayName: partnerDisplayName,
+  };
+});
+
 /** Get partner UID from couple doc (the member that is not fromUserId). */
 async function getPartnerUid(coupleId, fromUserId) {
   const coupleDoc = await db.collection("couples").doc(coupleId).get();
