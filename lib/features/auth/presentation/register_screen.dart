@@ -10,7 +10,8 @@ import '../../../core/services/auth_service.dart';
 import 'auth_providers.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, this.email});
+  final String? email;
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
@@ -30,6 +31,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.email != null) {
+      _emailController.text = widget.email!;
+    }
+  }
 
   @override
   void dispose() {
