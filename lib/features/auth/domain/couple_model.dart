@@ -28,14 +28,8 @@ class CoupleModel with _$CoupleModel {
     // Key is user UID, value is their status (emoji + text)
     Map<String, CoupleStatus>? status,
 
-    // Gamification: couple XP (persisted in Firestore)
-    @Default(0) int xp,
     // Blueprint answers: sectionId -> userId -> { questionId: value }
     Map<String, dynamic>? blueprintAnswers,
-    // Section IDs for which XP was already awarded (once per section per couple)
-    List<String>? completedBlueprintSections,
-    // Quest XP granted once per day: questId -> "YYYY-MM-DD"
-    Map<String, String>? questXpLastGrantedAt,
   }) = _CoupleModel;
 
   factory CoupleModel.fromJson(Map<String, dynamic> json) =>
