@@ -21,11 +21,11 @@ String _todayString() {
 /// [currentUserDataProvider] caches one snapshot and does not refresh after pairing.
 /// Gamification must use [userProvider] (Firestore user stream) so [coupleId] stays correct.
 String? _coupleIdForXp(dynamic ref) {
-  return ref.read(userProvider).when(
-        data: (user) => user?.coupleId,
-        loading: () => null,
-        error: (_, __) => null,
-      );
+  final userAsync = ref.read(userProvider);
+  if (userAsync.hasValue) {
+    return userAsync.value?.coupleId;
+  }
+  return null;
 }
 
 /// True if this quest already granted XP today (once per day).
