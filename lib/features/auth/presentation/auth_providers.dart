@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stream_transform/stream_transform.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/services/firebase_service.dart';
 import '../data/user_repository.dart';
 import '../domain/user_model.dart';
 import '../domain/couple_model.dart';
@@ -51,52 +49,50 @@ Stream<bool?> isUserPaired(IsUserPairedRef ref) {
 
 @riverpod
 Stream<CoupleModel?> currentCouple(CurrentCoupleRef ref) {
-  return ref.watch(userProvider.stream).switchMap((user) {
-    if (user?.coupleId == null || user!.coupleId!.isEmpty) {
-      return Stream.value(null);
+  // Use AsyncValue directly so we always get the current user value,
+  // even if it was emitted before this provider was first built.
+  // .stream is a broadcast stream and doesn't replay past emissions —
+  // using switchMap on it causes a stuck-loading bug on login.
+  final coupleId = ref.watch(userProvider).valueOrNull?.coupleId;
+  if (coupleId == null || coupleId.isEmpty) {
+    return Stream.value(null);
+  }
+  return FirebaseFirestore.instance
+      .collection('couples')
+      .doc(coupleId)
+      .snapshots()
+      .map((doc) {
+    if (!doc.exists) return null;
+    try {
+      return CoupleModel.fromFirestore(doc);
+    } catch (e) {
+      debugPrint('Error parsing couple data: $e');
+      return null;
     }
-    final firestore = FirebaseFirestore.instance;
-    return firestore
-        .collection('couples')
-        .doc(user.coupleId!)
-        .snapshots()
-        .map((doc) {
-      if (!doc.exists) return null;
-      try {
-        return CoupleModel.fromFirestore(doc);
-      } catch (e) {
-        debugPrint('Error parsing couple data: $e');
-        return null;
-      }
-    });
   });
 }
 
 @riverpod
 Stream<UserModel?> currentUserData(CurrentUserDataRef ref) {
-  return ref.watch(userProvider.stream);
+  // Rebuild from auth state directly rather than re-wrapping userProvider.stream,
+  // which is a broadcast stream that doesn't replay already-emitted values.
+  final firebaseUser = ref.watch(authStateProvider).valueOrNull;
+  if (firebaseUser == null) return Stream.value(null);
+  return ref.read(userRepositoryProvider).streamUser(firebaseUser.uid);
 }
 
 @riverpod
 Stream<UserModel?> partner(PartnerRef ref) {
-  return ref.watch(currentCoupleProvider.stream).switchMap((couple) {
-    if (couple == null) {
-      return Stream.value(null);
-    }
-    final firebaseUser = ref.watch(currentUserProvider);
-    if (firebaseUser == null) {
-      return Stream.value(null);
-    }
-    final partnerUid = couple.members.firstWhere(
-      (uid) => uid != firebaseUser.uid,
-      orElse: () => '',
-    );
-    if (partnerUid.isEmpty) {
-      return Stream.value(null);
-    }
-    final userRepository = ref.read(userRepositoryProvider);
-    return userRepository.streamUser(partnerUid);
-  });
+  final couple = ref.watch(currentCoupleProvider).valueOrNull;
+  if (couple == null) return Stream.value(null);
+  final firebaseUser = ref.watch(currentUserProvider);
+  if (firebaseUser == null) return Stream.value(null);
+  final partnerUid = couple.members.firstWhere(
+    (uid) => uid != firebaseUser.uid,
+    orElse: () => '',
+  );
+  if (partnerUid.isEmpty) return Stream.value(null);
+  return ref.read(userRepositoryProvider).streamUser(partnerUid);
 }
 
 @riverpod
