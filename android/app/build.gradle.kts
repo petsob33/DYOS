@@ -5,6 +5,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
     // Google Services plugin for Firebase
     id("com.google.gms.google-services")
+    // Uploads Crashlytics mapping files / native symbols for deobfuscated crash reports.
+    id("com.google.firebase.crashlytics")
 }
 
 import java.util.Properties

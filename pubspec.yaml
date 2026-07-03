@@ -63,6 +63,7 @@ dependencies:
   shared_preferences: ^2.5.4
   purchases_ui_flutter: ^9.16.1
   stream_transform: ^2.1.1
+  firebase_crashlytics: ^4.3.10
 
 dev_dependencies:
   flutter_test:
