@@ -1,0 +1,13 @@
+{
+  "name": "firestore-rules-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Firestore emulator tests for firestore.rules (full CEL fidelity - functions, resource.data, get()/exists() - which the Dart fake_cloud_firestore harness does not support).",
+  "scripts": {
+    "test": "node --test *.test.js"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1"
+  }
+}

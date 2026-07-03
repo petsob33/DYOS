@@ -112,12 +112,17 @@ service cloud.firestore {
         function isAuthor() {
           return resource.data.authorId == request.auth.uid;
         }
+        function isPrivateType(data) {
+          return data.type == 'private' || data.type == 'secretGift';
+        }
 
-        // Čtení a listování pro členy páru
-        allow list, get: if isCoupleMember();
-        
+        // Čtení a listování pro členy páru; private/secretGift notes
+        // smí číst jen autor (Secret Gift/private nesmí být čitelné partnerem)
+        allow list, get: if isCoupleMember() &&
+                            (!isPrivateType(resource.data) || isAuthor());
+
         // Vytvoření: Člen páru + autor jsem já + správný typ
-        allow create: if isCoupleMember() && 
+        allow create: if isCoupleMember() &&
                          request.resource.data.authorId == request.auth.uid &&
                          request.resource.data.type is string;
                          
