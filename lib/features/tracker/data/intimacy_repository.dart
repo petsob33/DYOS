@@ -25,7 +25,10 @@ IntimacyRepository intimacyRepository(IntimacyRepositoryRef ref) {
 /// - Retrieving logs as streams for real-time updates
 /// - Deleting logs
 class IntimacyRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  IntimacyRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseFirestore _firestore;
 
   /// Add a new intimacy log
   /// 
