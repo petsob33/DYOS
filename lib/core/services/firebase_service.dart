@@ -156,6 +156,20 @@ class FirebaseService {
     await _subscriptionService.setQuestXpGrantedAt(coupleId, questId, dateString);
   }
 
+  /// Atomically grants XP for a quest, once per day, inside a single
+  /// Firestore transaction. See [SubscriptionService.grantQuestXpIfEligible].
+  Future<bool> grantQuestXpIfEligible({
+    required String coupleId,
+    required String questId,
+    required int amount,
+  }) {
+    return _subscriptionService.grantQuestXpIfEligible(
+      coupleId: coupleId,
+      questId: questId,
+      amount: amount,
+    );
+  }
+
   /// Update user's status in the couple document
   /// 
   /// Updates the emoji and text status for the current user.

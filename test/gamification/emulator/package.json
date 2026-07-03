@@ -1,0 +1,13 @@
+{
+  "name": "gamification-xp-emulator-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Proves the grantQuestXpIfEligible transaction pattern is safe under real concurrency against the Firestore emulator. The Dart fake_cloud_firestore package used for test/gamification/subscription_service_xp_test.dart does not serialize concurrent runTransaction() calls (its _DummyTransaction has no locking/retry), so it cannot demonstrate the race is actually closed - only the real Firestore engine (via this emulator) does.",
+  "scripts": {
+    "test": "node --test *.test.js"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1"
+  }
+}
