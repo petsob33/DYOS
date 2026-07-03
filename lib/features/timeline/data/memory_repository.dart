@@ -28,8 +28,12 @@ MemoryRepository memoryRepository(MemoryRepositoryRef ref) {
 /// - Storing memory data in Firestore
 /// - Retrieving memories as streams for real-time updates
 class MemoryRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  MemoryRepository({FirebaseFirestore? firestore, FirebaseStorage? storage})
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _storage = storage ?? FirebaseStorage.instance;
+
+  final FirebaseFirestore _firestore;
+  final FirebaseStorage _storage;
 
   /// Create a new memory with media files
   /// 
