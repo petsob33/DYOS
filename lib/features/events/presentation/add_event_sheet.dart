@@ -187,9 +187,8 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
         await repository.addOrUpdateEvent(event, userData.coupleId!);
 
         if (!isEditing) {
-          final couple = ref.read(coupleProvider).valueOrNull;
           final xpGranted =
-              await grantQuestXpIfEligible(ref, 'event', 15, couple);
+              await grantQuestXpIfEligible(ref, 'event', 15);
           final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
           await ref.read(adServiceProvider).maybeShowAdAfterIntimacyOrEventAdded(
                 isPremium: isPremium,

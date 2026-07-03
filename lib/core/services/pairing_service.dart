@@ -175,6 +175,12 @@ class PairingService {
       debugPrint('[PairingService] FirebaseFunctionsException: code=${e.code} message=${e.message} details=${e.details}');
       switch (e.code) {
         case 'not-found':
+          // The Cloud Function returns 'not-found' for both a missing
+          // current-user document and a missing partner, distinguished only
+          // by message text - see functions/index.js pairWithInviteCode.
+          if (e.message?.contains('Current user not found') == true) {
+            throw UserNotFoundException();
+          }
           throw PartnerNotFoundException();
         case 'already-exists':
           final details = e.details as Map?;
@@ -236,6 +242,12 @@ class PairingService {
     } on FirebaseFunctionsException catch (e) {
       switch (e.code) {
         case 'not-found':
+          // See functions/index.js pairWithEmail: 'not-found' is returned
+          // both for a missing current-user document and a missing
+          // partner, distinguished only by message text.
+          if (e.message?.contains('Current user not found') == true) {
+            throw UserNotFoundException();
+          }
           throw PartnerNotFoundException();
         case 'already-exists':
           final details = e.details as Map?;

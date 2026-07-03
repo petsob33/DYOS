@@ -84,7 +84,6 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
   Future<void> _onCompleteSection() async {
     final user = ref.read(currentUserDataProvider).valueOrNull;
     final coupleId = user?.coupleId;
-    final couple = ref.read(coupleProvider).valueOrNull;
     final sectionId = widget.sectionId;
 
     if (sectionId != null && coupleId != null) {
@@ -97,7 +96,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
         answers: serialized,
       );
       final xpGranted = await grantQuestXpIfEligible(
-          ref, 'blueprint_$sectionId', 100, couple);
+          ref, 'blueprint_$sectionId', 100);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
