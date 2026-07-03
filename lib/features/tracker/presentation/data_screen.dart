@@ -274,7 +274,7 @@ class _FrequencyChart extends StatelessWidget {
                   enabled: true,
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipColor: (_) => AppTheme.colors.card,
-                    tooltipRoundedRadius: 8,
+                    tooltipBorderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 titlesData: FlTitlesData(
