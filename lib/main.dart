@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -165,25 +167,62 @@ Future<void> _configureAppCheck() async {
   }
 }
 
+/// Crashlytics collection is disabled in debug builds (kDebugMode) so local
+/// development/test crashes don't pollute the production dashboard; enabled
+/// for profile and release.
+Future<void> _configureCrashlytics() async {
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (kDebugMode) {
+      FlutterError.presentError(details);
+    } else {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
+  };
+
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+}
+
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  _configureSafeDebugLogging();
-  await Firebase.initializeApp();
-  await _configureAppCheck();
-  await _configureRevenueCat();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const ProviderScope(child: OurOSRoot()));
-  unawaited(initializeGoogleMobileAdsSdk());
+  await runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      _configureSafeDebugLogging();
+      await Firebase.initializeApp();
+      await _configureCrashlytics();
+      await _configureAppCheck();
+      await _configureRevenueCat();
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      runApp(const ProviderScope(child: OurOSRoot()));
+      unawaited(initializeGoogleMobileAdsSdk());
+    },
+    (error, stack) {
+      // Errors outside the Flutter framework and not caught by
+      // PlatformDispatcher.instance.onError (e.g. thrown from async code
+      // started before runZonedGuarded's zone takes over) land here.
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    },
+  );
 }
 
 Future<void> _configureRevenueCat() async {
-  if (_revenueCatApiKey.isEmpty) return;
+  developer.log('Attempting to configure RevenueCat...', name: 'RevenueCat');
+  if (_revenueCatApiKey.isEmpty) {
+    developer.log('RevenueCat API Key is missing. Skipping configuration.', name: 'RevenueCat');
+    return;
+  }
   try {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     await Purchases.configure(
       PurchasesConfiguration(_revenueCatApiKey)..appUserID = uid,
     );
+    developer.log('RevenueCat configured successfully.', name: 'RevenueCat');
   } catch (e) {
+    developer.log('RevenueCat configure failed: $e', name: 'RevenueCat');
     AppLogger.debug('RevenueCat configure failed: $e');
   }
 }
