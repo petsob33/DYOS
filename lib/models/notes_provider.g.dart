@@ -25,7 +25,7 @@ final latestSharedNoteProvider = AutoDisposeStreamProvider<NoteItem?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LatestSharedNoteRef = AutoDisposeStreamProviderRef<NoteItem?>;
-String _$coupleNotesHash() => r'4cfdcbd89836fb52b4fc73a2bb59cf8f55bcbda9';
+String _$coupleNotesHash() => r'faf82711b450825293b595cfad6fc87cd044d10e';
 
 /// Copied from Dart SDK
 class _SystemHash {

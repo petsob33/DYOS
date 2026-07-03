@@ -195,12 +195,12 @@ class MockHttpsCallable extends _i1.Mock implements _i4.HttpsCallable {
           as _i5.Future<_i4.HttpsCallableResult<T>>);
 
   @override
-  _i5.Stream<_i4.StreamResponse> stream<T, R>([Object? input]) =>
+  _i5.Stream<_i4.StreamResponse<T, R>> stream<T, R>([Object? input]) =>
       (super.noSuchMethod(
             Invocation.method(#stream, [input]),
-            returnValue: _i5.Stream<_i4.StreamResponse>.empty(),
+            returnValue: _i5.Stream<_i4.StreamResponse<T, R>>.empty(),
           )
-          as _i5.Stream<_i4.StreamResponse>);
+          as _i5.Stream<_i4.StreamResponse<T, R>>);
 }
 
 /// A class which mocks [HttpsCallableResult].
