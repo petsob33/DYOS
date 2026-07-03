@@ -25,11 +25,16 @@ Stream<NoteItem?> latestSharedNote(LatestSharedNoteRef ref) {
 Stream<List<NoteItem>> coupleNotes(CoupleNotesRef ref, {NoteType? type}) {
   final coupleAsync = ref.watch(currentCoupleProvider);
   final couple = coupleAsync.valueOrNull;
-  
+
   if (couple?.id == null || couple!.id.isEmpty) {
     return Stream.value([]);
   }
-  
+
   final repository = ref.watch(notesRepositoryProvider);
-  return repository.getNotes(couple.id, type: type);
+  final currentUserId = ref.watch(currentUserProvider)?.uid;
+  return repository.getNotes(
+    couple.id,
+    type: type,
+    requestingUserId: currentUserId,
+  );
 }
