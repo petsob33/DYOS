@@ -111,6 +111,53 @@ void main() {
     });
   });
 
+  group('MemoryRepository pagination (getRecentMemoriesFeed / getOlderMemories)', () {
+    test('getRecentMemoriesFeed bounds to the newest [limit] memories', () async {
+      for (var i = 0; i < 5; i++) {
+        await repository.createMemory(
+          memory: buildMemory(caption: 'Memory $i', date: DateTime(2026, 1, i + 1)),
+          mediaFiles: [],
+        );
+      }
+
+      final feed = await repository.getRecentMemoriesFeed(coupleId, limit: 3).first;
+
+      expect(feed.map((m) => m.caption), ['Memory 4', 'Memory 3', 'Memory 2']);
+    });
+
+    test('getOlderMemories fetches the page before a given date', () async {
+      for (var i = 0; i < 5; i++) {
+        await repository.createMemory(
+          memory: buildMemory(caption: 'Memory $i', date: DateTime(2026, 1, i + 1)),
+          mediaFiles: [],
+        );
+      }
+
+      final recent = await repository.getRecentMemoriesFeed(coupleId, limit: 3).first;
+      final older = await repository.getOlderMemories(
+        coupleId,
+        before: recent.last.date,
+        limit: 50,
+      );
+
+      expect(older.map((m) => m.caption), ['Memory 1', 'Memory 0']);
+    });
+
+    test('getOlderMemories returns nothing past the oldest memory', () async {
+      await repository.createMemory(
+        memory: buildMemory(date: DateTime(2026, 1, 1)),
+        mediaFiles: [],
+      );
+
+      final older = await repository.getOlderMemories(
+        coupleId,
+        before: DateTime(2026, 1, 1),
+      );
+
+      expect(older, isEmpty);
+    });
+  });
+
   group('MemoryRepository.updateMemory', () {
     test('updates caption and category, leaving media untouched', () async {
       final created = await repository.createMemory(

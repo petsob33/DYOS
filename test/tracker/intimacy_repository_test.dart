@@ -63,6 +63,40 @@ void main() {
     });
   });
 
+  group('IntimacyRepository pagination (getRecentLogsFeed / getOlderLogs)', () {
+    test('getRecentLogsFeed bounds to the newest [limit] logs', () async {
+      for (var i = 0; i < 5; i++) {
+        await repository.addLog(buildLog(date: DateTime(2026, 1, i + 1)), coupleId);
+      }
+
+      final feed = await repository.getRecentLogsFeed(coupleId, limit: 3).first;
+
+      expect(
+        feed.map((l) => l.date),
+        [DateTime(2026, 1, 5), DateTime(2026, 1, 4), DateTime(2026, 1, 3)],
+      );
+    });
+
+    test('getOlderLogs fetches the page before a given date', () async {
+      for (var i = 0; i < 5; i++) {
+        await repository.addLog(buildLog(date: DateTime(2026, 1, i + 1)), coupleId);
+      }
+
+      final recent = await repository.getRecentLogsFeed(coupleId, limit: 3).first;
+      final older = await repository.getOlderLogs(coupleId, before: recent.last.date, limit: 50);
+
+      expect(older.map((l) => l.date), [DateTime(2026, 1, 2), DateTime(2026, 1, 1)]);
+    });
+
+    test('getOlderLogs returns nothing past the oldest log', () async {
+      await repository.addLog(buildLog(date: DateTime(2026, 1, 1)), coupleId);
+
+      final older = await repository.getOlderLogs(coupleId, before: DateTime(2026, 1, 1));
+
+      expect(older, isEmpty);
+    });
+  });
+
   group('IntimacyRepository.updateLog', () {
     test('updates an existing log', () async {
       final added = await repository.addLog(buildLog(rating: 3), coupleId);
