@@ -899,10 +899,9 @@ packages:
   google_places_autocomplete:
     dependency: "direct main"
     description:
-      name: google_places_autocomplete
-      sha256: "481894618812b758eb25102f04eca98227669ac480b1e95390ce873f0857ca21"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/google_places_autocomplete"
+      relative: true
+    source: path
     version: "2.1.2"
   google_sign_in:
     dependency: "direct main"
