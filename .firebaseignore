@@ -13,7 +13,8 @@ coverage/
 __tests__/
 
 # Build outputs
-build/
+# NOTE: build/web is the Flutter web output and IS the Firebase Hosting
+# public dir (see firebase.json) — do not ignore it.
 dist/
 .next/
 out/
