@@ -172,6 +172,11 @@ Future<void> _configureAppCheck() async {
 /// development/test crashes don't pollute the production dashboard; enabled
 /// for profile and release.
 Future<void> _configureCrashlytics() async {
+  // firebase_crashlytics has no web platform implementation (its pubspec
+  // only declares android/ios/macos) — any call on web throws
+  // MissingPluginException, which is fatal here since it's unguarded.
+  if (kIsWeb) return;
+
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
 
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -207,6 +212,9 @@ Future<void> main() async {
       // Errors outside the Flutter framework and not caught by
       // PlatformDispatcher.instance.onError (e.g. thrown from async code
       // started before runZonedGuarded's zone takes over) land here.
+      // Crashlytics has no web implementation, so skip it there instead of
+      // throwing a second, truly-uncaught error while trying to report one.
+      if (kIsWeb) return;
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     },
   );
