@@ -79,6 +79,14 @@ dev_dependencies:
   firebase_auth_mocks: ^0.15.2
   flutter_launcher_icons: ^0.14.4
 
+# Vendored Android-only fork of google_places_autocomplete (see
+# packages/google_places_autocomplete/pubspec.yaml for why): its upstream
+# iOS pod forces a 17.0 deployment target we don't want, so on iOS this
+# plugin has no native implementation and call sites treat it as unavailable.
+dependency_overrides:
+  google_places_autocomplete:
+    path: packages/google_places_autocomplete
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
