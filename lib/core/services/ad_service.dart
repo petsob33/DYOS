@@ -52,7 +52,7 @@ const String _iosRewardedIdFromEnv = String.fromEnvironment(
 const String _intimacyEventCounterKey = 'ad_intimacy_event_counter';
 
 /// AdMob on iOS is off until you set [Info.plist] GADApplicationIdentifier and real units.
-const bool _kEnableIosAds = false;
+const bool _kEnableIosAds = true;
 
 /// Call from the app entrypoint. Skips web; on iOS no-ops until iOS ads are enabled in this file.
 Future<void> initializeGoogleMobileAdsSdk() async {
@@ -109,12 +109,14 @@ class AdService {
         if (_androidInterstitialIdFromEnv.isNotEmpty) {
           return _androidInterstitialIdFromEnv;
         }
+        if (kDebugMode) return _androidInterstitialTestId;
         if (_androidInterstitialProductionId.isNotEmpty) {
           return _androidInterstitialProductionId;
         }
         return _androidInterstitialTestId;
       case TargetPlatform.iOS:
         if (!_kEnableIosAds) return null;
+        if (kDebugMode) return _iosInterstitialTestId;
         return _iosInterstitialIdFromEnv.isNotEmpty
             ? _iosInterstitialIdFromEnv
             : _iosInterstitialTestId;
@@ -130,12 +132,14 @@ class AdService {
         if (_androidRewardedIdFromEnv.isNotEmpty) {
           return _androidRewardedIdFromEnv;
         }
+        if (kDebugMode) return _androidRewardedTestId;
         if (_androidRewardedProductionId.isNotEmpty) {
           return _androidRewardedProductionId;
         }
         return _androidRewardedTestId;
       case TargetPlatform.iOS:
         if (!_kEnableIosAds) return null;
+        if (kDebugMode) return _iosRewardedTestId;
         return _iosRewardedIdFromEnv.isNotEmpty
             ? _iosRewardedIdFromEnv
             : _iosRewardedTestId;
