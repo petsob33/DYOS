@@ -177,10 +177,13 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: RefreshIndicator(
+                onRefresh: _loadOfferings,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: AppSpacing.sm),
                     _buildHero(context, c),
@@ -211,7 +214,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(AppSpacing.lg),
                             child: Text(
-                              'Could not load plans. Pull down to retry.',
+                              'Could not load plans: $_offeringsError. Pull down to retry.',
                               style: GoogleFonts.inter(
                                 color: c.textSecondary,
                               ),
@@ -257,8 +260,10 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                 ),
               ),
             ),
+          ),
             _buildCtaSection(context, c),
           ],
+
         ),
       ),
     );
@@ -388,13 +393,35 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
 
   Widget _buildPlanCards(BuildContext context, AppPalette c) {
     final offering = _offerings?.current;
-    if (offering == null) return const SizedBox.shrink();
+    if (offering == null) {
+      return BentoCard(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Text(
+            'No plans available right now. Pull down to retry.',
+            style: GoogleFonts.inter(color: c.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
     final annual = offering.annual;
     final monthly = offering.monthly;
     final packages = <Package>[];
     if (annual != null) packages.add(annual);
     if (monthly != null) packages.add(monthly);
-    if (packages.isEmpty) return const SizedBox.shrink();
+    if (packages.isEmpty) {
+      return BentoCard(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Text(
+            'No plans configured. Pull down to retry.',
+            style: GoogleFonts.inter(color: c.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
 
     return Column(
       children: packages.map((package) {
