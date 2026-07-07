@@ -15,6 +15,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'app.dart';
 import 'core/services/ad_service.dart';
 import 'core/services/app_logger.dart';
+import 'firebase_options.dart';
 
 /// Background handler for FCM – runs when app is terminated/background.
 /// Must be top-level. Notification is shown by system if message has notification payload.
@@ -192,7 +193,9 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       _configureSafeDebugLogging();
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: kIsWeb ? DefaultFirebaseOptions.web : null,
+      );
       await _configureCrashlytics();
       await _configureAppCheck();
       await _configureRevenueCat();
