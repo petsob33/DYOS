@@ -19,19 +19,32 @@ jobs:
         working-directory: functions
         run: npm ci
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-
-      - name: Build Flutter web app for Hosting
-        run: |
-          flutter pub get
-          flutter build web --release
-
       - id: auth
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      - name: Deploy Firestore rules, Storage rules, Functions and Hosting
-        run: npx firebase-tools deploy --project dyos-520c2 --non-interactive
+      # Deployed first and independently of Hosting: this is what actually
+      # matters (e.g. the compressImage fix) and must not be blocked by an
+      # unrelated Flutter web build failure.
+      - name: Deploy Functions, Firestore rules and Storage rules
+        run: npx firebase-tools deploy --project dyos-520c2 --only functions,firestore,storage --non-interactive
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Build Flutter web app for Hosting
+        id: build_web
+        continue-on-error: true
+        run: |
+          flutter pub get
+          flutter build web --release
+
+      - name: Deploy Hosting
+        if: steps.build_web.outcome == 'success'
+        run: npx firebase-tools deploy --project dyos-520c2 --only hosting --non-interactive
+
+      - name: Warn if Hosting was skipped
+        if: steps.build_web.outcome != 'success'
+        run: echo "::warning::Flutter web build failed, Hosting was not deployed. Functions/Firestore/Storage deployed successfully above."
