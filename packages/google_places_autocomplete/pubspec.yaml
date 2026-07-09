@@ -1,0 +1,46 @@
+name: google_places_autocomplete
+description: >
+  Vendored, Android-only fork of google_places_autocomplete 2.1.2. The
+  upstream iOS pod hardcodes `s.platform = :ios, '17.0'`, which forces the
+  whole app's iOS deployment target to 17.0. This fork drops the iOS
+  native implementation so CocoaPods never sees that requirement; the
+  Dart API is unchanged, so on iOS the plugin simply has no platform
+  implementation (existing call sites already handle init failures
+  gracefully). See dependency_overrides in the app's pubspec.yaml.
+
+version: 2.1.2
+homepage: https://github.com/Cuboid-Inc/google_places_autocomplete
+repository: https://github.com/Cuboid-Inc/google_places_autocomplete
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  rxdart: ^0.28.0
+  plugin_platform_interface: ^2.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+platforms:
+  android:
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.cuboid.google_places_autocomplete
+        pluginClass: GooglePlacesAutocompletePlugin
+
+topics:
+  - network
+  - http
+  - google-places
+  - flexible-ui
+  - map

@@ -91,7 +91,7 @@ final isUserPairedProvider = AutoDisposeStreamProvider<bool?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsUserPairedRef = AutoDisposeStreamProviderRef<bool?>;
-String _$currentCoupleHash() => r'ab4ca07a2dd4988a69be8a50d1c9abf9e604e195';
+String _$currentCoupleHash() => r'9e58516b9c56e127e65bbeb0486107d73677e4b1';
 
 /// See also [currentCouple].
 @ProviderFor(currentCouple)
@@ -108,7 +108,7 @@ final currentCoupleProvider = AutoDisposeStreamProvider<CoupleModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentCoupleRef = AutoDisposeStreamProviderRef<CoupleModel?>;
-String _$currentUserDataHash() => r'a3343640fa52ff5bb4ec44840fcc995db8858f21';
+String _$currentUserDataHash() => r'c613e102425a5991a2e565bff00be62ee32e36cb';
 
 /// See also [currentUserData].
 @ProviderFor(currentUserData)
@@ -125,7 +125,7 @@ final currentUserDataProvider = AutoDisposeStreamProvider<UserModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserDataRef = AutoDisposeStreamProviderRef<UserModel?>;
-String _$partnerHash() => r'74c1fda8b67ecdae2d47a7c691555e8b3f11d0d9';
+String _$partnerHash() => r'a0e58ccdf2270b60296612b34050362289684645';
 
 /// See also [partner].
 @ProviderFor(partner)
