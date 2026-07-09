@@ -8,12 +8,17 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    }
+  },
   "functions": {
     "source": "functions",
     "runtime": "nodejs20"
   },
   "hosting": {
-    "public": "public",
+    "public": "build/web",
     "ignore": [
       "firebase.json",
       "**/.*",

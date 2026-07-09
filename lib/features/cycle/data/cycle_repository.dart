@@ -27,7 +27,10 @@ CycleRepository cycleRepository(CycleRepositoryRef ref) {
 /// - Deleting logs
 /// - Getting/updating cycle settings
 class CycleRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  CycleRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseFirestore _firestore;
 
   /// Add or update a cycle log entry
   /// 

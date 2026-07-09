@@ -28,8 +28,12 @@ MemoryRepository memoryRepository(MemoryRepositoryRef ref) {
 /// - Storing memory data in Firestore
 /// - Retrieving memories as streams for real-time updates
 class MemoryRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  MemoryRepository({FirebaseFirestore? firestore, FirebaseStorage? storage})
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _storage = storage ?? FirebaseStorage.instance;
+
+  final FirebaseFirestore _firestore;
+  final FirebaseStorage _storage;
 
   /// Create a new memory with media files
   /// 
@@ -168,6 +172,51 @@ class MemoryRepository {
       memories.sort((a, b) => b.date.compareTo(a.date));
       return memories;
     });
+  }
+
+  /// Live stream of the most recent [limit] memories for a couple, ordered
+  /// by date descending.
+  ///
+  /// Unlike [getMemories] (which streams the *entire* collection - required
+  /// by memories_map_screen.dart and insight_provider.dart, which need to
+  /// see every memory, not just recent ones), this bounds reads for
+  /// feed-style UI like the timeline list. Pair with [getOlderMemories] for
+  /// "load more" pagination of everything before this window.
+  Stream<List<Memory>> getRecentMemoriesFeed(String coupleId, {int limit = 50}) {
+    if (coupleId.isEmpty) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('couples')
+        .doc(coupleId)
+        .collection('memories')
+        .orderBy('date', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) => _parseMemories(snapshot.docs));
+  }
+
+  /// One-shot fetch of up to [limit] memories older than [before], for
+  /// "load more" pagination following [getRecentMemoriesFeed]. Not a live
+  /// stream - historical pages don't need to update in real time.
+  Future<List<Memory>> getOlderMemories(
+    String coupleId, {
+    required DateTime before,
+    int limit = 50,
+  }) async {
+    if (coupleId.isEmpty) return [];
+
+    final snapshot = await _firestore
+        .collection('couples')
+        .doc(coupleId)
+        .collection('memories')
+        .orderBy('date', descending: true)
+        .where('date', isLessThan: Timestamp.fromDate(before))
+        .limit(limit)
+        .get();
+
+    return _parseMemories(snapshot.docs);
   }
 
   /// Update an existing memory (caption, date, category, location only; media unchanged).

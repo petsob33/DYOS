@@ -25,7 +25,10 @@ IntimacyRepository intimacyRepository(IntimacyRepositoryRef ref) {
 /// - Retrieving logs as streams for real-time updates
 /// - Deleting logs
 class IntimacyRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  IntimacyRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseFirestore _firestore;
 
   /// Add a new intimacy log
   /// 
@@ -99,6 +102,52 @@ class IntimacyRepository {
       logs.sort((a, b) => b.date.compareTo(a.date));
       return logs;
     });
+  }
+
+  /// Live stream of the most recent [limit] intimacy logs, ordered by date
+  /// descending.
+  ///
+  /// Unlike [watchLogs] (streamed unbounded - required by data_screen.dart,
+  /// insight_provider.dart and cycle_tracking_screen.dart, which compute
+  /// stats/streaks over the couple's full history), this bounds reads for
+  /// feed-style UI like the intimacy history list. Pair with
+  /// [getOlderLogs] for "load more" pagination of everything before this
+  /// window.
+  Stream<List<IntimacyLog>> getRecentLogsFeed(String coupleId, {int limit = 50}) {
+    if (coupleId.isEmpty) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('couples')
+        .doc(coupleId)
+        .collection('intimacy_logs')
+        .orderBy('date', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) => _parseLogs(snapshot.docs));
+  }
+
+  /// One-shot fetch of up to [limit] intimacy logs older than [before], for
+  /// "load more" pagination following [getRecentLogsFeed]. Not a live
+  /// stream - historical pages don't need to update in real time.
+  Future<List<IntimacyLog>> getOlderLogs(
+    String coupleId, {
+    required DateTime before,
+    int limit = 50,
+  }) async {
+    if (coupleId.isEmpty) return [];
+
+    final snapshot = await _firestore
+        .collection('couples')
+        .doc(coupleId)
+        .collection('intimacy_logs')
+        .orderBy('date', descending: true)
+        .where('date', isLessThan: Timestamp.fromDate(before))
+        .limit(limit)
+        .get();
+
+    return _parseLogs(snapshot.docs);
   }
 
   /// Update an existing intimacy log

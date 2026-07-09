@@ -21,8 +21,19 @@ class TimelineScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final memoriesAsync = ref.watch(memoriesStreamProvider);
-    final memoriesCount = memoriesAsync.valueOrNull?.length ?? 0;
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    // The unfiltered feed is paginated (see TimelineFeedController); a
+    // category filter falls back to the existing unbounded stream, since
+    // couples rarely have enough memories in a single category for
+    // pagination to matter, and it avoids needing a composite Firestore
+    // index for category + date range queries.
+    final isFiltered = selectedCategory != null;
+    final filteredAsync = isFiltered ? ref.watch(memoriesStreamProvider) : null;
+    final feedState = ref.watch(timelineFeedControllerProvider);
+    final memories = isFiltered ? (filteredAsync?.valueOrNull ?? const []) : feedState.memories;
+    final isLoading = isFiltered && (filteredAsync?.isLoading ?? false);
+    final loadError = isFiltered ? filteredAsync?.error : null;
+    final memoriesCount = memories.length;
     final currentSp = ref.watch(currentXpProvider);
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
     final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
@@ -63,35 +74,20 @@ class TimelineScreen extends ConsumerWidget {
               limit: 30,
             ),
           Expanded(
-            child: memoriesAsync.when(
-              data: (memories) {
-                if (memories.isEmpty) {
-                  return _EmptyState();
-                }
-
-                final groupedMemories = <String, List<Memory>>{};
-                for (final memory in memories) {
-                  final monthKey = _formatMonthYear(memory.date);
-                  groupedMemories.putIfAbsent(monthKey, () => []).add(memory);
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  itemCount: groupedMemories.length,
-                  itemBuilder: (context, index) {
-                    final monthKey = groupedMemories.keys.elementAt(index);
-                    final monthMemories = groupedMemories[monthKey]!;
-
-                    return _TimelineMonthSection(
-                      month: monthKey,
-                      memories: monthMemories,
-                    );
-                  },
-                );
-              },
-              loading: () => const _LoadingState(),
-              error: (error, stack) => _ErrorState(error: error.toString()),
-            ),
+            child: loadError != null
+                ? _ErrorState(error: loadError.toString())
+                : isLoading
+                    ? const _LoadingState()
+                    : memories.isEmpty
+                        ? _EmptyState()
+                        : _TimelineList(
+                            memories: memories,
+                            formatMonthYear: _formatMonthYear,
+                            showLoadMore: !isFiltered && feedState.hasMore,
+                            isLoadingMore: feedState.isLoadingMore,
+                            onLoadMore: () =>
+                                ref.read(timelineFeedControllerProvider.notifier).loadMore(),
+                          ),
           ),
         ],
       ),
@@ -128,7 +124,7 @@ class TimelineScreen extends ConsumerWidget {
     );
   }
 
-  String _formatMonthYear(DateTime date) {
+  static String _formatMonthYear(DateTime date) {
     final months = [
       'January',
       'February',
@@ -144,6 +140,60 @@ class TimelineScreen extends ConsumerWidget {
       'December'
     ];
     return '${months[date.month - 1]} ${date.year}';
+  }
+}
+
+/// Groups [memories] by month and renders them, with an optional "load
+/// older memories" button/spinner appended at the end.
+class _TimelineList extends StatelessWidget {
+  const _TimelineList({
+    required this.memories,
+    required this.formatMonthYear,
+    required this.showLoadMore,
+    required this.isLoadingMore,
+    required this.onLoadMore,
+  });
+
+  final List<Memory> memories;
+  final String Function(DateTime) formatMonthYear;
+  final bool showLoadMore;
+  final bool isLoadingMore;
+  final VoidCallback onLoadMore;
+
+  @override
+  Widget build(BuildContext context) {
+    final groupedMemories = <String, List<Memory>>{};
+    for (final memory in memories) {
+      final monthKey = formatMonthYear(memory.date);
+      groupedMemories.putIfAbsent(monthKey, () => []).add(memory);
+    }
+    final monthKeys = groupedMemories.keys.toList();
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      itemCount: monthKeys.length + (showLoadMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index == monthKeys.length) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+            child: Center(
+              child: isLoadingMore
+                  ? const CircularProgressIndicator()
+                  : OutlinedButton(
+                      onPressed: onLoadMore,
+                      child: const Text('Load older memories'),
+                    ),
+            ),
+          );
+        }
+
+        final monthKey = monthKeys[index];
+        return _TimelineMonthSection(
+          month: monthKey,
+          memories: groupedMemories[monthKey]!,
+        );
+      },
+    );
   }
 }
 

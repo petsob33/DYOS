@@ -10,7 +10,6 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
 import '../../../premium/presentation/premium_provider.dart';
-import '../../../auth/presentation/auth_providers.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 import '../widgets/pick_place_screen.dart';
@@ -265,9 +264,8 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       (previous, next) async {
         if (next is AddMemorySuccess) {
           final isNewMemory = widget.initialMemory == null;
-          final couple = ref.read(coupleProvider).valueOrNull;
           final xpGranted = isNewMemory
-              ? await grantQuestXpIfEligible(ref, 'memory', 25, couple)
+              ? await grantQuestXpIfEligible(ref, 'memory', 25)
               : false;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

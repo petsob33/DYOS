@@ -64,9 +64,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       await authService.registerWithGoogle();
       ref.invalidate(userProvider);
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -121,9 +123,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       // Router redirects by profile [coupleId]; invalidate drops stale profile
       // from a previous session so we do not open /home on the wrong user.
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {

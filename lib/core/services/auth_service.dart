@@ -36,7 +36,12 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   
   /// Google Sign-In instance
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    // Web client ID (type 3 in google-services.json) — required on Android
+    // to obtain an idToken that Firebase Auth can verify.
+    serverClientId:
+        '112080403338-evu84vogva87fvee1rohdvmk2qsc2k2f.apps.googleusercontent.com',
+  );
   
   /// Lazy getter for UserRepository - only accessed when needed
   /// This follows dependency injection pattern through Riverpod

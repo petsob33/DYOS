@@ -1,0 +1,121 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/bento_card.dart';
+import '../../../events/presentation/event_provider.dart';
+import 'package:flutter/services.dart';
+
+class CountdownCard extends ConsumerWidget {
+  const CountdownCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nextEventAsync = ref.watch(nextEventProvider);
+
+    return nextEventAsync.when(
+      data: (event) {
+        if (event == null) {
+          return BentoCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Countdown',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppTheme.colors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'No upcoming events',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.colors.textSecondary,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          );
+        }
+
+        final now = DateTime.now();
+        final eventDate = DateTime(
+          event.date.year,
+          event.date.month,
+          event.date.day,
+        );
+        final today = DateTime(now.year, now.month, now.day);
+        final daysUntil = eventDate.difference(today).inDays;
+
+        return BentoCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Countdown',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: AppTheme.colors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                '$daysUntil',
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.colors.primary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'days until: ${event.title}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.colors.textSecondary,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => BentoCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Countdown',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: AppTheme.colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            const Center(child: CircularProgressIndicator()),
+          ],
+        ),
+      ),
+      error: (_, __) => BentoCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Countdown',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: AppTheme.colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Error loading events',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.colors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

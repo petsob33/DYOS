@@ -105,7 +105,7 @@ void main() {
         firebaseServiceProvider.overrideWithValue(mockFirebaseService),
         authServiceProvider.overrideWithValue(mockAuthService),
         // Mocking other providers to avoid errors
-        isUserPairedProvider.overrideWith((ref) => Future.value(false)),
+        isUserPairedProvider.overrideWith((ref) => Stream.value(false)),
         userProvider.overrideWith((ref) => const Stream.empty()),
         hasSeenTutorialProvider.overrideWith((ref) => Future.value(true)), // Skip tutorial by default
         ...overrides,
@@ -184,7 +184,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Pair with your Partner'), findsOneWidget);
-    });
+    }, skip: true /* PairingScreen was rewritten to an email-based pairing UI - this test targets the old invite-code-entry/tutorial-dialog UI which no longer exists in lib/features/auth/presentation/pairing_screen.dart. Needs a product decision on whether to rewrite for the new UI or delete; see K ROZHODNUTI in the summary. */);
     testWidgets('displays user invite code after loading', (WidgetTester tester) async {
       // Set larger surface size to avoid off-screen issues
       tester.view.physicalSize = const Size(1080, 2400);
@@ -208,7 +208,7 @@ void main() {
 
       expect(find.text('ME-9999'), findsOneWidget);
       expect(find.text('Connect with your partner'), findsOneWidget);
-    });
+    }, skip: true /* PairingScreen was rewritten to an email-based pairing UI - this test targets the old invite-code-entry/tutorial-dialog UI which no longer exists in lib/features/auth/presentation/pairing_screen.dart. Needs a product decision on whether to rewrite for the new UI or delete; see K ROZHODNUTI in the summary. */);
 
     testWidgets('shows error when loading user data fails', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
@@ -225,7 +225,7 @@ void main() {
 
       expect(find.textContaining('Error loading data'), findsOneWidget);
       expect(find.text('Try again'), findsOneWidget);
-    });
+    }, skip: true /* PairingScreen was rewritten to an email-based pairing UI - this test targets the old invite-code-entry/tutorial-dialog UI which no longer exists in lib/features/auth/presentation/pairing_screen.dart. Needs a product decision on whether to rewrite for the new UI or delete; see K ROZHODNUTI in the summary. */);
 
     testWidgets('validates invite code format', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
@@ -265,7 +265,7 @@ void main() {
       await tester.tap(pairButton);
       await tester.pumpAndSettle();
       expect(find.text('You cannot pair with yourself'), findsOneWidget);
-    });
+    }, skip: true /* PairingScreen was rewritten to an email-based pairing UI - this test targets the old invite-code-entry/tutorial-dialog UI which no longer exists in lib/features/auth/presentation/pairing_screen.dart. Needs a product decision on whether to rewrite for the new UI or delete; see K ROZHODNUTI in the summary. */);
 
     testWidgets('successfully pairs and navigates to home', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
@@ -314,7 +314,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Successfully paired'), findsOneWidget);
-    });
+    }, skip: true /* PairingScreen was rewritten to an email-based pairing UI - this test targets the old invite-code-entry/tutorial-dialog UI which no longer exists in lib/features/auth/presentation/pairing_screen.dart. Needs a product decision on whether to rewrite for the new UI or delete; see K ROZHODNUTI in the summary. */);
 
     testWidgets('handles PartnerNotFoundException from service', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
@@ -346,7 +346,7 @@ void main() {
 
       expect(find.byType(SnackBar), findsOneWidget);
       expect(find.text(PartnerNotFoundException().message), findsOneWidget);
-    });
+    }, skip: true /* PairingScreen was rewritten to an email-based pairing UI - this test targets the old invite-code-entry/tutorial-dialog UI which no longer exists in lib/features/auth/presentation/pairing_screen.dart. Needs a product decision on whether to rewrite for the new UI or delete; see K ROZHODNUTI in the summary. */);
 
     testWidgets('handles generic error from service', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
@@ -376,6 +376,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Unable to complete pairing right now'), findsOneWidget);
-    });
+    }, skip: true /* PairingScreen was rewritten to an email-based pairing UI - this test targets the old invite-code-entry/tutorial-dialog UI which no longer exists in lib/features/auth/presentation/pairing_screen.dart. Needs a product decision on whether to rewrite for the new UI or delete; see K ROZHODNUTI in the summary. */);
   });
 }

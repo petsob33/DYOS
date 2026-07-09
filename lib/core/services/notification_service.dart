@@ -20,7 +20,7 @@ part 'notification_service.g.dart';
 /// Handles:
 /// - Local notifications (in-app / foreground)
 /// - Firebase Cloud Messaging (push when app is in background or closed)
-@riverpod
+@Riverpod(keepAlive: true)
 NotificationService notificationService(NotificationServiceRef ref) {
   return NotificationService();
 }
@@ -59,7 +59,7 @@ class NotificationService {
       );
 
       final initialized = await _notifications.initialize(
-        initSettings,
+        settings: initSettings,
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
@@ -175,10 +175,10 @@ class NotificationService {
         presentSound: true,
       );
       await _notifications.show(
-        DateTime.now().millisecondsSinceEpoch % 100000,
-        title,
-        body,
-        const NotificationDetails(android: androidDetails, iOS: iosDetails),
+        id: DateTime.now().millisecondsSinceEpoch % 100000,
+        title: title,
+        body: body,
+        notificationDetails: const NotificationDetails(android: androidDetails, iOS: iosDetails),
       );
     } catch (e) {
       AppLogger.debug('Error showing FCM as local notification: $e');
@@ -270,10 +270,10 @@ class NotificationService {
       );
 
       await _notifications.show(
-        1,
-        '💓 Touch',
-        'Your partner touched you',
-        details,
+        id: 1,
+        title: '💓 Touch',
+        body: 'Your partner touched you',
+        notificationDetails: details,
         payload: _buildPayload(type: 'haptic'),
       );
       AppLogger.debug('Haptic notification shown successfully');
@@ -318,10 +318,10 @@ class NotificationService {
       );
 
       await _notifications.show(
-        2,
-        '💬 Quick Message',
-        message,
-        details,
+        id: 2,
+        title: '💬 Quick Message',
+        body: message,
+        notificationDetails: details,
         payload: _buildPayload(type: 'quick_message'),
       );
       AppLogger.debug('Quick message notification shown successfully');

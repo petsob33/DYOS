@@ -4,6 +4,7 @@
 *.pyc
 *.swp
 .DS_Store
+.firebase/
 .atom/
 .build/
 .buildlog/
@@ -46,9 +47,17 @@ app.*.map.json
 
 # Local secrets
 ios/Runner/Secrets.xcconfig
+*.jks
+key.properties
+android/key.properties
 
 # Cloud Functions dependencies (install with npm ci in functions/)
 functions/node_modules/
+test/security/rules/node_modules/
+test/gamification/emulator/node_modules/
 
 # Scratch / local snapshots
 tmp/
+
+# Firebase emulator logs
+*-debug.log

@@ -16,7 +16,10 @@ EventRepository eventRepository(EventRepositoryRef ref) {
 /// This class provides a high-level API for event operations while hiding
 /// the implementation details of Firestore.
 class EventRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  EventRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseFirestore _firestore;
 
   /// Add or update an event
   /// 
@@ -66,23 +69,43 @@ class EventRepository {
   }
 
   /// Watch events for a couple
-  /// 
+  ///
   /// Returns a stream of events ordered by date ascending.
   /// The stream automatically updates when events are added, updated, or deleted.
-  /// 
+  ///
   /// [coupleId] - The ID of the couple to get events for
-  /// 
+  ///
   /// Returns: Stream of List of Event ordered by date ascending
-  Stream<List<Event>> watchEvents(String coupleId) {
+  ///
+  /// Deliberately not paginated like memories/intimacy logs: this single
+  /// stream backs the events calendar (needs markers across every month the
+  /// user navigates to, not just recent ones), nextEventProvider (needs to
+  /// see future events) and eventsForDate (needs any past date the user
+  /// picks) - truncating to "N most recent" would silently drop future
+  /// events. Instead this bounds by a rolling date window
+  /// ([yearsOfHistory] back, no upper bound so all future events are always
+  /// included) plus a generous count [limit] as a belt-and-suspenders cap -
+  /// unlike a plain count limit on an ascending query, this can't ever
+  /// crowd out future events with old ones.
+  Stream<List<Event>> watchEvents(
+    String coupleId, {
+    int yearsOfHistory = 3,
+    int limit = 2000,
+  }) {
     if (coupleId.isEmpty) {
       return Stream.value([]);
     }
+
+    final now = DateTime.now();
+    final cutoff = DateTime(now.year - yearsOfHistory, now.month, now.day);
 
     return _firestore
         .collection('couples')
         .doc(coupleId)
         .collection('events')
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(cutoff))
         .orderBy('date', descending: false)
+        .limit(limit)
         .snapshots()
         .map((snapshot) {
       final events = _parseEvents(snapshot.docs);
