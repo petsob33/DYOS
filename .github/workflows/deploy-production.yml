@@ -30,9 +30,14 @@ jobs:
       - name: Deploy Functions, Firestore rules and Storage rules
         run: npx firebase-tools deploy --project dyos-520c2 --only functions,firestore,storage --non-interactive
 
+      # Pinned just before Flutter's IconData became a `final` class
+      # (flutter/flutter#181345, landed 2026-03-24): phosphor_flutter 2.1.0
+      # (last published 2023, unmaintained) subclasses IconData and fails to
+      # compile on anything newer. Bump this once phosphor_flutter is
+      # replaced or patched to not extend IconData.
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.41.5'
 
       - name: Build Flutter web app for Hosting
         id: build_web
