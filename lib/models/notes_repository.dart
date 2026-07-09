@@ -80,28 +80,45 @@ class NotesRepository {
   }
 
   /// Get notes stream for a couple
-  /// 
+  ///
   /// Returns a stream of notes ordered by createdAt descending.
   /// The stream automatically updates when notes are added, updated, or deleted.
-  /// 
+  ///
   /// [coupleId] - The ID of the couple to get notes for
   /// [type] - Optional type to filter notes by
-  /// 
+  /// [requestingUserId] - Required when [type] is `private` or `secretGift`.
+  /// Firestore rules only allow the author to list those note types, and the
+  /// `list` rule can't verify an unconstrained `authorId` field against a
+  /// query that only filters by `type` - so the query itself must also
+  /// filter by authorId or the read is denied server-side.
+  ///
   /// Returns: Stream<List<NoteItem>> ordered by createdAt descending
-  Stream<List<NoteItem>> getNotes(String coupleId, {NoteType? type}) {
+  Stream<List<NoteItem>> getNotes(
+    String coupleId, {
+    NoteType? type,
+    String? requestingUserId,
+  }) {
     if (coupleId.isEmpty) {
       return Stream.value([]);
     }
-    
+
     Query query = _firestore
         .collection('couples')
         .doc(coupleId)
         .collection('notes');
-        
+
     if (type != null) {
       query = query.where('type', isEqualTo: type.name);
     }
-    
+
+    if (type == NoteType.private || type == NoteType.secretGift) {
+      assert(
+        requestingUserId != null && requestingUserId.isNotEmpty,
+        'requestingUserId is required when querying private/secretGift notes',
+      );
+      query = query.where('authorId', isEqualTo: requestingUserId);
+    }
+
     // If filtering by type, we can't use orderBy with where on different fields
     // So we'll sort in memory instead
     return query.snapshots().map((snapshot) {

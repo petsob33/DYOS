@@ -41,6 +41,9 @@ class PurchaseService {
   /// Purchases the given store product via RevenueCat, then syncs premium
   /// status to the couple document so the partner gets premium instantly.
   Future<void> purchaseProduct(StoreProduct storeProduct) async {
+    if (!await Purchases.isConfigured) {
+      throw Exception('Subscription service unavailable — missing API key.');
+    }
     final result = await Purchases.purchase(
       PurchaseParams.storeProduct(storeProduct),
     );
@@ -50,12 +53,18 @@ class PurchaseService {
   /// Restores purchases from the store, then syncs premium status to Firestore
   /// if the user has an active entitlement.
   Future<void> restorePurchases() async {
+    if (!await Purchases.isConfigured) {
+      throw Exception('Subscription service unavailable — missing API key.');
+    }
     final customerInfo = await Purchases.restorePurchases();
     await syncCustomerInfoToFirestore(customerInfo);
   }
 
   /// Fetches the current offerings (products) from RevenueCat.
   Future<Offerings> getOfferings() async {
+    if (!await Purchases.isConfigured) {
+      throw Exception('Subscription service unavailable — missing API key.');
+    }
     return Purchases.getOfferings();
   }
 

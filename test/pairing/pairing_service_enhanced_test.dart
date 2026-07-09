@@ -5,32 +5,43 @@ import 'package:mockito/annotations.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:ouros_app/core/services/pairing_service.dart';
 import 'package:ouros_app/core/services/pairing_exceptions.dart';
-import 'package:ouros_app/features/auth/domain/user_model.dart';
 
-// We need to mock FirebaseFunctions and HttpsCallable
-class MockFirebaseFunctions extends Mock implements FirebaseFunctions {}
-class MockHttpsCallable extends Mock implements HttpsCallable {}
-class MockHttpsCallableResult extends Mock implements HttpsCallableResult {
-  @override
-  final dynamic data;
-  MockHttpsCallableResult({this.data});
-}
+import 'pairing_service_enhanced_test.mocks.dart';
 
+// Mockito's manual `extends Mock implements X` pattern can't safely mock
+// httpsCallable() here: FirebaseFunctions.httpsCallable() has a
+// non-nullable HttpsCallable return type, and a hand-rolled Mock subclass
+// has no way to supply the `returnValue` Mock.noSuchMethod() needs while
+// `when(...)` is recording - it returns null instead, and the runtime
+// throws a TypeError assigning null to the non-nullable return type,
+// corrupting mockito's internal `when()` state for every later test in the
+// file. @GenerateMocks generates a proper SmartFake-backed override that
+// avoids this.
+@GenerateMocks([FirebaseFunctions, HttpsCallable, HttpsCallableResult])
 void main() {
   late FakeFirebaseFirestore firestore;
   late MockFirebaseAuth firebaseAuth;
   late MockFirebaseFunctions functions;
+  late MockHttpsCallable callable;
   late PairingService pairingService;
 
   setUp(() {
     firestore = FakeFirebaseFirestore();
     functions = MockFirebaseFunctions();
-    
+    callable = MockHttpsCallable();
+
+    // pairWithInviteCode() and pairWithEmail() both go through a single
+    // named Cloud Function call - see lib/core/services/pairing_service.dart.
+    // The real pairing logic (existence/already-paired checks, Firestore
+    // writes) now runs server-side in functions/index.js inside a
+    // transaction, so the client is only responsible for mapping
+    // FirebaseFunctionsException codes to typed PairingExceptions.
+    when(functions.httpsCallable('pairWithInviteCode')).thenReturn(callable);
+
     // Default user
     final currentUser = MockUser(
       uid: 'current-user-id',
@@ -38,7 +49,7 @@ void main() {
       displayName: 'Me',
     );
     firebaseAuth = MockFirebaseAuth(mockUser: currentUser, signedIn: true);
-    
+
     pairingService = PairingService(
       auth: firebaseAuth,
       firestore: firestore,
@@ -48,45 +59,22 @@ void main() {
 
   group('PairingService.pairWithInviteCode - Edge Cases', () {
     test('SUCCESS: pairs with valid partner invite code', () async {
-      // Setup partner
-      const partnerId = 'partner-id';
-      const partnerCode = 'PART-1234';
-      await firestore.collection('users').doc(partnerId).set({
-        'uid': partnerId,
-        'displayName': 'Partner',
-        'inviteCode': partnerCode,
-        'coupleId': null,
-      });
+      final result0 = MockHttpsCallableResult();
+      when(result0.data).thenReturn(
+        {'coupleId': 'couple_123', 'partnerDisplayName': 'Partner'},
+      );
+      when(callable.call(any)).thenAnswer((_) async => result0);
 
-      // Setup current user in firestore
-      await firestore.collection('users').doc('current-user-id').set({
-        'uid': 'current-user-id',
-        'displayName': 'Me',
-        'inviteCode': 'ME-9999',
-        'coupleId': null,
-      });
+      final result = await pairingService.pairWithInviteCode('PART-1234');
 
-      final result = await pairingService.pairWithInviteCode(partnerCode);
-
-      expect(result.coupleId, isNotEmpty);
+      expect(result.coupleId, 'couple_123');
       expect(result.partnerDisplayName, 'Partner');
-
-      // Verify firestore updates
-      final meDoc = await firestore.collection('users').doc('current-user-id').get();
-      final partnerDoc = await firestore.collection('users').doc(partnerId).get();
-      
-      expect(meDoc.data()?['coupleId'], result.coupleId);
-      expect(partnerDoc.data()?['coupleId'], result.coupleId);
-
-      final coupleDoc = await firestore.collection('couples').doc(result.coupleId).get();
-      expect(coupleDoc.exists, true);
-      expect(coupleDoc.data()?['members'], containsAll(['current-user-id', partnerId]));
     });
 
     test('FAILURE: throws GenericPairingException when not logged in', () async {
       // Sign out
       await firebaseAuth.signOut();
-      
+
       expect(
         () => pairingService.pairWithInviteCode('PART-1234'),
         throwsA(isA<GenericPairingException>().having((e) => e.message, 'message', contains('sign in again'))),
@@ -105,7 +93,13 @@ void main() {
     });
 
     test('FAILURE: throws PartnerNotFoundException when code does not exist', () async {
-      // Ensure firestore is empty or doesn't have this code
+      when(callable.call(any)).thenThrow(
+        FirebaseFunctionsException(
+          code: 'not-found',
+          message: 'User with this code was not found.',
+        ),
+      );
+
       expect(
         () => pairingService.pairWithInviteCode('NONE-0000'),
         throwsA(isA<PartnerNotFoundException>()),
@@ -113,75 +107,64 @@ void main() {
     });
 
     test('FAILURE: throws SelfPairingException when pairing with own code', () async {
-      const myCode = 'ME-9999';
-      await firestore.collection('users').doc('current-user-id').set({
-        'uid': 'current-user-id',
-        'inviteCode': myCode,
-      });
+      when(callable.call(any)).thenThrow(
+        FirebaseFunctionsException(
+          code: 'invalid-argument',
+          message: 'You cannot pair with yourself.',
+        ),
+      );
 
       expect(
-        () => pairingService.pairWithInviteCode(myCode),
+        () => pairingService.pairWithInviteCode('ME-9999'),
         throwsA(isA<SelfPairingException>()),
       );
     });
 
     test('FAILURE: throws UserAlreadyPairedException when current user is already paired', () async {
-      const partnerId = 'partner-id';
-      const partnerCode = 'PART-1234';
-      await firestore.collection('users').doc(partnerId).set({
-        'uid': partnerId,
-        'inviteCode': partnerCode,
-        'coupleId': null,
-      });
-
-      // I'm already paired
-      await firestore.collection('users').doc('current-user-id').set({
-        'uid': 'current-user-id',
-        'inviteCode': 'ME-9999',
-        'coupleId': 'already-paired-id',
-      });
+      when(callable.call(any)).thenThrow(
+        FirebaseFunctionsException(
+          code: 'already-exists',
+          message: 'Your account is already paired.',
+          details: {'type': 'user_already_paired'},
+        ),
+      );
 
       expect(
-        () => pairingService.pairWithInviteCode(partnerCode),
+        () => pairingService.pairWithInviteCode('PART-1234'),
         throwsA(isA<UserAlreadyPairedException>()),
       );
     });
 
     test('FAILURE: throws PartnerAlreadyPairedException when partner is already paired', () async {
-      const partnerId = 'partner-id';
-      const partnerCode = 'PART-1234';
-      // Partner is already paired
-      await firestore.collection('users').doc(partnerId).set({
-        'uid': partnerId,
-        'inviteCode': partnerCode,
-        'coupleId': 'partner-already-paired-id',
-      });
-
-      await firestore.collection('users').doc('current-user-id').set({
-        'uid': 'current-user-id',
-        'inviteCode': 'ME-9999',
-        'coupleId': null,
-      });
+      when(callable.call(any)).thenThrow(
+        FirebaseFunctionsException(
+          code: 'already-exists',
+          message: 'This user is already paired.',
+          details: {'type': 'partner_already_paired'},
+        ),
+      );
 
       expect(
-        () => pairingService.pairWithInviteCode(partnerCode),
+        () => pairingService.pairWithInviteCode('PART-1234'),
         throwsA(isA<PartnerAlreadyPairedException>()),
       );
     });
 
     test('FAILURE: throws UserNotFoundException when current user document is missing', () async {
-      const partnerId = 'partner-id';
-      const partnerCode = 'PART-1234';
-      await firestore.collection('users').doc(partnerId).set({
-        'uid': partnerId,
-        'inviteCode': partnerCode,
-        'coupleId': null,
-      });
+      // functions/index.js returns 'not-found' for BOTH a missing
+      // current-user document and a missing partner, distinguished only by
+      // message text - the client must branch on the message, not just the
+      // code (this was a real bug: both used to map to
+      // PartnerNotFoundException).
+      when(callable.call(any)).thenThrow(
+        FirebaseFunctionsException(
+          code: 'not-found',
+          message: 'Current user not found.',
+        ),
+      );
 
-      // current-user-id NOT in firestore
-      
       expect(
-        () => pairingService.pairWithInviteCode(partnerCode),
+        () => pairingService.pairWithInviteCode('PART-1234'),
         throwsA(isA<UserNotFoundException>()),
       );
     });

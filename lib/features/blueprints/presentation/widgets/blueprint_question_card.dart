@@ -98,7 +98,8 @@ class BlueprintQuestionCard extends StatelessWidget {
       case BlueprintQuestionType.multiSelect:
         return _MultiSelectInput(
           options: question.options ?? [],
-          selected: (value as List<String>?) ?? [],
+          selected:
+              value is List ? List<String>.from(value) : const [],
           onChanged: (v) => onChanged(v),
         );
       case BlueprintQuestionType.measurement:

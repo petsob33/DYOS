@@ -36,111 +36,138 @@ class IntimacyHistoryList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logsAsync = ref.watch(intimacyLogsStreamProvider);
+    // limit == null means "show everything" (the full history screen) -
+    // that's the case that benefits from real pagination against a bounded
+    // Firestore read window. A small preview (limit != null, e.g. the
+    // dashboard's last-5 widget) keeps using the existing unbounded stream,
+    // since it's already a tiny slice and doesn't need its own paginated
+    // data source.
+    final isFullHistory = limit == null;
+    final feedState = isFullHistory ? ref.watch(intimacyFeedControllerProvider) : null;
+    final logsAsync = isFullHistory ? null : ref.watch(intimacyLogsStreamProvider);
     final currentUserAsync = ref.watch(userProvider);
     final currentUserDataAsync = ref.watch(currentUserDataProvider);
     final partnerAsync = ref.watch(partnerProvider);
 
-    return logsAsync.when(
-      data: (logs) {
-        if (logs.isEmpty) {
-          return const _EmptyState();
-        }
+    Widget buildBody(List<IntimacyLog> logs) {
+      if (logs.isEmpty) {
+        return const _EmptyState();
+      }
 
-        // Limit logs if specified
-        final limitedLogs = limit != null && logs.length > limit!
-            ? logs.take(limit!).toList()
-            : logs;
-        final hasMoreLogs = limit != null && logs.length > limit!;
+      // Limit logs if specified
+      final limitedLogs = limit != null && logs.length > limit!
+          ? logs.take(limit!).toList()
+          : logs;
+      final hasMoreLogs = limit != null && logs.length > limit!;
 
-        // Group logs by month
-        final groupedLogs = <String, List<IntimacyLog>>{};
-        for (final log in limitedLogs) {
-          final monthKey = _formatMonthYear(log.date);
-          groupedLogs.putIfAbsent(monthKey, () => []).add(log);
-        }
+      // Group logs by month
+      final groupedLogs = <String, List<IntimacyLog>>{};
+      for (final log in limitedLogs) {
+        final monthKey = _formatMonthYear(log.date);
+        groupedLogs.putIfAbsent(monthKey, () => []).add(log);
+      }
 
-        // Sort months descending (newest first)
-        final sortedMonths = groupedLogs.keys.toList()
-          ..sort((a, b) {
-            // Parse month strings to compare dates
-            final aDate = _parseMonthYear(a);
-            final bDate = _parseMonthYear(b);
-            return bDate.compareTo(aDate);
-          });
+      // Sort months descending (newest first)
+      final sortedMonths = groupedLogs.keys.toList()
+        ..sort((a, b) {
+          // Parse month strings to compare dates
+          final aDate = _parseMonthYear(a);
+          final bDate = _parseMonthYear(b);
+          return bDate.compareTo(aDate);
+        });
 
-        // Helper widget to build the list with optional "View All" button
-        Widget buildListView({
-          required String? currentUserPhotoUrl,
-          required String? partnerPhotoUrl,
-        }) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ...sortedMonths.map((monthKey) {
-                final monthLogs = groupedLogs[monthKey]!;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  child: _IntimacyMonthSection(
-                    month: monthKey,
-                    logs: monthLogs,
-                    currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
-                    currentUserPhotoUrl: currentUserPhotoUrl,
-                    partnerPhotoUrl: partnerPhotoUrl,
-                  ),
-                );
-              }),
-              if (hasMoreLogs && showViewAllButton)
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        context.push('/intimacy-history');
-                      },
-                      icon: const Icon(PhosphorIconsBold.arrowRight),
-                      label: const Text('View All'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.colors.primary,
-                        side: BorderSide(
-                          color: AppTheme.colors.primary,
-                          width: 2,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.md,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+      // Helper widget to build the list with optional "View All"/"Load more" button
+      Widget buildListView({
+        required String? currentUserPhotoUrl,
+        required String? partnerPhotoUrl,
+      }) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ...sortedMonths.map((monthKey) {
+              final monthLogs = groupedLogs[monthKey]!;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: _IntimacyMonthSection(
+                  month: monthKey,
+                  logs: monthLogs,
+                  currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
+                  currentUserPhotoUrl: currentUserPhotoUrl,
+                  partnerPhotoUrl: partnerPhotoUrl,
+                ),
+              );
+            }),
+            if (hasMoreLogs && showViewAllButton)
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      context.push('/intimacy-history');
+                    },
+                    icon: const Icon(PhosphorIconsBold.arrowRight),
+                    label: const Text('View All'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.colors.primary,
+                      side: BorderSide(
+                        color: AppTheme.colors.primary,
+                        width: 2,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.md,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
                 ),
-            ],
-          );
-        }
+              ),
+            if (isFullHistory && (feedState?.hasMore ?? false))
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Center(
+                  child: feedState!.isLoadingMore
+                      ? const CircularProgressIndicator()
+                      : OutlinedButton(
+                          onPressed: () =>
+                              ref.read(intimacyFeedControllerProvider.notifier).loadMore(),
+                          child: const Text('Load older logs'),
+                        ),
+                ),
+              ),
+          ],
+        );
+      }
 
-        return currentUserDataAsync.when(
-          data: (currentUserData) => partnerAsync.when(
-            data: (partnerData) => buildListView(
-              currentUserPhotoUrl: currentUserData?.photoUrl,
-              partnerPhotoUrl: partnerData?.photoUrl,
-            ),
-            loading: () => const _LoadingState(),
-            error: (_, _) => buildListView(
-              currentUserPhotoUrl: currentUserData?.photoUrl,
-              partnerPhotoUrl: null,
-            ),
+      return currentUserDataAsync.when(
+        data: (currentUserData) => partnerAsync.when(
+          data: (partnerData) => buildListView(
+            currentUserPhotoUrl: currentUserData?.photoUrl,
+            partnerPhotoUrl: partnerData?.photoUrl,
           ),
           loading: () => const _LoadingState(),
-          error: (_, __) => buildListView(
-            currentUserPhotoUrl: null,
+          error: (_, _) => buildListView(
+            currentUserPhotoUrl: currentUserData?.photoUrl,
             partnerPhotoUrl: null,
           ),
-        );
-      },
+        ),
+        loading: () => const _LoadingState(),
+        error: (_, __) => buildListView(
+          currentUserPhotoUrl: null,
+          partnerPhotoUrl: null,
+        ),
+      );
+    }
+
+    if (isFullHistory) {
+      return buildBody(feedState!.logs);
+    }
+
+    return logsAsync!.when(
+      data: buildBody,
       loading: () => const _LoadingState(),
       error: (error, stack) => _ErrorState(error: error.toString()),
     );
