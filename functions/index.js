@@ -420,8 +420,10 @@ exports.compressImage = functions.storage.object().onFinalize(async (object) => 
     return null;
   }
 
-  // Skip if already compressed (has _compressed suffix)
-  if (filePath.includes("_compressed")) {
+  // Skip if this file was already produced by this function (avoids an
+  // infinite re-trigger loop, since overwriting the file below fires
+  // another onFinalize event for the same path).
+  if (object.metadata && object.metadata.compressed === "true") {
     console.log("Skipping already compressed file:", filePath);
     return null;
   }
@@ -444,12 +446,21 @@ exports.compressImage = functions.storage.object().onFinalize(async (object) => 
       .jpeg({ quality: 85, mozjpeg: true })
       .toFile(tempCompressedPath);
 
+    // Preserve the download token the client may have already fetched via
+    // getDownloadURL() right after upload. Overwriting the object without
+    // carrying this over invalidates any URL already saved (e.g. in
+    // Firestore), since the token would no longer match the live object.
+    const [existingMetadata] = await file.getMetadata();
+    const downloadToken =
+      existingMetadata.metadata && existingMetadata.metadata.firebaseStorageDownloadTokens;
+
     // Upload compressed image back to Storage (overwrite original)
     const metadata = {
       contentType: "image/jpeg",
       metadata: {
         originalContentType: contentType,
         compressed: "true",
+        ...(downloadToken ? { firebaseStorageDownloadTokens: downloadToken } : {}),
       },
     };
 
