@@ -19,6 +19,15 @@ jobs:
         working-directory: functions
         run: npm ci
 
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Build Flutter web app for Hosting
+        run: |
+          flutter pub get
+          flutter build web --release
+
       - id: auth
         uses: google-github-actions/auth@v2
         with:
