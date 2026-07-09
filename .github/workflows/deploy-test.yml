@@ -1,0 +1,25 @@
+name: Deploy preview (test-main)
+
+# Hosting-only preview channel deploy. Deliberately does NOT touch Functions,
+# Firestore rules or Storage rules — those live in the same production
+# Firebase project (dyos-520c2) and a test-main push must never overwrite
+# them. Only `main` (deploy-production.yml) deploys those.
+
+on:
+  push:
+    branches:
+      - test-main
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: dyos-520c2
+          channelId: test-main
+          expires: 30d
