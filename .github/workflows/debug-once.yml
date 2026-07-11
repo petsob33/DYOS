@@ -67,7 +67,7 @@ jobs:
         run: |
           node -e "
           const admin = require('firebase-admin');
-          admin.initializeApp();
+          admin.initializeApp({ storageBucket: 'dyos-520c2.firebasestorage.app' });
           (async () => {
             const db = admin.firestore();
             const bucket = admin.storage().bucket();
