@@ -13,8 +13,11 @@ part 'couple_model.g.dart';
 @freezed
 class CoupleModel with _$CoupleModel {
   const CoupleModel._();
-  @JsonSerializable(explicitToJson: true)
   const factory CoupleModel({
+    // Freezed constructor param, not a field/getter yet when the analyzer
+    // checks this; source_gen still honors it correctly (id is excluded
+    // from toJson in couple_model.g.dart).
+    // ignore: invalid_annotation_target
     @JsonKey(includeFromJson: true, includeToJson: false) required String id,
     required List<String> members, // Array of user UIDs (important for Security Rules!)
     DateTime? anniversaryDate, // For counting days together
@@ -127,7 +130,6 @@ class TimestampConverter implements JsonConverter<DateTime?, dynamic> {
 /// The status is stored in the couple document for quick access.
 @freezed
 class CoupleStatus with _$CoupleStatus {
-  @JsonSerializable(explicitToJson: true)
   const factory CoupleStatus({
     required String emoji,
     required String text,

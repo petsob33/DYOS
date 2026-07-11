@@ -92,7 +92,6 @@ enum MemoryCategory {
 /// Memories are linked to a couple via pairId and include media, caption, date, and location.
 @freezed
 class Memory with _$Memory {
-  @JsonSerializable(explicitToJson: true)
   const factory Memory({
     required String id,
     required String pairId, // Link to the couple

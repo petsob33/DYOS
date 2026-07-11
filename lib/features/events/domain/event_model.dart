@@ -28,7 +28,6 @@ class RequiredTimestampConverter implements JsonConverter<DateTime, dynamic> {
 /// This model stores information about an event including date and title.
 @freezed
 class Event with _$Event {
-  @JsonSerializable(explicitToJson: true)
   const factory Event({
     required String id,
     @RequiredTimestampConverter() required DateTime date,

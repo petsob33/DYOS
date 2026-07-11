@@ -58,7 +58,6 @@ enum Mood {
 /// including flow intensity, mood, and notes.
 @freezed
 class CycleLog with _$CycleLog {
-  @JsonSerializable(explicitToJson: true)
   const factory CycleLog({
     required String id,
     @RequiredTimestampConverter() required DateTime date,

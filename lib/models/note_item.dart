@@ -34,7 +34,6 @@ enum NoteType {
 /// content, type, and metadata.
 @freezed
 class NoteItem with _$NoteItem {
-  @JsonSerializable(explicitToJson: true)
   const factory NoteItem({
     required String id,
     required String content,

@@ -7,8 +7,6 @@ part 'user_model.g.dart';
 
 @freezed
 class UserModel with _$UserModel {
-  // Tady řekneš: Chci, aby se to umělo převést i na JSON (explicitToJson: true)
-  @JsonSerializable(explicitToJson: true)
   const factory UserModel({
     required String uid,
     required String email,

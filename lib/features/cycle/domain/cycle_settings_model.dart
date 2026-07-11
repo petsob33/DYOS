@@ -34,7 +34,6 @@ class TimestampConverter implements JsonConverter<DateTime?, dynamic> {
 /// including average cycle length, period length, and the last period start date.
 @freezed
 class CycleSettings with _$CycleSettings {
-  @JsonSerializable(explicitToJson: true)
   const factory CycleSettings({
     required String id,
     @Default(28) int averageCycleLength, // CRITICAL: This must be editable
