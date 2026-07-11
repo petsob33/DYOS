@@ -367,7 +367,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.watch(hapticSignalsStreamProvider);
     ref.watch(quickMessagesStreamProvider);
 
-    final isPairedAsync = ref.watch(isUserPairedProvider);
+    ref.watch(isUserPairedProvider);
     final currentUserAsync = ref.watch(currentUserDataProvider);
     final coupleAsync = ref.watch(currentCoupleProvider);
     final partnerAsync = ref.watch(partnerProvider);
