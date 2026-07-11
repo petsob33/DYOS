@@ -19,9 +19,6 @@ class ListsCard extends ConsumerWidget {
 
     return bucketListNotesAsync.when(
       data: (notes) {
-        final totalCount = notes.length;
-        final hasItems = totalCount > 0;
-
         final c = AppTheme.colors;
 
         return BentoCard(

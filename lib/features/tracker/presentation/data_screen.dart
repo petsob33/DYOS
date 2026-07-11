@@ -211,8 +211,6 @@ class _FrequencyChart extends StatelessWidget {
       final month = entry.value;
       final monthKey = month.year * 12 + month.month;
       final count = monthCounts[monthKey] ?? 0;
-      final maxCount = monthCounts.values.isEmpty ? 1 : (monthCounts.values.reduce(math.max));
-      final normalizedHeight = maxCount > 0 ? count / maxCount : 0.0;
 
       return BarChartGroupData(
         x: index,
