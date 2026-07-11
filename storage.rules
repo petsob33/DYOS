@@ -20,9 +20,9 @@ service firebase.storage {
       // Helper function to check if user is a member of the couple
       // Note: This requires a Firestore read, which is acceptable for security
       function isCoupleMember() {
-        return isAuthenticated() && 
-               exists(/databases/(default)/documents/couples/$(coupleId)) &&
-               request.auth.uid in get(/databases/(default)/documents/couples/$(coupleId)).data.members;
+        return isAuthenticated() &&
+               firestore.exists(/databases/(default)/documents/couples/$(coupleId)) &&
+               request.auth.uid in firestore.get(/databases/(default)/documents/couples/$(coupleId)).data.members;
       }
       
       // Allow reading if user is a couple member
@@ -56,10 +56,10 @@ service firebase.storage {
         return request.auth.uid == userId;
       }
       function hasUserDoc(uid) {
-        return exists(/databases/(default)/documents/users/$(uid));
+        return firestore.exists(/databases/(default)/documents/users/$(uid));
       }
       function userCoupleId(uid) {
-        return get(/databases/(default)/documents/users/$(uid)).data.coupleId;
+        return firestore.get(/databases/(default)/documents/users/$(uid)).data.coupleId;
       }
       function isPartnerInSameCouple() {
         return isAuthenticated() &&
