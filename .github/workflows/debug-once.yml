@@ -49,4 +49,4 @@ jobs:
           "
 
       - name: Apply CORS policy to Storage bucket now (don't wait for next full deploy)
-        run: gsutil cors set cors.json gs://dyos-520c2.firebasestorage.app
+        run: gcloud storage buckets update gs://dyos-520c2.firebasestorage.app --cors-file=cors.json --project=dyos-520c2
