@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../../../core/theme/app_theme.dart';
+import '../theme/app_theme.dart';
 
 /// A reusable, generic calendar widget that follows the OurOS design system.
 /// 

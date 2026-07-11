@@ -41,7 +41,7 @@ import '../../features/notes/presentation/screens/secret_notes_screen.dart';
 import '../../features/cycle/presentation/cycle_tracking_screen.dart';
 import '../../features/events/presentation/add_event_sheet.dart';
 import '../../features/events/presentation/events_screen.dart';
-import '../../models/note_item.dart';
+import '../../features/notes/domain/note_item.dart';
 
 part 'app_router.g.dart';
 

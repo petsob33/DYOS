@@ -5,8 +5,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
-import '../../../../models/note_item.dart';
-import '../../../../models/notes_provider.dart';
+import '../../domain/note_item.dart';
+import '../notes_provider.dart';
 
 class SecretNotesScreen extends ConsumerWidget {
   const SecretNotesScreen({super.key});
