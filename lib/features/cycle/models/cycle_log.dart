@@ -11,7 +11,6 @@ part 'cycle_log.g.dart';
 /// including flow intensity and mood.
 @freezed
 class CycleLog with _$CycleLog {
-  @JsonSerializable(explicitToJson: true)
   const factory CycleLog({
     required DateTime date,
     required FlowIntensity flowIntensity,
