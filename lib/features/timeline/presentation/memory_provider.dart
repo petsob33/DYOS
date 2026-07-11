@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../domain/memory_model.dart';
 import '../data/memory_repository.dart';
@@ -147,7 +147,7 @@ class AddMemoryController extends StateNotifier<AddMemoryState> {
 
   Future<void> uploadMemory({
     required Memory memory,
-    required List<File> mediaFiles,
+    required List<XFile> mediaFiles,
   }) async {
     try {
       final userAsync = ref.watch(userProvider);

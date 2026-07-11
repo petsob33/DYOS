@@ -47,6 +47,8 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app uses your location to show your position on the map and to search for places nearby.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>DYOS needs access to your photo library so you can attach photos to your memories.</string>
 	<key>GOOGLE_PLACES_API_KEY</key>
 	<string>$(GOOGLE_PLACES_API_KEY)</string>
 	<!-- iOS AdMob: production GADApplicationIdentifier when you ship iOS ads. Test ID keeps SDK happy if you build iOS. -->
