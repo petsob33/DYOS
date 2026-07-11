@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/memory_model.dart';
@@ -45,15 +45,15 @@ class MemoryRepository {
   /// 
   /// [memory] - The Memory object to create (can have empty id to auto-generate)
   /// [mediaFiles] - List of image/video files to upload
-  /// 
+  ///
   /// Returns: The created Memory object with populated mediaUrls and id
-  /// 
+  ///
   /// Throws: Exception if upload or save fails
-  /// 
+  ///
   /// Storage path format: memories/{coupleId}/{timestamp}_{index}.jpg
   Future<Memory> createMemory({
     required Memory memory,
-    required List<File> mediaFiles,
+    required List<XFile> mediaFiles,
   }) async {
     try {
       // Validate inputs
@@ -74,11 +74,16 @@ class MemoryRepository {
         
         for (int i = 0; i < mediaFiles.length; i++) {
           final file = mediaFiles[i];
-          
-          // Determine file extension from file path
-          final extension = file.path.split('.').last.toLowerCase();
+
+          // Determine file extension from the picked file's original name.
+          // XFile.path is a blob: URL on web (no real extension), so the
+          // name (kept from the source file on every platform) is the only
+          // reliable source here.
+          final nameParts = file.name.split('.');
+          final extension =
+              (nameParts.length > 1 ? nameParts.last : 'jpg').toLowerCase();
           final storagePath = 'memories/${memory.pairId}/${timestamp}_$i.$extension';
-          
+
           // Determine content type based on extension
           String? contentType;
           if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(extension)) {
@@ -89,16 +94,17 @@ class MemoryRepository {
             if (extension == 'mov') contentType = 'video/quicktime';
             else if (extension == 'mkv') contentType = 'video/x-matroska';
           }
-          
+
           // Create reference and upload file with metadata
           final storageRef = _storage.ref().child(storagePath);
-          final metadata = contentType != null
-              ? SettableMetadata(contentType: contentType)
-              : null;
-          
+          final metadata = SettableMetadata(contentType: contentType);
+
           try {
-            await storageRef.putFile(file, metadata);
-            
+            // Upload as bytes (not putFile) so this works on every platform,
+            // including web, where dart:io's File/putFile are unsupported.
+            final bytes = await file.readAsBytes();
+            await storageRef.putData(bytes, metadata);
+
             // Get download URL
             final downloadUrl = await storageRef.getDownloadURL();
             downloadUrls.add(downloadUrl);
