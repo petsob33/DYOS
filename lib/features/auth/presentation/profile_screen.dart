@@ -81,7 +81,7 @@ class ProfileScreen extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
-                                      user.email ?? '',
+                                      user.email,
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium
@@ -168,7 +168,7 @@ class ProfileScreen extends ConsumerWidget {
                                         ),
                                         const SizedBox(height: AppSpacing.xs),
                                         Text(
-                                          partner.email ?? '',
+                                          partner.email,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodySmall
