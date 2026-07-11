@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
-import '../../../shared/widgets/calendar/dyos_universal_calendar.dart';
+import '../../../core/widgets/dyos_universal_calendar.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../data/event_repository.dart';
 import '../domain/event_model.dart';

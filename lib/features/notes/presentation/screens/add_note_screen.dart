@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../models/note_item.dart';
-import '../../../../models/notes_repository.dart';
+import '../../domain/note_item.dart';
+import '../../data/notes_repository.dart';
 import '../../../auth/presentation/auth_providers.dart';
 
 /// Screen for adding a new note
