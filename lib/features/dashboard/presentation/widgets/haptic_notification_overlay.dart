@@ -40,8 +40,16 @@ class _HapticNotificationOverlayState extends State<HapticNotificationOverlay>
 
     // Auto-dismiss after animation
     Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        Navigator.of(context).pop();
+      if (!mounted) return;
+      final navigator = Navigator.of(context);
+      final route = ModalRoute.of(context);
+      // Remove this overlay's own route explicitly, rather than popping
+      // whatever happens to be on top of the stack. Otherwise, if another
+      // dialog was shown after this one, this timer would pop that other
+      // dialog instead, leaving this overlay stuck forever as an invisible,
+      // full-screen barrier that blocks all touch input.
+      if (route != null && route.isActive) {
+        navigator.removeRoute(route);
       }
     });
   }
