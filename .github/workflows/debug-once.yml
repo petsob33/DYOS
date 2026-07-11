@@ -1,11 +1,9 @@
 name: Debug Once (temporary diagnostic)
 
 on:
-  workflow_dispatch:
-    inputs:
-      email:
-        description: "User email to look up"
-        required: true
+  push:
+    branches:
+      - debug-diagnostic-run
 
 jobs:
   debug:
@@ -29,7 +27,7 @@ jobs:
       - name: Inspect user + couple membership
         working-directory: functions
         env:
-          DEBUG_EMAIL: ${{ github.event.inputs.email }}
+          DEBUG_EMAIL: "pesobusines@gmail.com"
         run: |
           node -e "
           const admin = require('firebase-admin');
@@ -43,19 +41,20 @@ jobs:
               return;
             }
             const userDoc = usersSnap.docs[0];
+            const userData = userDoc.data();
             console.log('uid:', userDoc.id);
-            console.log('user data:', JSON.stringify(userDoc.data()));
-            const coupleId = userDoc.data().coupleId;
+            console.log('coupleId on user doc:', userData.coupleId || null);
+            const coupleId = userData.coupleId;
             if (!coupleId) {
-              console.log('User has no coupleId set.');
+              console.log('User has no coupleId set - not paired.');
               return;
             }
             const coupleDoc = await db.collection('couples').doc(coupleId).get();
             console.log('couples/' + coupleId + ' exists:', coupleDoc.exists);
             if (coupleDoc.exists) {
               const data = coupleDoc.data();
-              console.log('couple data:', JSON.stringify(data));
               console.log('members field type:', Array.isArray(data.members) ? 'array' : typeof data.members);
+              console.log('members:', JSON.stringify(data.members));
               console.log('uid in members:', Array.isArray(data.members) && data.members.includes(userDoc.id));
             }
           })().catch((e) => { console.error(e); process.exit(1); });
