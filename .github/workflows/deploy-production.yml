@@ -35,7 +35,7 @@ jobs:
       # CachedNetworkImage/Image.network under CanvasKit), which the browser
       # blocks without this - memory photos silently fail to load on web.
       - name: Apply CORS policy to Storage bucket
-        run: gsutil cors set cors.json gs://dyos-520c2.firebasestorage.app
+        run: gcloud storage buckets update gs://dyos-520c2.firebasestorage.app --cors-file=cors.json --project=dyos-520c2
 
       # Pinned just before Flutter's IconData became a `final` class
       # (flutter/flutter#181345, landed 2026-03-24): phosphor_flutter 2.1.0
