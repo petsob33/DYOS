@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +29,10 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _imagePicker = ImagePicker();
 
-  List<File> _selectedFiles = [];
+  List<XFile> _selectedFiles = [];
+  // Bytes read at pick time so previews work on every platform (Image.file
+  // relies on dart:io, which is unsupported on web).
+  final List<Uint8List> _selectedThumbnails = [];
   DateTime _selectedDate = DateTime.now();
   MemoryCategory _selectedCategory = MemoryCategory.other;
   Map<String, dynamic>? _location;
@@ -73,9 +76,17 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       );
 
       if (pickedFiles.isNotEmpty) {
-        setState(() {
-          _selectedFiles = pickedFiles.map((file) => File(file.path)).toList();
-        });
+        final thumbnails = await Future.wait(
+          pickedFiles.map((file) => file.readAsBytes()),
+        );
+        if (mounted) {
+          setState(() {
+            _selectedFiles = pickedFiles;
+            _selectedThumbnails
+              ..clear()
+              ..addAll(thumbnails);
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -104,9 +115,13 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       );
 
       if (pickedFile != null) {
-        setState(() {
-          _selectedFiles.add(File(pickedFile.path));
-        });
+        final thumbnail = await pickedFile.readAsBytes();
+        if (mounted) {
+          setState(() {
+            _selectedFiles.add(pickedFile);
+            _selectedThumbnails.add(thumbnail);
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -128,6 +143,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
   void _removeImage(int index) {
     setState(() {
       _selectedFiles.removeAt(index);
+      _selectedThumbnails.removeAt(index);
     });
   }
 
@@ -346,7 +362,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
               children: [
                 if (!_isEditMode) ...[
                   _ImagePickerSection(
-                    selectedFiles: _selectedFiles,
+                    thumbnails: _selectedThumbnails,
                     onPickImages: _pickImages,
                     onPickImage: _pickImage,
                     onRemoveImage: _removeImage,
@@ -469,13 +485,13 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
 /// Image picker section with preview
 class _ImagePickerSection extends StatelessWidget {
   const _ImagePickerSection({
-    required this.selectedFiles,
+    required this.thumbnails,
     required this.onPickImages,
     required this.onPickImage,
     required this.onRemoveImage,
   });
 
-  final List<File> selectedFiles;
+  final List<Uint8List> thumbnails;
   final VoidCallback onPickImages;
   final VoidCallback onPickImage;
   final void Function(int) onRemoveImage;
@@ -494,12 +510,12 @@ class _ImagePickerSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         // Selected images preview
-        if (selectedFiles.isNotEmpty)
+        if (thumbnails.isNotEmpty)
           SizedBox(
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: selectedFiles.length,
+              itemCount: thumbnails.length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
@@ -507,8 +523,8 @@ class _ImagePickerSection extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          selectedFiles[index],
+                        child: Image.memory(
+                          thumbnails[index],
                           width: 120,
                           height: 120,
                           fit: BoxFit.cover,
@@ -548,7 +564,7 @@ class _ImagePickerSection extends StatelessWidget {
           onPressed: onPickImages,
           icon: const Icon(PhosphorIconsBold.image),
           label: Text(
-            selectedFiles.isEmpty ? 'Add Photos' : 'Add More Photos',
+            thumbnails.isEmpty ? 'Add Photos' : 'Add More Photos',
             style: TextStyle(
               color: AppTheme.colors.primary,
               fontWeight: FontWeight.w600,
