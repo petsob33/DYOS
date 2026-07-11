@@ -19,4 +19,14 @@ class DefaultFirebaseOptions {
     storageBucket: 'dyos-520c2.firebasestorage.app',
     measurementId: 'G-NF4H6Y5MLE',
   );
+
+  /// VAPID key for Web Push, required by `FirebaseMessaging.getToken()` on
+  /// web (Firebase Console → Project settings → Cloud Messaging → Web
+  /// configuration → "Web Push certificates" → generate/copy the key pair).
+  /// It's a public key, safe to ship in client code - not a secret.
+  ///
+  /// Until a real key is set here, web push tokens can't be requested and
+  /// NotificationService silently skips FCM registration on web (see
+  /// notification_service.dart).
+  static const String webPushVapidKey = 'REPLACE_WITH_VAPID_KEY_FROM_FIREBASE_CONSOLE';
 }
