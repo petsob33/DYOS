@@ -237,6 +237,8 @@ exports.pairWithInviteCode = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("internal", error.message);
   }
 
+  await setCoupleClaims(currentUid, partnerUid, coupleRef.id);
+
   return {
     coupleId: coupleRef.id,
     partnerDisplayName: partnerDisplayName,
@@ -339,11 +341,26 @@ exports.pairWithEmail = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError("internal", error.message);
   }
 
+  await setCoupleClaims(currentUid, partnerUid, coupleRef.id);
+
   return {
     coupleId: coupleRef.id,
     partnerDisplayName: partnerDisplayName,
   };
 });
+
+/**
+ * Stamp both members' Auth tokens with a coupleId custom claim so Storage
+ * Security Rules can check couple membership directly from request.auth.token
+ * without a cross-service Firestore read (firestore.get/exists proved
+ * unreliable for this project - see storage.rules).
+ */
+async function setCoupleClaims(uid1, uid2, coupleId) {
+  await Promise.all([
+    admin.auth().setCustomUserClaims(uid1, { coupleId }),
+    admin.auth().setCustomUserClaims(uid2, { coupleId }),
+  ]);
+}
 
 /** Get partner UID from couple doc (the member that is not fromUserId). */
 async function getPartnerUid(coupleId, fromUserId) {

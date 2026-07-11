@@ -30,6 +30,13 @@ jobs:
       - name: Deploy Functions, Firestore rules and Storage rules
         run: npx firebase-tools deploy --project dyos-520c2 --only functions,firestore,storage --non-interactive
 
+      # Storage buckets have no CORS policy by default. Native apps aren't
+      # affected, but Flutter Web fetches image bytes via XHR (for
+      # CachedNetworkImage/Image.network under CanvasKit), which the browser
+      # blocks without this - memory photos silently fail to load on web.
+      - name: Apply CORS policy to Storage bucket
+        run: gsutil cors set cors.json gs://dyos-520c2.firebasestorage.app
+
       # Pinned just before Flutter's IconData became a `final` class
       # (flutter/flutter#181345, landed 2026-03-24): phosphor_flutter 2.1.0
       # (last published 2023, unmaintained) subclasses IconData and fails to
