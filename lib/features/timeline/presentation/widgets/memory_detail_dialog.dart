@@ -138,7 +138,9 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
             ),
           ],
         ),
-        child: ClipRRect(
+        child: Stack(
+          children: [
+            ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -273,7 +275,9 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                 size: 24,
                                 color: AppTheme.colors.textSecondary,
                               ),
-                              onPressed: () {
+                              onPressed: _isDeleting
+                                  ? null
+                                  : () {
                                 showModalBottomSheet(
                                   context: context,
                                   backgroundColor: Colors.transparent,
@@ -437,6 +441,20 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
               ),
             ],
           ),
+            ),
+            if (_isDeleting)
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    child: const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
