@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../models/notes_provider.dart';
-import '../../../../widgets/home/quick_note_card.dart';
+import '../../../notes/presentation/notes_provider.dart';
+import 'quick_note_card.dart';
 
 class QuickNoteDashboardCard extends ConsumerWidget {
   const QuickNoteDashboardCard();
