@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../../core/constants/app_spacing.dart';
-import '../../core/theme/app_theme.dart';
+import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class QuickNoteCard extends StatelessWidget {
   const QuickNoteCard({

@@ -6,7 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
-import '../../../shared/widgets/calendar/dyos_universal_calendar.dart';
+import '../../../core/widgets/dyos_universal_calendar.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../events/presentation/event_provider.dart';
 import '../../events/presentation/add_event_sheet.dart';

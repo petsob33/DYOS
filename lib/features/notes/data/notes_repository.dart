@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'note_item.dart';
+import '../domain/note_item.dart';
 
 part 'notes_repository.g.dart';
 
