@@ -16,18 +16,6 @@ class EventsCard extends ConsumerWidget {
 
     return eventsAsync.when(
       data: (events) {
-        final upcomingEvents = events.where((event) {
-          final today = DateTime.now();
-          final eventDate = DateTime(
-            event.date.year,
-            event.date.month,
-            event.date.day,
-          );
-          final todayDate = DateTime(today.year, today.month, today.day);
-          return eventDate.isAfter(todayDate) ||
-              eventDate.isAtSameMomentAs(todayDate);
-        }).toList();
-
         final c = AppTheme.colors;
 
         return BentoCard(

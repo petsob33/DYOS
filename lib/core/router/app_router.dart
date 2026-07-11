@@ -120,12 +120,12 @@ GoRouter appRouter(AppRouterRef ref) {
     });
   });
 
-  // Watch auth state - Stream<User?>
-  final authState = ref.watch(authStateProvider);
-  // Watch user data - Stream<UserModel?>
-  final userState = ref.watch(userProvider);
+  // Watch auth state - Stream<User?> - rebuilds the router when it changes
+  ref.watch(authStateProvider);
+  // Watch user data - Stream<UserModel?> - rebuilds the router when it changes
+  ref.watch(userProvider);
   // Watch temporary pairing state from PairingScreen to prevent race conditions during redirect
-  final pendingCoupleId = ref.watch(pairingConfirmedCoupleIdProvider);
+  ref.watch(pairingConfirmedCoupleIdProvider);
 
   return GoRouter(
     navigatorKey: appNavigatorKey,
