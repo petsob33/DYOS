@@ -28,5 +28,5 @@ class DefaultFirebaseOptions {
   /// Until a real key is set here, web push tokens can't be requested and
   /// NotificationService silently skips FCM registration on web (see
   /// notification_service.dart).
-  static const String webPushVapidKey = 'REPLACE_WITH_VAPID_KEY_FROM_FIREBASE_CONSOLE';
+  static const String webPushVapidKey = 'BITVDh3_iyssmGVcZoITHvag0OadjSuo_BfqOvMSir3izGCKl4NHvwFkzPwS-11AmBLTAmDJAfCSCwYdzq9Q3OA';
 }
