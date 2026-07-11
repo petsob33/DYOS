@@ -1,0 +1,62 @@
+name: Debug Once (temporary diagnostic)
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: "User email to look up"
+        required: true
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Inspect user + couple membership
+        working-directory: functions
+        env:
+          DEBUG_EMAIL: ${{ github.event.inputs.email }}
+        run: |
+          node -e "
+          const admin = require('firebase-admin');
+          admin.initializeApp();
+          (async () => {
+            const db = admin.firestore();
+            const email = process.env.DEBUG_EMAIL;
+            const usersSnap = await db.collection('users').where('email', '==', email).limit(1).get();
+            if (usersSnap.empty) {
+              console.log('NO USER DOC FOUND for email:', email);
+              return;
+            }
+            const userDoc = usersSnap.docs[0];
+            console.log('uid:', userDoc.id);
+            console.log('user data:', JSON.stringify(userDoc.data()));
+            const coupleId = userDoc.data().coupleId;
+            if (!coupleId) {
+              console.log('User has no coupleId set.');
+              return;
+            }
+            const coupleDoc = await db.collection('couples').doc(coupleId).get();
+            console.log('couples/' + coupleId + ' exists:', coupleDoc.exists);
+            if (coupleDoc.exists) {
+              const data = coupleDoc.data();
+              console.log('couple data:', JSON.stringify(data));
+              console.log('members field type:', Array.isArray(data.members) ? 'array' : typeof data.members);
+              console.log('uid in members:', Array.isArray(data.members) && data.members.includes(userDoc.id));
+            }
+          })().catch((e) => { console.error(e); process.exit(1); });
+          "
