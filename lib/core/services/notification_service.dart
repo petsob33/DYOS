@@ -4,11 +4,13 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../firebase_options.dart';
 import '../router/app_router.dart';
 import 'app_logger.dart';
 
@@ -121,7 +123,18 @@ class NotificationService {
   }
 
   Future<void> _saveFcmTokenIfLoggedIn() async {
-    final token = await FirebaseMessaging.instance.getToken();
+    if (kIsWeb && DefaultFirebaseOptions.webPushVapidKey.startsWith('REPLACE_WITH_')) {
+      AppLogger.debug(
+        'Skipping web FCM token: set DefaultFirebaseOptions.webPushVapidKey '
+        '(Firebase Console → Cloud Messaging → Web Push certificates) first.',
+      );
+      return;
+    }
+    final token = kIsWeb
+        ? await FirebaseMessaging.instance.getToken(
+            vapidKey: DefaultFirebaseOptions.webPushVapidKey,
+          )
+        : await FirebaseMessaging.instance.getToken();
     if (token != null) {
       await _saveFcmTokenToFirestore(token);
     }
