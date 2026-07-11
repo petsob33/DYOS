@@ -382,6 +382,10 @@ async function sendFcmToUser(uid, notification, data) {
     data: data || {},
     android: { priority: "high" },
     apns: { payload: { aps: { contentAvailable: true } } },
+    webpush: {
+      notification: { icon: "/icons/Icon-192.png" },
+      fcmOptions: { link: "/" },
+    },
   });
   return true;
 }
