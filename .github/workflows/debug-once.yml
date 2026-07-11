@@ -59,3 +59,55 @@ jobs:
             }
           })().catch((e) => { console.error(e); process.exit(1); });
           "
+
+      - name: Inspect latest memory's stored image + actual Storage object
+        working-directory: functions
+        env:
+          DEBUG_EMAIL: "pesobusines@gmail.com"
+        run: |
+          node -e "
+          const admin = require('firebase-admin');
+          admin.initializeApp();
+          (async () => {
+            const db = admin.firestore();
+            const bucket = admin.storage().bucket();
+            const email = process.env.DEBUG_EMAIL;
+            const usersSnap = await db.collection('users').where('email', '==', email).limit(1).get();
+            if (usersSnap.empty) { console.log('NO USER'); return; }
+            const coupleId = usersSnap.docs[0].data().coupleId;
+            const memSnap = await db.collection('couples').doc(coupleId).collection('memories')
+              .orderBy('createdAt', 'desc').limit(1).get();
+            if (memSnap.empty) { console.log('NO MEMORIES FOUND for couple', coupleId); return; }
+            const mem = memSnap.docs[0].data();
+            console.log('memory id:', memSnap.docs[0].id);
+            console.log('caption:', mem.caption);
+            console.log('mediaUrls:', JSON.stringify(mem.mediaUrls));
+            if (!mem.mediaUrls || mem.mediaUrls.length === 0) { console.log('NO mediaUrls stored.'); return; }
+            for (const url of mem.mediaUrls) {
+              console.log('---');
+              console.log('stored URL:', url);
+              const u = new URL(url);
+              const encodedPath = u.pathname.split('/o/')[1];
+              const objectPath = decodeURIComponent(encodedPath);
+              const storedToken = u.searchParams.get('token');
+              console.log('object path:', objectPath);
+              console.log('token in stored URL:', storedToken);
+              const file = bucket.file(objectPath);
+              const [exists] = await file.exists();
+              console.log('object exists in bucket:', exists);
+              if (exists) {
+                const [meta] = await file.getMetadata();
+                console.log('object size:', meta.size);
+                console.log('object contentType:', meta.contentType);
+                console.log('object custom metadata:', JSON.stringify(meta.metadata));
+                const actualTokens = (meta.metadata && meta.metadata.firebaseStorageDownloadTokens) || '';
+                console.log('actual firebaseStorageDownloadTokens on object:', actualTokens);
+                console.log('stored token matches one of actual tokens:', actualTokens.split(',').includes(storedToken));
+              }
+            }
+          })().catch((e) => { console.error(e); process.exit(1); });
+          "
+
+      - name: Recent compressImage function logs
+        run: |
+          gcloud functions logs read compressImage --region=us-central1 --project=dyos-520c2 --limit=50 || echo "log fetch failed"
