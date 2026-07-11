@@ -257,7 +257,7 @@ class MemoryRepository {
     return docs.map((doc) {
       try {
         return Memory.fromFirestore(doc);
-      } catch (e, stackTrace) {
+      } catch (e) {
         // Skip invalid documents
         return null;
       }

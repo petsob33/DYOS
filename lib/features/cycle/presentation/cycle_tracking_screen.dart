@@ -814,15 +814,13 @@ class _DayOptionsWidget extends ConsumerWidget {
                                             color: AppTheme.colors.text,
                                           ),
                                     ),
-                                    if (log.rating != null) ...[
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Rating: ${log.rating}/5',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                              color: AppTheme.colors.textSecondary,
-                                            ),
-                                      ),
-                                    ],
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Rating: ${log.rating}/5',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: AppTheme.colors.textSecondary,
+                                          ),
+                                    ),
                                   ],
                                 ),
                               ),
