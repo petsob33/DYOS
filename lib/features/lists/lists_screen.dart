@@ -6,7 +6,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
-import '../auth/presentation/auth_providers.dart';
 import '../../../models/note_item.dart';
 import '../../../models/notes_provider.dart';
 
