@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../domain/memory_model.dart';
 import '../data/memory_repository.dart';
 import '../../auth/presentation/auth_providers.dart';
-import '../../auth/domain/user_model.dart';
 import '../../premium/presentation/premium_provider.dart';
 import '../../../../core/services/ad_service.dart';
 
