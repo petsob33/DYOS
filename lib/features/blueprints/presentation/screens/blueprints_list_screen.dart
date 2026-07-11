@@ -7,7 +7,6 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../data/blueprint_mock_data.dart';
-import 'blueprint_detail_screen.dart';
 
 /// Lists Blueprint (preference questionnaire) categories. Tap to open a section.
 class BlueprintsListScreen extends StatelessWidget {
