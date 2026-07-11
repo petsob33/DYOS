@@ -91,6 +91,7 @@ class AdService {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         if (_androidBannerIdFromEnv.isNotEmpty) return _androidBannerIdFromEnv;
+        if (kDebugMode) return _androidBannerTestId;
         return _androidBannerProductionId;
       case TargetPlatform.iOS:
         if (!_kEnableIosAds) return null;
