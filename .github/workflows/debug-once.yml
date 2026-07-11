@@ -24,90 +24,29 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      - name: Inspect user + couple membership
+      - name: Backfill coupleId custom claims for existing couples
         working-directory: functions
-        env:
-          DEBUG_EMAIL: "pesobusines@gmail.com"
         run: |
           node -e "
           const admin = require('firebase-admin');
           admin.initializeApp();
           (async () => {
             const db = admin.firestore();
-            const email = process.env.DEBUG_EMAIL;
-            const usersSnap = await db.collection('users').where('email', '==', email).limit(1).get();
-            if (usersSnap.empty) {
-              console.log('NO USER DOC FOUND for email:', email);
-              return;
-            }
-            const userDoc = usersSnap.docs[0];
-            const userData = userDoc.data();
-            console.log('uid:', userDoc.id);
-            console.log('coupleId on user doc:', userData.coupleId || null);
-            const coupleId = userData.coupleId;
-            if (!coupleId) {
-              console.log('User has no coupleId set - not paired.');
-              return;
-            }
-            const coupleDoc = await db.collection('couples').doc(coupleId).get();
-            console.log('couples/' + coupleId + ' exists:', coupleDoc.exists);
-            if (coupleDoc.exists) {
-              const data = coupleDoc.data();
-              console.log('members field type:', Array.isArray(data.members) ? 'array' : typeof data.members);
-              console.log('members:', JSON.stringify(data.members));
-              console.log('uid in members:', Array.isArray(data.members) && data.members.includes(userDoc.id));
-            }
-          })().catch((e) => { console.error(e); process.exit(1); });
-          "
-
-      - name: Inspect latest memory's stored image + actual Storage object
-        working-directory: functions
-        env:
-          DEBUG_EMAIL: "pesobusines@gmail.com"
-        run: |
-          node -e "
-          const admin = require('firebase-admin');
-          admin.initializeApp({ storageBucket: 'dyos-520c2.firebasestorage.app' });
-          (async () => {
-            const db = admin.firestore();
-            const bucket = admin.storage().bucket();
-            const email = process.env.DEBUG_EMAIL;
-            const usersSnap = await db.collection('users').where('email', '==', email).limit(1).get();
-            if (usersSnap.empty) { console.log('NO USER'); return; }
-            const coupleId = usersSnap.docs[0].data().coupleId;
-            const memSnap = await db.collection('couples').doc(coupleId).collection('memories')
-              .orderBy('createdAt', 'desc').limit(1).get();
-            if (memSnap.empty) { console.log('NO MEMORIES FOUND for couple', coupleId); return; }
-            const mem = memSnap.docs[0].data();
-            console.log('memory id:', memSnap.docs[0].id);
-            console.log('caption:', mem.caption);
-            console.log('mediaUrls:', JSON.stringify(mem.mediaUrls));
-            if (!mem.mediaUrls || mem.mediaUrls.length === 0) { console.log('NO mediaUrls stored.'); return; }
-            for (const url of mem.mediaUrls) {
-              console.log('---');
-              console.log('stored URL:', url);
-              const u = new URL(url);
-              const encodedPath = u.pathname.split('/o/')[1];
-              const objectPath = decodeURIComponent(encodedPath);
-              const storedToken = u.searchParams.get('token');
-              console.log('object path:', objectPath);
-              console.log('token in stored URL:', storedToken);
-              const file = bucket.file(objectPath);
-              const [exists] = await file.exists();
-              console.log('object exists in bucket:', exists);
-              if (exists) {
-                const [meta] = await file.getMetadata();
-                console.log('object size:', meta.size);
-                console.log('object contentType:', meta.contentType);
-                console.log('object custom metadata:', JSON.stringify(meta.metadata));
-                const actualTokens = (meta.metadata && meta.metadata.firebaseStorageDownloadTokens) || '';
-                console.log('actual firebaseStorageDownloadTokens on object:', actualTokens);
-                console.log('stored token matches one of actual tokens:', actualTokens.split(',').includes(storedToken));
+            const couplesSnap = await db.collection('couples').get();
+            console.log('couples found:', couplesSnap.size);
+            for (const doc of couplesSnap.docs) {
+              const members = doc.data().members;
+              if (!Array.isArray(members) || members.length === 0) {
+                console.log('skip', doc.id, '- no members array');
+                continue;
               }
+              await Promise.all(members.map((uid) =>
+                admin.auth().setCustomUserClaims(uid, { coupleId: doc.id })
+              ));
+              console.log('stamped coupleId=' + doc.id + ' on members:', JSON.stringify(members));
             }
           })().catch((e) => { console.error(e); process.exit(1); });
           "
 
-      - name: Recent compressImage function logs
-        run: |
-          gcloud functions logs read compressImage --region=us-central1 --project=dyos-520c2 --limit=50 || echo "log fetch failed"
+      - name: Apply CORS policy to Storage bucket now (don't wait for next full deploy)
+        run: gsutil cors set cors.json gs://dyos-520c2.firebasestorage.app

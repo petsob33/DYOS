@@ -167,6 +167,13 @@ class PairingService {
       debugPrint('[PairingService] function returned: ${result.data}');
 
       final data = Map<String, dynamic>.from(result.data as Map);
+
+      // The Cloud Function just stamped a coupleId custom claim on this
+      // user's Auth token (see functions/index.js setCoupleClaims) - refresh
+      // now so Storage rule checks against request.auth.token.coupleId see
+      // it immediately instead of waiting for the token's natural refresh.
+      await currentUser.getIdToken(true);
+
       return PairInviteCodeResult(
         coupleId: data['coupleId'] as String,
         partnerDisplayName: data['partnerDisplayName'] as String?,
@@ -235,6 +242,11 @@ class PairingService {
       final callable = _functions.httpsCallable('pairWithEmail');
       final result = await callable.call({'email': normalizedEmail});
       final data = Map<String, dynamic>.from(result.data as Map);
+
+      // Refresh again to pick up the coupleId custom claim the function
+      // just set - see the matching comment in pairWithInviteCode above.
+      await currentUser.getIdToken(true);
+
       return PairInviteCodeResult(
         coupleId: data['coupleId'] as String,
         partnerDisplayName: data['partnerDisplayName'] as String?,

@@ -17,15 +17,14 @@ service firebase.storage {
         return request.auth != null;
       }
       
-      // Helper function to check if user is a member of the couple
-      // Note: This requires a Firestore read, which is acceptable for security
-      // TEMP DIAGNOSTIC: cross-service firestore.exists/firestore.get calls
-      // keep denying writes even though the underlying data checks out
-      // (verified via Admin SDK). Bypassing the Firestore check here to
-      // isolate whether firestore.* is actually the blocker. Revert once
-      // confirmed - see conversation for follow-up.
+      // Helper function to check if user is a member of the couple.
+      // Uses the coupleId custom claim (stamped on the Auth token by the
+      // pairing Cloud Functions) rather than firestore.exists/firestore.get:
+      // those cross-service calls compiled and deployed fine but reliably
+      // denied valid, verified-correct requests in this project, so
+      // membership is checked from the token instead - no extra read needed.
       function isCoupleMember() {
-        return isAuthenticated();
+        return isAuthenticated() && request.auth.token.coupleId == coupleId;
       }
       
       // Allow reading if user is a couple member
