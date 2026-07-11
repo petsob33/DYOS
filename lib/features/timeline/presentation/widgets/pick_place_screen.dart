@@ -1,9 +1,9 @@
 import 'dart:io' show Platform;
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_autocomplete/google_places_autocomplete.dart';
@@ -11,6 +11,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/config/maps_api_config.dart';
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/services/geocoding_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Default center (Prague) when no initial position
@@ -51,6 +52,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
   bool _isGettingLocation = false;
   bool _mapsConfigResolved = false;
   bool _mapsSdkAvailable = false;
+  String? _resolvedApiKey;
   List<Prediction> _predictions = [];
   bool _placesLoading = false;
   bool _placesReady = false;
@@ -80,6 +82,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
       setState(() {
         _mapsConfigResolved = true;
         _mapsSdkAvailable = mapsOk;
+        _resolvedApiKey = geoKey;
       });
       if (!mapsOk) {
         if (mounted) {
@@ -96,6 +99,13 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         }
         return;
       }
+
+      // google_places_autocomplete has no web platform implementation, and
+      // dart:io's Platform (used below for isPhysicalDevice) throws on web -
+      // skip predictions entirely there; typed-address search still works
+      // via geocodeAddress's web REST fallback.
+      if (kIsWeb) return;
+
       final deviceInfo = DeviceInfoPlugin();
       final isPhysicalDevice = Platform.isAndroid
           ? (await deviceInfo.androidInfo).isPhysicalDevice
@@ -202,7 +212,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
     if (query.isEmpty) return;
     setState(() => _isSearching = true);
     try {
-      final locations = await locationFromAddress(query);
+      final locations = await geocodeAddress(query, webApiKey: _resolvedApiKey);
       if (locations.isEmpty || !mounted) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

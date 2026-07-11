@@ -32,6 +32,15 @@
 
   <title>DYOS – relationship OS for couples</title>
   <link rel="manifest" href="manifest.json">
+
+  <!--
+    Google Maps JavaScript API, required by google_maps_flutter_web for the
+    "Add place" / "Memories map" screens. This key is restricted by HTTP
+    referrer (dyos-520c2.web.app / firebaseapp.com) in Google Cloud Console,
+    so - like any Maps JS key - it's safe to ship in client-side HTML; the
+    referrer check, not secrecy, is what protects it.
+  -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAostnGOc7KYdNthRf8YZPnqXk9d17XSc8" async></script>
   <style>
     :root {
       --dyos-bg: #f2f2f7;
