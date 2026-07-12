@@ -39,6 +39,7 @@ jobs:
       # properties file), so local dev is untouched.
       - name: Tune Gradle memory for CI runner
         run: |
+          printf '\n' >> android/gradle.properties
           cat >> android/gradle.properties <<'EOF'
           org.gradle.jvmargs=-Xmx4G -XX:MaxMetaspaceSize=1G -XX:ReservedCodeCacheSize=256m
           org.gradle.daemon=false
