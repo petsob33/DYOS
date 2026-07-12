@@ -13,6 +13,9 @@ concurrency:
   group: build-apk
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,6 +31,19 @@ jobs:
         with:
           flutter-version: '3.41.5'
 
+      # android/gradle.properties sets -Xmx8G for local dev machines, which
+      # is more than a standard GitHub-hosted runner has in total. The last
+      # two builds OOM-thrashed the runner into unresponsiveness and got
+      # killed by GitHub's health check ~5min into assembleRelease. Override
+      # with CI-safe values by appending (later keys win in a Java
+      # properties file), so local dev is untouched.
+      - name: Tune Gradle memory for CI runner
+        run: |
+          cat >> android/gradle.properties <<'EOF'
+          org.gradle.jvmargs=-Xmx4G -XX:MaxMetaspaceSize=1G -XX:ReservedCodeCacheSize=256m
+          org.gradle.daemon=false
+          EOF
+
       - name: Build release APK
         run: |
           flutter pub get
@@ -38,3 +54,17 @@ jobs:
           name: dyos-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 14
+
+      # Workflow artifacts require a GitHub login and download as a zip,
+      # which is awkward from an Android browser. A Release asset gives a
+      # direct .apk link that installs straight from the browser's
+      # downloads. One release per run, tagged by run number.
+      - name: Publish APK to a GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="apk-${{ github.run_number }}"
+          gh release create "$tag" build/app/outputs/flutter-apk/app-release.apk \
+            --title "DYOS Android build #${{ github.run_number }}" \
+            --notes "Automated debug-signed build for sideloading/testing. Not for Play Store." \
+            --target "${{ github.sha }}"
