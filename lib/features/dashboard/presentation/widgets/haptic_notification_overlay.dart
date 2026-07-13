@@ -5,6 +5,13 @@ import '../../../../core/theme/app_theme.dart';
 
 /// Overlay widget for haptic signal notification
 class HapticNotificationOverlay extends StatefulWidget {
+  /// Called exactly once when the auto-dismiss timer fires. The caller
+  /// (whoever inserted this into an Overlay) is responsible for actually
+  /// removing it from the tree.
+  final VoidCallback onDismiss;
+
+  const HapticNotificationOverlay({required this.onDismiss, super.key});
+
   @override
   State<HapticNotificationOverlay> createState() =>
       _HapticNotificationOverlayState();
@@ -41,16 +48,7 @@ class _HapticNotificationOverlayState extends State<HapticNotificationOverlay>
     // Auto-dismiss after animation
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (!mounted) return;
-      final navigator = Navigator.of(context);
-      final route = ModalRoute.of(context);
-      // Remove this overlay's own route explicitly, rather than popping
-      // whatever happens to be on top of the stack. Otherwise, if another
-      // dialog was shown after this one, this timer would pop that other
-      // dialog instead, leaving this overlay stuck forever as an invisible,
-      // full-screen barrier that blocks all touch input.
-      if (route != null && route.isActive) {
-        navigator.removeRoute(route);
-      }
+      widget.onDismiss();
     });
   }
 
@@ -62,39 +60,52 @@ class _HapticNotificationOverlayState extends State<HapticNotificationOverlay>
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Opacity(
-              opacity: _opacityAnimation.value,
-              child: Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: AppTheme.colors.love.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.colors.love.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    PhosphorIconsBold.heart,
-                    color: AppTheme.colors.love,
-                    size: 64,
+    // MaterialType.transparency (not just a transparent color) is required
+    // here: a plain Material(color: Colors.transparent) still defaults to
+    // MaterialType.canvas, whose ink-features layer absorbs every hit test
+    // over its whole bounds regardless of paint color - it doesn't merely
+    // look invisible, it silently blocks all touches to whatever is behind
+    // it. Since this widget is inserted directly into the Overlay (see
+    // home_screen.dart), it is sized to fill the whole screen even though
+    // only the small heart icon in the middle is visible, so this was
+    // blocking input to the entire app for as long as the notification was
+    // showing. This overlay has no interactive content of its own, so
+    // IgnorePointer belt-and-suspenders it too.
+    return IgnorePointer(
+      child: Material(
+        type: MaterialType.transparency,
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _opacityAnimation.value,
+                child: Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: AppTheme.colors.love.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.colors.love.withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      PhosphorIconsBold.heart,
+                      color: AppTheme.colors.love,
+                      size: 64,
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

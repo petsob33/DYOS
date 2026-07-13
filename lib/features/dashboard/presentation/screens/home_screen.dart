@@ -150,18 +150,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       debugPrint('Error showing haptic system notification: $e');
     }
 
-    // Also show overlay if app is in foreground
+    // Also show a non-modal overlay if app is in foreground. This is
+    // intentionally NOT showDialog(): a dialog inserts a full-screen modal
+    // barrier that blocks all touch input to the rest of the app until it's
+    // dismissed. Inserting directly into the Overlay keeps the app fully
+    // interactive while the notification is visible.
     if (mounted && context.mounted) {
       try {
-        showDialog(
-          context: context,
-          barrierColor: Colors.transparent,
-          barrierDismissible: true,
-          builder: (dialogContext) {
+        final overlayState = Overlay.of(context);
+        late final OverlayEntry entry;
+        entry = OverlayEntry(
+          builder: (_) {
             debugPrint('Building haptic notification overlay');
-            return HapticNotificationOverlay();
+            return HapticNotificationOverlay(
+              onDismiss: () {
+                if (entry.mounted) entry.remove();
+              },
+            );
           },
         );
+        overlayState.insert(entry);
         debugPrint('Haptic notification overlay shown');
       } catch (e, stackTrace) {
         debugPrint('Error showing haptic notification overlay: $e');
@@ -341,18 +349,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       debugPrint('Error showing quick message system notification: $e');
     }
 
-    // Also show overlay if app is in foreground
+    // Also show a non-modal overlay if app is in foreground. This is
+    // intentionally NOT showDialog(): a dialog inserts a full-screen modal
+    // barrier that blocks all touch input to the rest of the app until it's
+    // dismissed. Inserting directly into the Overlay keeps the app fully
+    // interactive while the notification is visible, and the card itself
+    // can still be swiped away early (see QuickMessageNotificationOverlay).
     if (mounted && context.mounted) {
       try {
-        showDialog(
-          context: context,
-          barrierColor: Colors.transparent,
-          barrierDismissible: true,
-          builder: (dialogContext) {
+        final overlayState = Overlay.of(context);
+        late final OverlayEntry entry;
+        entry = OverlayEntry(
+          builder: (_) {
             debugPrint('Building quick message notification overlay');
-            return QuickMessageNotificationOverlay(message: message);
+            return QuickMessageNotificationOverlay(
+              message: message,
+              onDismiss: () {
+                if (entry.mounted) entry.remove();
+              },
+            );
           },
         );
+        overlayState.insert(entry);
         debugPrint('Quick message notification overlay shown');
       } catch (e, stackTrace) {
         debugPrint('Error showing quick message notification overlay: $e');

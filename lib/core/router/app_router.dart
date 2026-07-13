@@ -18,6 +18,7 @@ import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/firebase_test_screen.dart';
 import '../../features/auth/presentation/pairing_screen.dart';
 import '../../features/dashboard/presentation/screens/home_screen.dart';
+import '../../features/dashboard/presentation/screens/chat_screen.dart';
 import '../../features/timeline/presentation/screens/timeline_screen.dart';
 import '../../features/timeline/presentation/screens/add_memory_screen.dart';
 import '../../features/timeline/presentation/screens/memories_map_screen.dart';
@@ -261,6 +262,15 @@ GoRouter appRouter(AppRouterRef ref) {
           context,
           state,
           const ProfileScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/chat',
+        name: 'chat',
+        pageBuilder: (context, state) => buildPageWithSlideTransition(
+          context,
+          state,
+          const ChatScreen(),
         ),
       ),
       GoRoute(
