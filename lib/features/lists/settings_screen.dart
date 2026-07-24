@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_mode_provider.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/firebase_service.dart';
 import '../../../features/auth/presentation/auth_providers.dart';
@@ -442,6 +443,68 @@ class SettingsScreen extends ConsumerWidget {
                     error: (_, __) => const SizedBox.shrink(),
                   );
                 },
+              ),
+              const SizedBox(height: AppSpacing.md),
+              // Appearance (theme mode) card
+              Material(
+                color: context.colors.card,
+                borderRadius: BorderRadius.circular(16),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            PhosphorIconsBold.moon,
+                            color: context.colors.primary,
+                            size: 24,
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Text(
+                            'Appearance',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: context.colors.text,
+                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final currentMode = ref
+                                  .watch(themeModeControllerProvider)
+                                  .valueOrNull ??
+                              ThemeMode.system;
+                          return SegmentedButton<ThemeMode>(
+                            segments: const [
+                              ButtonSegment(
+                                value: ThemeMode.light,
+                                label: Text('Light'),
+                              ),
+                              ButtonSegment(
+                                value: ThemeMode.dark,
+                                label: Text('Dark'),
+                              ),
+                              ButtonSegment(
+                                value: ThemeMode.system,
+                                label: Text('System'),
+                              ),
+                            ],
+                            selected: {currentMode},
+                            onSelectionChanged: (selection) {
+                              ref
+                                  .read(themeModeControllerProvider.notifier)
+                                  .setMode(selection.first);
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               // Pairing button
