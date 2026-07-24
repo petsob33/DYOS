@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -106,6 +107,11 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
         });
       }
     }
+  }
+
+  Future<void> _openLegalUrl(String path) async {
+    final uri = Uri.parse('https://dyos-520c2.web.app/$path');
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -589,7 +595,11 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                   color: c.textSecondary,
                 ),
               ),
-              _footerLink('Privacy', () {}, c),
+              _footerLink(
+                'Privacy',
+                () => _openLegalUrl('privacy-policy.html'),
+                c,
+              ),
               Text(
                 ' · ',
                 style: GoogleFonts.inter(
@@ -597,7 +607,11 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                   color: c.textSecondary,
                 ),
               ),
-              _footerLink('Terms', () {}, c),
+              _footerLink(
+                'Terms',
+                () => _openLegalUrl('terms-of-service.html'),
+                c,
+              ),
             ],
           ),
         ],
