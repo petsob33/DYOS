@@ -1,0 +1,19 @@
+targets:
+  $default:
+    builders:
+      # Without this, nested @freezed/@JsonSerializable objects (e.g.
+      # CoupleStatus inside CoupleModel.status, UserStatus inside
+      # UserModel) get embedded as raw Dart class instances in the
+      # generated toJson() map instead of being recursively converted,
+      # which Firestore writes reject outright. Some previously-locked
+      # freezed/json_serializable versions defaulted this to true
+      # per-class; pin it globally (on both builders - freezed emits the
+      # `@JsonSerializable(explicitToJson: ...)` annotation that
+      # json_serializable then reads) so regenerating with any compatible
+      # package version stays correct.
+      freezed:
+        options:
+          explicit_to_json: true
+      json_serializable:
+        options:
+          explicit_to_json: true

@@ -1,20 +1,10 @@
 import '../domain/blueprint_question.dart';
+import '../domain/blueprint_section.dart';
 
-/// One Blueprint section (category) with title, emoji, and questions.
-class BlueprintSection {
-  const BlueprintSection({
-    required this.id,
-    required this.title,
-    required this.emoji,
-    required this.questions,
-  });
-  final String id;
-  final String title;
-  final String emoji;
-  final List<BlueprintQuestion> questions;
-}
-
-/// Mock Blueprint sections for development and demo.
+/// Blueprint section content: the seed source for the `blueprint_sections`
+/// Firestore collection (see `scripts/seed_blueprint_sections.js`) and the
+/// offline/pre-seed fallback used by [blueprintSectionsProvider] and
+/// [blueprintSectionProvider] when Firestore has no data yet.
 class BlueprintMockData {
   BlueprintMockData._();
 
@@ -22,7 +12,8 @@ class BlueprintMockData {
   static const String travelConfigSectionTitle = 'Travel Config';
   static const String travelConfigSectionEmoji = '✈️';
 
-  static List<BlueprintSection> get allSections => [
+  static List<BlueprintSection> get allSections {
+    final sections = <BlueprintSection>[
         BlueprintSection(
           id: 'travel',
           title: travelConfigSectionTitle,
@@ -179,7 +170,11 @@ class BlueprintMockData {
           emoji: '😂',
           questions: humorQuestions,
         ),
-      ];
+    ];
+    return [
+      for (var i = 0; i < sections.length; i++) sections[i].copyWith(order: i),
+    ];
+  }
 
   static BlueprintSection? sectionById(String id) {
     try {

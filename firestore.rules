@@ -15,6 +15,17 @@ service cloud.firestore {
     }
     
     // ============================================
+    // BLUEPRINT SECTIONS
+    // ============================================
+    // Shared, non-couple-scoped questionnaire content (not answers - those
+    // live on the couple doc). Seeded via scripts/seed_blueprint_sections.js
+    // using the Admin SDK, which bypasses these rules; clients only read.
+    match /blueprint_sections/{sectionId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // ============================================
     // COUPLES
     // ============================================
     match /couples/{coupleId} {
