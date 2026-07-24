@@ -45,7 +45,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
             child: Center(
               child: Icon(
                 PhosphorIconsBold.heart,
-                color: AppTheme.colors.love.withValues(alpha: 0.3),
+                color: context.colors.love.withValues(alpha: 0.3),
                 size: 56,
               ),
             ),
@@ -82,10 +82,10 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
                 color: _isPressed
-                    ? AppTheme.colors.love.withValues(alpha: 0.1)
+                    ? context.colors.love.withValues(alpha: 0.1)
                     : _justSent
-                    ? AppTheme.colors.success.withValues(alpha: 0.1)
-                    : AppTheme.colors.background,
+                    ? context.colors.success.withValues(alpha: 0.1)
+                    : context.colors.background,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Center(
@@ -95,10 +95,10 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
                     Icon(
                       PhosphorIconsBold.heart,
                       color: _isPressed
-                          ? AppTheme.colors.love
+                          ? context.colors.love
                           : _justSent
-                          ? AppTheme.colors.success
-                          : AppTheme.colors.love.withValues(alpha: 0.6),
+                          ? context.colors.success
+                          : context.colors.love.withValues(alpha: 0.6),
                       size: 56,
                     ),
                     if (!unlocked) ...[
@@ -106,7 +106,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
                       Text(
                         'Unlock with DYOS+ or via the Roadmap',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -116,7 +116,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
                         'Sent',
                         style: Theme.of(context).textTheme.labelMedium
                             ?.copyWith(
-                              color: AppTheme.colors.success,
+                              color: context.colors.success,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -132,7 +132,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
         child: Center(
           child: Icon(
             PhosphorIconsBold.heart,
-            color: AppTheme.colors.love.withValues(alpha: 0.3),
+            color: context.colors.love.withValues(alpha: 0.3),
             size: 56,
           ),
         ),
@@ -141,7 +141,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
         child: Center(
           child: Icon(
             PhosphorIconsBold.heart,
-            color: AppTheme.colors.love.withValues(alpha: 0.3),
+            color: context.colors.love.withValues(alpha: 0.3),
             size: 56,
           ),
         ),
@@ -177,7 +177,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Sent to partner'),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -193,7 +193,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error sending: $error'),
-                backgroundColor: AppTheme.colors.love,
+                backgroundColor: context.colors.love,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

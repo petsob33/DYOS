@@ -54,7 +54,7 @@ class _EditProfilePictureScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error picking image: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -71,7 +71,7 @@ class _EditProfilePictureScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please select an image first'),
-          backgroundColor: AppTheme.colors.love,
+          backgroundColor: context.colors.love,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -89,7 +89,7 @@ class _EditProfilePictureScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('User not found'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -133,7 +133,7 @@ class _EditProfilePictureScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Profile picture updated successfully!'),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -151,7 +151,7 @@ class _EditProfilePictureScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${e.toString()}'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -168,7 +168,7 @@ class _EditProfilePictureScreenState
     final userDataAsync = ref.watch(currentUserDataProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Edit Profile Picture'),
       ),
@@ -197,7 +197,7 @@ class _EditProfilePictureScreenState
                             CircleAvatar(
                               radius: 80,
                               backgroundColor:
-                                  AppTheme.colors.primary.withValues(alpha: 0.1),
+                                  context.colors.primary.withValues(alpha: 0.1),
                               backgroundImage: _selectedImage != null
                                   ? FileImage(_selectedImage!)
                                   : (userData.photoUrl != null &&
@@ -211,7 +211,7 @@ class _EditProfilePictureScreenState
                                   ? Icon(
                                       PhosphorIconsBold.user,
                                       size: 80,
-                                      color: AppTheme.colors.primary,
+                                      color: context.colors.primary,
                                     )
                                   : null,
                             ),
@@ -242,9 +242,9 @@ class _EditProfilePictureScreenState
                             icon: const Icon(PhosphorIconsBold.image),
                             label: const Text('Choose Image'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: AppTheme.colors.primary,
+                              foregroundColor: context.colors.primary,
                               side: BorderSide(
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                                 width: 2,
                               ),
                               padding: const EdgeInsets.symmetric(
@@ -268,7 +268,7 @@ class _EditProfilePictureScreenState
                           ? null
                           : _saveProfilePicture,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.colors.primary,
+                        backgroundColor: context.colors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.md,

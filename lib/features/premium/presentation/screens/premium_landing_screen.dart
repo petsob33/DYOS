@@ -117,7 +117,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
   @override
   Widget build(BuildContext context) {
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
-    const c = AppTheme.colors;
+    final c = context.colors;
 
     if (isPremium) {
       return Scaffold(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ouros_app/core/theme/app_theme.dart';
 import 'package:ouros_app/features/dashboard/presentation/widgets/haptic_notification_overlay.dart';
 import 'package:ouros_app/features/dashboard/presentation/widgets/quick_message_notification_overlay.dart';
 
@@ -20,6 +21,7 @@ void main() {
     late BuildContext capturedContext;
     await tester.pumpWidget(
       MaterialApp(
+        theme: AppTheme.light,
         home: Builder(
           builder: (context) {
             capturedContext = context;
@@ -114,6 +116,7 @@ void main() {
       late BuildContext capturedContext;
       await tester.pumpWidget(
         MaterialApp(
+          theme: AppTheme.light,
           home: Builder(
             builder: (context) {
               capturedContext = context;
@@ -200,6 +203,7 @@ void main() {
       late BuildContext capturedContext;
       await tester.pumpWidget(
         MaterialApp(
+          theme: AppTheme.light,
           home: Builder(
             builder: (context) {
               capturedContext = context;

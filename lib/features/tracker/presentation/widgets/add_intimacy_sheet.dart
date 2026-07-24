@@ -123,10 +123,10 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppTheme.colors.primary,
+              primary: context.colors.primary,
               onPrimary: Colors.white,
-              surface: AppTheme.colors.card,
-              onSurface: AppTheme.colors.text,
+              surface: context.colors.card,
+              onSurface: context.colors.text,
             ),
           ),
           child: child!,
@@ -142,10 +142,10 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           return Theme(
             data: Theme.of(context).copyWith(
               colorScheme: ColorScheme.light(
-                primary: AppTheme.colors.primary,
+                primary: context.colors.primary,
                 onPrimary: Colors.white,
-                surface: AppTheme.colors.card,
-                onSurface: AppTheme.colors.text,
+                surface: context.colors.card,
+                onSurface: context.colors.text,
               ),
             ),
             child: child!,
@@ -197,7 +197,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Please pair with a partner first'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -213,7 +213,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Please select an initiator'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -272,7 +272,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                       ? 'Intimacy log added! +20 XP'
                       : 'Intimacy log added! XP for this activity is granted once per day.',
                 ),
-                backgroundColor: AppTheme.colors.success,
+                backgroundColor: context.colors.success,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -293,7 +293,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                     ? 'Intimacy log updated successfully!'
                     : 'Intimacy log added successfully!',
               ),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -311,7 +311,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${e.toString()}'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -349,7 +349,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.colors.background,
+        color: context.colors.background,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(24),
         ),
@@ -364,7 +364,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                color: context.colors.textSecondary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -378,14 +378,14 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                     widget.logToEdit != null ? 'Edit Intimacy Log' : 'Add Intimacy Log',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(PhosphorIconsBold.x),
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ],
               ),
@@ -506,29 +506,29 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                            color: context.colors.textSecondary.withValues(alpha: 0.2),
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                            color: context.colors.textSecondary.withValues(alpha: 0.2),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: AppTheme.colors.primary,
+                            color: context.colors.primary,
                             width: 2,
                           ),
                         ),
                         filled: true,
-                        fillColor: AppTheme.colors.card,
+                        fillColor: context.colors.card,
                         contentPadding: const EdgeInsets.all(AppSpacing.md),
                       ),
                       maxLines: 3,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                     ),
                     const SizedBox(height: AppSpacing.xl),
@@ -539,7 +539,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                       child: ElevatedButton(
                         onPressed: _isSubmitting ? null : _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.colors.primary,
+                          backgroundColor: context.colors.primary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             vertical: AppSpacing.md,
@@ -598,12 +598,12 @@ class _DatePickerSection extends StatelessWidget {
           'Date & Time',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Material(
-          color: AppTheme.colors.card,
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
@@ -614,7 +614,7 @@ class _DatePickerSection extends StatelessWidget {
                 children: [
                   Icon(
                     PhosphorIconsBold.calendar,
-                    color: AppTheme.colors.primary,
+                    color: context.colors.primary,
                     size: 24,
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -626,14 +626,14 @@ class _DatePickerSection extends StatelessWidget {
                           _formatDate(selectedDate),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _formatTime(selectedDate),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                         ),
                       ],
@@ -641,7 +641,7 @@ class _DatePickerSection extends StatelessWidget {
                   ),
                   Icon(
                     PhosphorIconsBold.caretRight,
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                     size: 20,
                   ),
                 ],
@@ -707,7 +707,7 @@ class _RatingSection extends StatelessWidget {
           'Rating',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -724,8 +724,8 @@ class _RatingSection extends StatelessWidget {
                   PhosphorIconsBold.fire,
                   size: 36,
                   color: isSelected
-                      ? AppTheme.colors.love
-                      : AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                      ? context.colors.love
+                      : context.colors.textSecondary.withValues(alpha: 0.3),
                 ),
               ),
             );
@@ -767,7 +767,7 @@ class _InitiatorSection extends StatelessWidget {
           'Initiator',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -815,8 +815,8 @@ class _InitiatorOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: isSelected
-          ? AppTheme.colors.primary.withValues(alpha: 0.12)
-          : AppTheme.colors.card,
+          ? context.colors.primary.withValues(alpha: 0.12)
+          : context.colors.card,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -830,8 +830,8 @@ class _InitiatorOption extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected
-                  ? AppTheme.colors.primary
-                  : AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                  ? context.colors.primary
+                  : context.colors.textSecondary.withValues(alpha: 0.2),
               width: isSelected ? 2 : 1.5,
             ),
           ),
@@ -840,8 +840,8 @@ class _InitiatorOption extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: isSelected
-                    ? AppTheme.colors.primary
-                    : AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                    ? context.colors.primary
+                    : context.colors.textSecondary.withValues(alpha: 0.1),
                 backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
                     ? CachedNetworkImageProvider(photoUrl!)
                     : null,
@@ -850,7 +850,7 @@ class _InitiatorOption extends StatelessWidget {
                         PhosphorIconsBold.user,
                         color: isSelected
                             ? Colors.white
-                            : AppTheme.colors.textSecondary,
+                            : context.colors.textSecondary,
                         size: 28,
                       )
                     : null,
@@ -861,8 +861,8 @@ class _InitiatorOption extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       color: isSelected
-                          ? AppTheme.colors.primary
-                          : AppTheme.colors.text,
+                          ? context.colors.primary
+                          : context.colors.text,
                     ),
               ),
             ],
@@ -892,7 +892,7 @@ class _TagsSection extends StatelessWidget {
           'Tags',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -905,19 +905,19 @@ class _TagsSection extends StatelessWidget {
               label: Text(tag),
               selected: isSelected,
               onSelected: (_) => onTagToggled(tag),
-              selectedColor: AppTheme.colors.primary.withValues(alpha: 0.12),
-              checkmarkColor: AppTheme.colors.primary,
+              selectedColor: context.colors.primary.withValues(alpha: 0.12),
+              checkmarkColor: context.colors.primary,
               labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: isSelected
-                        ? AppTheme.colors.primary
-                        : AppTheme.colors.text,
+                        ? context.colors.primary
+                        : context.colors.text,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
-              backgroundColor: AppTheme.colors.card,
+              backgroundColor: context.colors.card,
               side: BorderSide(
                 color: isSelected
-                    ? AppTheme.colors.primary
-                    : AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                    ? context.colors.primary
+                    : context.colors.textSecondary.withValues(alpha: 0.2),
                 width: isSelected ? 2 : 1.5,
               ),
               padding: const EdgeInsets.symmetric(
@@ -945,25 +945,25 @@ class _ProtectionSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppTheme.colors.card,
+      color: context.colors.card,
       borderRadius: BorderRadius.circular(16),
       child: SwitchListTile(
         title: Text(
           'Protection Used',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         subtitle: Text(
           'Was protection used during intimacy?',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
         ),
         value: value,
         onChanged: onChanged,
-        activeColor: AppTheme.colors.primary,
+        activeColor: context.colors.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -1003,7 +1003,7 @@ class _OrgasmsSection extends StatelessWidget {
           'Orgasms',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -1046,14 +1046,14 @@ class _OrgasmCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppTheme.colors.card,
+      color: context.colors.card,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+            color: context.colors.textSecondary.withValues(alpha: 0.2),
             width: 1.5,
           ),
         ),
@@ -1063,7 +1063,7 @@ class _OrgasmCounter extends StatelessWidget {
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -1079,16 +1079,16 @@ class _OrgasmCounter extends StatelessWidget {
                     height: 36,
                     decoration: BoxDecoration(
                       color: count > 0
-                          ? AppTheme.colors.primary.withValues(alpha: 0.1)
-                          : AppTheme.colors.textSecondary.withValues(alpha: 0.05),
+                          ? context.colors.primary.withValues(alpha: 0.1)
+                          : context.colors.textSecondary.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       PhosphorIconsBold.minus,
                       size: 18,
                       color: count > 0
-                          ? AppTheme.colors.primary
-                          : AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                          ? context.colors.primary
+                          : context.colors.textSecondary.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -1097,7 +1097,7 @@ class _OrgasmCounter extends StatelessWidget {
                   count.toString(),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -1108,13 +1108,13 @@ class _OrgasmCounter extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                      color: context.colors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       PhosphorIconsBold.plus,
                       size: 18,
-                      color: AppTheme.colors.primary,
+                      color: context.colors.primary,
                     ),
                   ),
                 ),
@@ -1144,7 +1144,7 @@ class _DurationSection extends StatelessWidget {
           'Duration',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -1160,32 +1160,32 @@ class _DurationSection extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                color: context.colors.textSecondary.withValues(alpha: 0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                color: context.colors.textSecondary.withValues(alpha: 0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: AppTheme.colors.primary,
+                color: context.colors.primary,
                 width: 2,
               ),
             ),
             filled: true,
-            fillColor: AppTheme.colors.card,
+            fillColor: context.colors.card,
             contentPadding: const EdgeInsets.all(AppSpacing.md),
             prefixIcon: Icon(
               PhosphorIconsBold.clock,
-              color: AppTheme.colors.primary,
+              color: context.colors.primary,
             ),
           ),
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
       ],
@@ -1210,7 +1210,7 @@ class _LocationSection extends StatelessWidget {
           'Location',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -1222,32 +1222,32 @@ class _LocationSection extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                color: context.colors.textSecondary.withValues(alpha: 0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                color: context.colors.textSecondary.withValues(alpha: 0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: AppTheme.colors.primary,
+                color: context.colors.primary,
                 width: 2,
               ),
             ),
             filled: true,
-            fillColor: AppTheme.colors.card,
+            fillColor: context.colors.card,
             contentPadding: const EdgeInsets.all(AppSpacing.md),
             prefixIcon: Icon(
               PhosphorIconsBold.mapPin,
-              color: AppTheme.colors.primary,
+              color: context.colors.primary,
             ),
           ),
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
       ],

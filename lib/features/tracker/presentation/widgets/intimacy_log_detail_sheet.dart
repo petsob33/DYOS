@@ -63,7 +63,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
         maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.colors.background,
+        color: context.colors.background,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(24),
         ),
@@ -78,7 +78,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                color: context.colors.textSecondary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -92,14 +92,14 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     'Intimacy Log Details',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(PhosphorIconsBold.x),
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ],
               ),
@@ -118,7 +118,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                       child: Text(
                         _formatDateTime(log.date),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: AppTheme.colors.text,
+                              color: context.colors.text,
                             ),
                       ),
                     ),
@@ -138,8 +138,8 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                               PhosphorIconsBold.fire,
                               size: 24,
                               color: isFilled
-                                  ? AppTheme.colors.love
-                                  : AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                                  ? context.colors.love
+                                  : context.colors.textSecondary.withValues(alpha: 0.3),
                             ),
                           );
                         }),
@@ -166,7 +166,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: AppTheme.colors.primary.withValues(alpha: 0.12),
+                                  backgroundColor: context.colors.primary.withValues(alpha: 0.12),
                                   backgroundImage: initiatorPhotoUrl != null && initiatorPhotoUrl.isNotEmpty
                                       ? CachedNetworkImageProvider(initiatorPhotoUrl)
                                       : null,
@@ -174,7 +174,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                       ? Icon(
                                           PhosphorIconsBold.user,
                                           size: 16,
-                                          color: AppTheme.colors.primary,
+                                          color: context.colors.primary,
                                         )
                                       : null,
                                 ),
@@ -182,7 +182,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                 Text(
                                   initiatorName,
                                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        color: AppTheme.colors.text,
+                                        color: context.colors.text,
                                       ),
                                 ),
                               ],
@@ -212,13 +212,13 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                 vertical: AppSpacing.xs,
                               ),
                               decoration: BoxDecoration(
-                                color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                                color: context.colors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 tag,
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppTheme.colors.primary,
+                                      color: context.colors.primary,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
@@ -240,14 +240,14 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                 : PhosphorIconsBold.xCircle,
                             size: 20,
                             color: log.protectionUsed
-                                ? AppTheme.colors.success
-                                : AppTheme.colors.textSecondary,
+                                ? context.colors.success
+                                : context.colors.textSecondary,
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             log.protectionUsed ? 'Used' : 'Not used',
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: AppTheme.colors.text,
+                                  color: context.colors.text,
                                 ),
                           ),
                         ],
@@ -274,13 +274,13 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                       Text(
                                         '$meName: ',
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                              color: AppTheme.colors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                       ),
                                       Text(
                                         '${log.userOrgasmCount}',
                                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                              color: AppTheme.colors.text,
+                                              color: context.colors.text,
                                               fontWeight: FontWeight.w700,
                                             ),
                                       ),
@@ -292,13 +292,13 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                                       Text(
                                         '$partnerName: ',
                                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                              color: AppTheme.colors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                       ),
                                       Text(
                                         '${log.partnerOrgasmCount}',
                                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                              color: AppTheme.colors.text,
+                                              color: context.colors.text,
                                               fontWeight: FontWeight.w700,
                                             ),
                                       ),
@@ -325,7 +325,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                         child: Text(
                           '${log.duration} minutes',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                       ),
@@ -339,7 +339,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                         child: Text(
                           log.location!,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                       ),
@@ -354,7 +354,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                         child: Text(
                           log.note!,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                       ),
@@ -370,8 +370,8 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                             icon: const Icon(PhosphorIconsBold.trash),
                             label: const Text('Delete'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: AppTheme.colors.love,
-                              side: BorderSide(color: AppTheme.colors.love),
+                              foregroundColor: context.colors.love,
+                              side: BorderSide(color: context.colors.love),
                               padding: const EdgeInsets.symmetric(
                                 vertical: AppSpacing.md,
                               ),
@@ -391,7 +391,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                             icon: const Icon(PhosphorIconsBold.pencil),
                             label: const Text('Edit'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.colors.primary,
+                              backgroundColor: context.colors.primary,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
                                 vertical: AppSpacing.md,
@@ -466,7 +466,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
             onPressed: () => Navigator.of(dialogContext).pop(true),
             child: Text(
               'Delete',
-              style: TextStyle(color: AppTheme.colors.love),
+              style: TextStyle(color: context.colors.love),
             ),
           ),
         ],
@@ -521,14 +521,14 @@ class _DetailSection extends StatelessWidget {
               Icon(
                 icon,
                 size: 20,
-                color: AppTheme.colors.primary,
+                color: context.colors.primary,
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.colors.text,
+                      color: context.colors.text,
                     ),
               ),
             ],

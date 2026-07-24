@@ -87,10 +87,10 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppTheme.colors.primary,
+              primary: context.colors.primary,
               onPrimary: Colors.white,
-              surface: AppTheme.colors.card,
-              onSurface: AppTheme.colors.text,
+              surface: context.colors.card,
+              onSurface: context.colors.text,
             ),
           ),
           child: child!,
@@ -106,10 +106,10 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
           return Theme(
             data: Theme.of(context).copyWith(
               colorScheme: ColorScheme.light(
-                primary: AppTheme.colors.primary,
+                primary: context.colors.primary,
                 onPrimary: Colors.white,
-                surface: AppTheme.colors.card,
-                onSurface: AppTheme.colors.text,
+                surface: context.colors.card,
+                onSurface: context.colors.text,
               ),
             ),
             child: child!,
@@ -140,7 +140,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Please enter a title'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -159,7 +159,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Please pair with a partner first'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -201,7 +201,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
                       ? 'Event added! +15 XP'
                       : 'Event added! XP for this activity is granted once per day.',
                 ),
-                backgroundColor: AppTheme.colors.success,
+                backgroundColor: context.colors.success,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -220,7 +220,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
               content: Text(
                 isEditing ? 'Event updated successfully!' : 'Event added successfully!',
               ),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -238,7 +238,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${e.toString()}'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -257,7 +257,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.colors.background,
+        color: context.colors.background,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(24),
         ),
@@ -272,7 +272,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                color: context.colors.textSecondary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -286,14 +286,14 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
                     widget.eventToEdit != null ? 'Edit Event' : 'Add Event',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(PhosphorIconsBold.x),
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ],
               ),
@@ -321,32 +321,32 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                            color: context.colors.textSecondary.withValues(alpha: 0.2),
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                            color: context.colors.textSecondary.withValues(alpha: 0.2),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: AppTheme.colors.primary,
+                            color: context.colors.primary,
                             width: 2,
                           ),
                         ),
                         filled: true,
-                        fillColor: AppTheme.colors.card,
+                        fillColor: context.colors.card,
                         contentPadding: const EdgeInsets.all(AppSpacing.md),
                         prefixIcon: Icon(
                           PhosphorIconsBold.calendar,
-                          color: AppTheme.colors.primary,
+                          color: context.colors.primary,
                         ),
                       ),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                       textCapitalization: TextCapitalization.sentences,
                     ),
@@ -358,7 +358,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
                       child: ElevatedButton(
                         onPressed: _isSubmitting ? null : _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.colors.primary,
+                          backgroundColor: context.colors.primary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             vertical: AppSpacing.md,
@@ -417,12 +417,12 @@ class _DatePickerSection extends StatelessWidget {
           'Date & Time',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Material(
-          color: AppTheme.colors.card,
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
@@ -433,7 +433,7 @@ class _DatePickerSection extends StatelessWidget {
                 children: [
                   Icon(
                     PhosphorIconsBold.calendar,
-                    color: AppTheme.colors.primary,
+                    color: context.colors.primary,
                     size: 24,
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -445,14 +445,14 @@ class _DatePickerSection extends StatelessWidget {
                           _formatDate(selectedDate),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _formatTime(selectedDate),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                         ),
                       ],
@@ -460,7 +460,7 @@ class _DatePickerSection extends StatelessWidget {
                   ),
                   Icon(
                     PhosphorIconsBold.caretRight,
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                     size: 20,
                   ),
                 ],

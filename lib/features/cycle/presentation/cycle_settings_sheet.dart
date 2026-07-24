@@ -35,7 +35,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Please pair with a partner first'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -63,7 +63,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Settings saved successfully!'),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -78,7 +78,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -109,10 +109,10 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppTheme.colors.primary,
+              primary: context.colors.primary,
               onPrimary: Colors.white,
-              surface: AppTheme.colors.card,
-              onSurface: AppTheme.colors.text,
+              surface: context.colors.card,
+              onSurface: context.colors.text,
             ),
           ),
           child: child!,
@@ -134,7 +134,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.6,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.colors.background,
+        color: context.colors.background,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(24),
         ),
@@ -149,7 +149,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                color: context.colors.textSecondary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -163,14 +163,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                     'Cycle Settings',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ],
               ),
@@ -199,14 +199,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
-                              color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                              color: context.colors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.calendar_today,
-                                  color: AppTheme.colors.primary,
+                                  color: context.colors.primary,
                                   size: 24,
                                 ),
                                 const SizedBox(width: AppSpacing.md),
@@ -217,14 +217,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                       Text(
                                         'Day in Cycle',
                                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                              color: AppTheme.colors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                       ),
                                       Text(
                                         'Day $dayInCycle',
                                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                               fontWeight: FontWeight.w800,
-                                              color: AppTheme.colors.primary,
+                                              color: context.colors.primary,
                                             ),
                                       ),
                                     ],
@@ -239,12 +239,12 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                           'Last Period Date',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: 12),
                         Material(
-                          color: AppTheme.colors.card,
+                          color: context.colors.card,
                           borderRadius: BorderRadius.circular(16),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(16),
@@ -255,7 +255,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                 children: [
                                   Icon(
                                     Icons.calendar_today,
-                                    color: AppTheme.colors.primary,
+                                    color: context.colors.primary,
                                     size: 24,
                                   ),
                                   const SizedBox(width: AppSpacing.md),
@@ -270,8 +270,8 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                 fontWeight: FontWeight.w600,
                                                 color: settings?.lastPeriodDate != null
-                                                    ? AppTheme.colors.text
-                                                    : AppTheme.colors.textSecondary,
+                                                    ? context.colors.text
+                                                    : context.colors.textSecondary,
                                               ),
                                         ),
                                         if (settings?.lastPeriodDate != null)
@@ -280,7 +280,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                           Text(
                                             'Tap to change',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  color: AppTheme.colors.textSecondary,
+                                                  color: context.colors.textSecondary,
                                                 ),
                                           ),
                                       ],
@@ -295,7 +295,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                   else
                                     Icon(
                                       Icons.chevron_right,
-                                      color: AppTheme.colors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                                 ],
                               ),
@@ -307,14 +307,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                           'Average Cycle Length',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           '${settings?.averageCycleLength ?? 28} days',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                         ),
                         const SizedBox(height: 24),
@@ -322,14 +322,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                           'Period Length',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           '${settings?.periodLength ?? 5} days',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                         ),
                         const SizedBox(height: 24),
@@ -344,14 +344,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                     'Hide Menstruation',
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.w700,
-                                          color: AppTheme.colors.text,
+                                          color: context.colors.text,
                                         ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Hide menstruation tracking and display in calendar',
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: AppTheme.colors.textSecondary,
+                                          color: context.colors.textSecondary,
                                         ),
                                   ),
                                 ],
@@ -375,7 +375,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: const Text('Please pair with a partner first'),
-                                          backgroundColor: AppTheme.colors.love,
+                                          backgroundColor: context.colors.love,
                                           behavior: SnackBarBehavior.floating,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(12),
@@ -404,7 +404,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text('Error: ${e.toString()}'),
-                                        backgroundColor: AppTheme.colors.love,
+                                        backgroundColor: context.colors.love,
                                         behavior: SnackBarBehavior.floating,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(12),
@@ -420,7 +420,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                   }
                                 }
                               },
-                              activeColor: AppTheme.colors.primary,
+                              activeColor: context.colors.primary,
                             ),
                           ],
                         ),
@@ -444,7 +444,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                           Text(
                             'Error loading settings',
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: AppTheme.colors.textSecondary,
+                                  color: context.colors.textSecondary,
                                 ),
                           ),
                           const SizedBox(height: 16),
@@ -452,12 +452,12 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                             'Last Period Date',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  color: AppTheme.colors.text,
+                                  color: context.colors.text,
                                 ),
                           ),
                           const SizedBox(height: 12),
                           Material(
-                            color: AppTheme.colors.card,
+                            color: context.colors.card,
                             borderRadius: BorderRadius.circular(16),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(16),
@@ -468,7 +468,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                   children: [
                                     Icon(
                                       Icons.calendar_today,
-                                      color: AppTheme.colors.primary,
+                                      color: context.colors.primary,
                                       size: 24,
                                     ),
                                     const SizedBox(width: AppSpacing.md),
@@ -477,7 +477,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                         'Not set',
                                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                               fontWeight: FontWeight.w600,
-                                              color: AppTheme.colors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                       ),
                                     ),
@@ -490,7 +490,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                     else
                                       Icon(
                                         Icons.chevron_right,
-                                        color: AppTheme.colors.textSecondary,
+                                        color: context.colors.textSecondary,
                                       ),
                                   ],
                                 ),

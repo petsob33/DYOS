@@ -127,14 +127,14 @@ class _QuickMessageNotificationOverlayState
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(
-                              color: AppTheme.colors.primary.withValues(
+                              color: context.colors.primary.withValues(
                                 alpha: 0.1,
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
                               PhosphorIconsBold.chatCircle,
-                              color: AppTheme.colors.primary,
+                              color: context.colors.primary,
                               size: 28,
                             ),
                           ),
@@ -148,7 +148,7 @@ class _QuickMessageNotificationOverlayState
                                   'Quick Message',
                                   style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(
-                                        color: AppTheme.colors.textSecondary,
+                                        color: context.colors.textSecondary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),
@@ -157,7 +157,7 @@ class _QuickMessageNotificationOverlayState
                                   widget.message,
                                   style: Theme.of(context).textTheme.bodyLarge
                                       ?.copyWith(
-                                        color: AppTheme.colors.text,
+                                        color: context.colors.text,
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),

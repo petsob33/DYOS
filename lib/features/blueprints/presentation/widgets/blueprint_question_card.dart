@@ -23,7 +23,7 @@ class BlueprintQuestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -133,7 +133,7 @@ class _SliderInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -187,7 +187,7 @@ class _ChoiceChipsInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Wrap(
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.xs,
@@ -235,7 +235,7 @@ class _MultiSelectInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Wrap(
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.xs,
@@ -290,7 +290,7 @@ class _MeasurementInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -342,7 +342,7 @@ class _SwitchInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Row(
       children: [
         Text(

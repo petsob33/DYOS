@@ -27,7 +27,7 @@ class MemoryDetailDialog extends ConsumerStatefulWidget {
     return showDialog(
       context: context,
       barrierDismissible: true, // Důležité: Kliknutí mimo zavře dialog
-      barrierColor: AppTheme.colors.shadow.withValues(alpha: 0.5),
+      barrierColor: context.colors.shadow.withValues(alpha: 0.5),
       builder: (context) => MemoryDetailDialog(
         memory: memory,
         initialImageIndex: initialImageIndex,
@@ -57,13 +57,13 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             child: Text('Cancel',
-                style: TextStyle(color: AppTheme.colors.textSecondary)),
+                style: TextStyle(color: context.colors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text('Delete',
                 style: TextStyle(
-                    color: AppTheme.colors.love, fontWeight: FontWeight.w600)),
+                    color: context.colors.love, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -78,7 +78,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Memory deleted'),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -91,7 +91,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to delete: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -128,11 +128,11 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
           maxWidth: 400,
         ),
         decoration: BoxDecoration(
-          color: AppTheme.colors.card, 
+          color: context.colors.card, 
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.colors.shadow.withValues(alpha: 0.1),
+              color: context.colors.shadow.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -168,16 +168,16 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                               imageUrl: widget.memory.mediaUrls[index],
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Container(
-                                color: AppTheme.colors.background,
+                                color: context.colors.background,
                                 child: Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: AppTheme.colors.primary,
+                                    color: context.colors.primary,
                                   ),
                                 ),
                               ),
                               errorWidget: (context, url, error) => Container(
-                                color: AppTheme.colors.background,
+                                color: context.colors.background,
                                 child: const Center(
                                   child: Icon(
                                     PhosphorIconsBold.image,
@@ -193,12 +193,12 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                     else
                       Container(
                         height: 200,
-                        color: AppTheme.colors.background,
+                        color: context.colors.background,
                         child: Center(
                           child: Text(
                             'No Photos',
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  color: AppTheme.colors.textSecondary,
+                                  color: context.colors.textSecondary,
                                 ),
                           ),
                         ),
@@ -273,7 +273,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                               icon: Icon(
                                 PhosphorIconsBold.gear,
                                 size: 24,
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                               onPressed: _isDeleting
                                   ? null
@@ -284,7 +284,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                   builder: (ctx) => Container(
                                     padding: const EdgeInsets.all(AppSpacing.lg),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.colors.card,
+                                      color: context.colors.card,
                                       borderRadius: const BorderRadius.vertical(
                                         top: Radius.circular(24),
                                       ),
@@ -295,7 +295,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                         ListTile(
                                           leading: Icon(
                                             PhosphorIconsBold.pencilSimple,
-                                            color: AppTheme.colors.primary,
+                                            color: context.colors.primary,
                                           ),
                                           title: const Text('Edit'),
                                           onTap: () {
@@ -308,12 +308,12 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                         ListTile(
                                           leading: Icon(
                                             PhosphorIconsBold.trash,
-                                            color: AppTheme.colors.love,
+                                            color: context.colors.love,
                                           ),
                                           title: Text(
                                             'Delete',
                                             style: TextStyle(
-                                              color: AppTheme.colors.love,
+                                              color: context.colors.love,
                                             ),
                                           ),
                                           onTap: () {
@@ -331,7 +331,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                 );
                               },
                               style: IconButton.styleFrom(
-                                backgroundColor: AppTheme.colors.background,
+                                backgroundColor: context.colors.background,
                                 padding: const EdgeInsets.all(8),
                               ),
                             ),
@@ -346,13 +346,13 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                             Icon(
                               PhosphorIconsBold.calendarBlank,
                               size: 16,
-                              color: AppTheme.colors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                             const SizedBox(width: AppSpacing.xs),
                             Text(
                               _formatDateTime(widget.memory.date),
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                             ),
                           ],
@@ -372,7 +372,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                                  color: context.colors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -381,7 +381,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                     Icon(
                                       PhosphorIconsBold.mapPin,
                                       size: 14,
-                                      color: AppTheme.colors.primary,
+                                      color: context.colors.primary,
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
@@ -390,7 +390,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                           .textTheme
                                           .bodySmall
                                           ?.copyWith(
-                                            color: AppTheme.colors.primary,
+                                            color: context.colors.primary,
                                             fontWeight: FontWeight.w600,
                                           ),
                                     ),
@@ -404,10 +404,10 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: AppTheme.colors.background,
+                                color: context.colors.background,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  // Oprava: Použití standardní šedé místo AppTheme.colors.border
+                                  // Oprava: Použití standardní šedé místo context.colors.border
                                   color: Colors.black12, 
                                 ),
                               ),
@@ -425,7 +425,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                         .textTheme
                                         .bodySmall
                                         ?.copyWith(
-                                          color: AppTheme.colors.textSecondary,
+                                          color: context.colors.textSecondary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                   ),

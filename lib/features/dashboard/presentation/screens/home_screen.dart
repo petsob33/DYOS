@@ -194,7 +194,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('User not found'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -207,7 +207,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Not paired. Please pair first.'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -247,7 +247,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         content: const Text(
                           'Haptic signal sent! Check console/logs for details.',
                         ),
-                        backgroundColor: AppTheme.colors.success,
+                        backgroundColor: context.colors.success,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 3),
                       ),
@@ -260,7 +260,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Error: $e'),
-                        backgroundColor: AppTheme.colors.love,
+                        backgroundColor: context.colors.love,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 5),
                       ),
@@ -271,7 +271,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               icon: const Icon(PhosphorIconsBold.handTap),
               label: const Text('Test Haptic Signal'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.colors.primary,
+                backgroundColor: context.colors.primary,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -297,7 +297,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         content: const Text(
                           'Quick message sent! Check console/logs for details.',
                         ),
-                        backgroundColor: AppTheme.colors.success,
+                        backgroundColor: context.colors.success,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 3),
                       ),
@@ -310,7 +310,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Error: $e'),
-                        backgroundColor: AppTheme.colors.love,
+                        backgroundColor: context.colors.love,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 5),
                       ),
@@ -321,7 +321,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               icon: const Icon(PhosphorIconsBold.chatCircle),
               label: const Text('Test Quick Message'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.colors.primary,
+                backgroundColor: context.colors.primary,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -413,7 +413,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 },
                 child: CircleAvatar(
                   radius: 18,
-                  backgroundColor: AppTheme.colors.primary.withValues(
+                  backgroundColor: context.colors.primary.withValues(
                     alpha: 0.1,
                   ),
                   backgroundImage: user?.photoUrl != null
@@ -423,7 +423,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ? Icon(
                           PhosphorIconsBold.user,
                           size: 20,
-                          color: AppTheme.colors.primary,
+                          color: context.colors.primary,
                         )
                       : null,
                 ),
@@ -443,7 +443,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: IconButton(
               icon: Icon(
                 PhosphorIconsBold.user,
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
               onPressed: () {
                 context.push('/profile');
@@ -456,12 +456,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           // Test notification button (for debugging)
           IconButton(
-            icon: Icon(PhosphorIconsBold.bell, color: AppTheme.colors.primary),
+            icon: Icon(PhosphorIconsBold.bell, color: context.colors.primary),
             onPressed: () => _testNotifications(context, ref),
             tooltip: 'Test Notifications',
           ),
           IconButton(
-            icon: Icon(PhosphorIconsBold.gear, color: AppTheme.colors.text),
+            icon: Icon(PhosphorIconsBold.gear, color: context.colors.text),
             onPressed: () {
               context.push('/settings');
             },
@@ -486,14 +486,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       'Widgets for your life',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ],

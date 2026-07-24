@@ -69,7 +69,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
     final memoriesAsync = ref.watch(memoriesStreamProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -82,13 +82,13 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                     'Calendar',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.settings),
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                     onPressed: () => _showSettingsSheet(context),
                     tooltip: 'Cycle Settings',
                   ),
@@ -178,14 +178,14 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                 shape: BoxShape.circle,
                               ),
                               selectedDecoration: BoxDecoration(
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                                 shape: BoxShape.circle,
                               ),
                               todayDecoration: BoxDecoration(
-                                color: AppTheme.colors.primary.withValues(alpha: 0.3),
+                                color: context.colors.primary.withValues(alpha: 0.3),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: AppTheme.colors.primary,
+                                  color: context.colors.primary,
                                   width: 2,
                                 ),
                               ),
@@ -346,7 +346,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                 return Container(
                                   margin: const EdgeInsets.all(2),
                                   decoration: BoxDecoration(
-                                    color: backgroundColor ?? AppTheme.colors.card,
+                                    color: backgroundColor ?? context.colors.card,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Center(
@@ -354,7 +354,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       '${date.day}',
                                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.w500,
-                                        color: AppTheme.colors.text,
+                                        color: context.colors.text,
                                       ),
                                     ),
                                   ),
@@ -392,7 +392,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       width: markerSize,
                                       height: markerSize,
                                       decoration: BoxDecoration(
-                                        color: AppTheme.colors.love,
+                                        color: context.colors.love,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -403,10 +403,10 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       width: markerSize,
                                       height: markerSize,
                                       decoration: BoxDecoration(
-                                        color: AppTheme.colors.love.withValues(alpha: 0.5),
+                                        color: context.colors.love.withValues(alpha: 0.5),
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                          color: AppTheme.colors.love,
+                                          color: context.colors.love,
                                           width: 1,
                                           style: BorderStyle.solid,
                                         ),
@@ -421,7 +421,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                          color: AppTheme.colors.success,
+                                          color: context.colors.success,
                                           width: 2,
                                         ),
                                       ),
@@ -433,7 +433,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       width: 4,
                                       height: 4,
                                       decoration: BoxDecoration(
-                                        color: AppTheme.colors.success,
+                                        color: context.colors.success,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -447,7 +447,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       width: markerSize,
                                       height: markerSize,
                                       decoration: BoxDecoration(
-                                        color: AppTheme.colors.primary,
+                                        color: context.colors.primary,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -461,7 +461,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       width: markerSize,
                                       height: markerSize,
                                       decoration: BoxDecoration(
-                                        color: AppTheme.colors.love,
+                                        color: context.colors.love,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -475,7 +475,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                       width: markerSize,
                                       height: markerSize,
                                       decoration: BoxDecoration(
-                                        color: AppTheme.colors.success,
+                                        color: context.colors.success,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -688,7 +688,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                   _formatDate(selectedDate),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                 ),
               ],
@@ -707,7 +707,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                     'Memories',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -742,14 +742,14 @@ class _DayOptionsWidget extends ConsumerWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                             fontWeight: FontWeight.w600,
-                                            color: AppTheme.colors.text,
+                                            color: context.colors.text,
                                           ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       memory.category.displayName,
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: AppTheme.colors.textSecondary,
+                                            color: context.colors.textSecondary,
                                           ),
                                     ),
                                   ],
@@ -757,7 +757,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                               ),
                               Icon(
                                 PhosphorIconsBold.caretRight,
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                                 size: 16,
                               ),
                             ],
@@ -775,7 +775,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                     'Intimacy',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -797,7 +797,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                             children: [
                               Icon(
                                 PhosphorIconsBold.heartStraight,
-                                color: AppTheme.colors.love,
+                                color: context.colors.love,
                                 size: 20,
                               ),
                               const SizedBox(width: AppSpacing.md),
@@ -809,14 +809,14 @@ class _DayOptionsWidget extends ConsumerWidget {
                                       'Intimacy',
                                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                             fontWeight: FontWeight.w600,
-                                            color: AppTheme.colors.text,
+                                            color: context.colors.text,
                                           ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       'Rating: ${log.rating}/5',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: AppTheme.colors.textSecondary,
+                                            color: context.colors.textSecondary,
                                           ),
                                     ),
                                   ],
@@ -824,7 +824,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                               ),
                               Icon(
                                 PhosphorIconsBold.caretRight,
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                                 size: 16,
                               ),
                             ],
@@ -842,7 +842,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                     'Events',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -864,7 +864,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                             children: [
                               Icon(
                                 PhosphorIconsBold.calendar,
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                                 size: 20,
                               ),
                               const SizedBox(width: AppSpacing.md),
@@ -876,14 +876,14 @@ class _DayOptionsWidget extends ConsumerWidget {
                                       event.title,
                                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                             fontWeight: FontWeight.w600,
-                                            color: AppTheme.colors.text,
+                                            color: context.colors.text,
                                           ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       _formatTime(event.date),
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: AppTheme.colors.textSecondary,
+                                            color: context.colors.textSecondary,
                                           ),
                                     ),
                                   ],
@@ -891,7 +891,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                               ),
                               Icon(
                                 PhosphorIconsBold.caretRight,
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                                 size: 16,
                               ),
                             ],
@@ -914,13 +914,13 @@ class _DayOptionsWidget extends ConsumerWidget {
                         },
                         icon: Icon(
                           PhosphorIconsBold.heart,
-                          color: AppTheme.colors.success,
+                          color: context.colors.success,
                           size: 18,
                         ),
                         label: const Text('Add Memory'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.colors.success,
-                          side: BorderSide(color: AppTheme.colors.success),
+                          foregroundColor: context.colors.success,
+                          side: BorderSide(color: context.colors.success),
                           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -937,13 +937,13 @@ class _DayOptionsWidget extends ConsumerWidget {
                         },
                         icon: Icon(
                           PhosphorIconsBold.heartStraight,
-                          color: AppTheme.colors.love,
+                          color: context.colors.love,
                           size: 18,
                         ),
                         label: const Text('Add Intimacy'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.colors.love,
-                          side: BorderSide(color: AppTheme.colors.love),
+                          foregroundColor: context.colors.love,
+                          side: BorderSide(color: context.colors.love),
                           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -963,13 +963,13 @@ class _DayOptionsWidget extends ConsumerWidget {
                         },
                         icon: Icon(
                           PhosphorIconsBold.calendarPlus,
-                          color: AppTheme.colors.primary,
+                          color: context.colors.primary,
                           size: 18,
                         ),
                         label: const Text('Add Event'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.colors.primary,
-                          side: BorderSide(color: AppTheme.colors.primary),
+                          foregroundColor: context.colors.primary,
+                          side: BorderSide(color: context.colors.primary),
                           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -987,8 +987,8 @@ class _DayOptionsWidget extends ConsumerWidget {
                         icon: const Icon(Icons.add, size: 18),
                         label: const Text('Add Period Log'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.colors.warning,
-                          side: BorderSide(color: AppTheme.colors.warning),
+                          foregroundColor: context.colors.warning,
+                          side: BorderSide(color: context.colors.warning),
                           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -1017,7 +1017,7 @@ class _CycleLegend extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppTheme.colors.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -1027,7 +1027,7 @@ class _CycleLegend extends StatelessWidget {
             'Legend',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: AppTheme.colors.text,
+              color: context.colors.text,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -1089,7 +1089,7 @@ class _LegendItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppTheme.colors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ],
@@ -1132,7 +1132,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Please pair with a partner first'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -1171,7 +1171,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                   ? 'Cycle log updated successfully!'
                   : 'Cycle log added successfully!',
             ),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -1189,7 +1189,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -1207,7 +1207,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.colors.background,
+        color: context.colors.background,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(24),
         ),
@@ -1222,7 +1222,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                color: context.colors.textSecondary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1238,14 +1238,14 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                         : 'Add Cycle Log',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ],
               ),
@@ -1262,7 +1262,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                       _formatDate(widget.date),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                     ),
                     const SizedBox(height: 24),
@@ -1272,7 +1272,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                       'Flow Intensity',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                     ),
                     const SizedBox(height: 12),
@@ -1292,20 +1292,20 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                               _flowIntensity = intensity;
                             });
                           },
-                          selectedColor: AppTheme.colors.primary.withValues(alpha: 0.12),
-                          checkmarkColor: AppTheme.colors.primary,
+                          selectedColor: context.colors.primary.withValues(alpha: 0.12),
+                          checkmarkColor: context.colors.primary,
                           labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
                                 color: isSelected
-                                    ? AppTheme.colors.primary
-                                    : AppTheme.colors.text,
+                                    ? context.colors.primary
+                                    : context.colors.text,
                                 fontWeight:
                                     isSelected ? FontWeight.w700 : FontWeight.w500,
                               ),
-                          backgroundColor: AppTheme.colors.card,
+                          backgroundColor: context.colors.card,
                           side: BorderSide(
                             color: isSelected
-                                ? AppTheme.colors.primary
-                                : AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                                ? context.colors.primary
+                                : context.colors.textSecondary.withValues(alpha: 0.2),
                             width: isSelected ? 2 : 1.5,
                           ),
                         );
@@ -1318,7 +1318,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                       'Mood',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                     ),
                     const SizedBox(height: 12),
@@ -1337,20 +1337,20 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                               _mood = mood;
                             });
                           },
-                          selectedColor: AppTheme.colors.primary.withValues(alpha: 0.12),
-                          checkmarkColor: AppTheme.colors.primary,
+                          selectedColor: context.colors.primary.withValues(alpha: 0.12),
+                          checkmarkColor: context.colors.primary,
                           labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
                                 color: isSelected
-                                    ? AppTheme.colors.primary
-                                    : AppTheme.colors.text,
+                                    ? context.colors.primary
+                                    : context.colors.text,
                                 fontWeight:
                                     isSelected ? FontWeight.w700 : FontWeight.w500,
                               ),
-                          backgroundColor: AppTheme.colors.card,
+                          backgroundColor: context.colors.card,
                           side: BorderSide(
                             color: isSelected
-                                ? AppTheme.colors.primary
-                                : AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                                ? context.colors.primary
+                                : context.colors.textSecondary.withValues(alpha: 0.2),
                             width: isSelected ? 2 : 1.5,
                           ),
                         );
@@ -1364,7 +1364,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                       child: ElevatedButton(
                         onPressed: _isSubmitting ? null : _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.colors.primary,
+                          backgroundColor: context.colors.primary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(

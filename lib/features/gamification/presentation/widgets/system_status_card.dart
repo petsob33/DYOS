@@ -71,7 +71,7 @@ class _SystemStatusCardState extends State<SystemStatusCard>
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final versionStr = LevelManager.currentVersionString(widget.currentXp);
     final tierMax = LevelManager.currentTierMaxXp(widget.currentXp);
     final nextLabel = LevelManager.nextTierVersionLabel(widget.currentXp);

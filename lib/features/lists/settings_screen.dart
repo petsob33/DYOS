@@ -25,7 +25,7 @@ class SettingsScreen extends ConsumerWidget {
           'Delete Account',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.love,
+                color: context.colors.love,
               ),
         ),
         content: Column(
@@ -35,7 +35,7 @@ class SettingsScreen extends ConsumerWidget {
             Text(
               'This action cannot be undone. This will permanently delete:',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -46,14 +46,14 @@ class SettingsScreen extends ConsumerWidget {
               '• Your pairing (partner will be unpaired)\n'
               '• All notes and lists',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Are you absolutely sure?',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.love,
+                    color: context.colors.love,
                     fontWeight: FontWeight.w700,
                   ),
             ),
@@ -64,13 +64,13 @@ class SettingsScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'Cancel',
-              style: TextStyle(color: AppTheme.colors.textSecondary),
+              style: TextStyle(color: context.colors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
-              foregroundColor: AppTheme.colors.love,
+              foregroundColor: context.colors.love,
             ),
             child: const Text(
               'Delete Forever',
@@ -129,7 +129,7 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error deleting account: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -153,7 +153,7 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('You must be paired to set anniversary date'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -200,7 +200,7 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Anniversary date updated'),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -213,7 +213,7 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error updating anniversary date: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -239,13 +239,13 @@ class SettingsScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'Cancel',
-              style: TextStyle(color: AppTheme.colors.textSecondary),
+              style: TextStyle(color: context.colors.textSecondary),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
-              foregroundColor: AppTheme.colors.love,
+              foregroundColor: context.colors.love,
             ),
             child: const Text('Log out'),
           ),
@@ -294,7 +294,7 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error logging out: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -324,7 +324,7 @@ class SettingsScreen extends ConsumerWidget {
                 'Settings',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.colors.text,
+                      color: context.colors.text,
                     ),
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -340,7 +340,7 @@ class SettingsScreen extends ConsumerWidget {
                           : null;
 
                       return Material(
-                        color: AppTheme.colors.card,
+                        color: context.colors.card,
                         borderRadius: BorderRadius.circular(16),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
@@ -351,7 +351,7 @@ class SettingsScreen extends ConsumerWidget {
                               children: [
                                 Icon(
                                   PhosphorIconsBold.calendarHeart,
-                                  color: AppTheme.colors.primary,
+                                  color: context.colors.primary,
                                   size: 24,
                                 ),
                                 const SizedBox(width: AppSpacing.md),
@@ -366,7 +366,7 @@ class SettingsScreen extends ConsumerWidget {
                                             .titleMedium
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
-                                              color: AppTheme.colors.text,
+                                              color: context.colors.text,
                                             ),
                                       ),
                                       const SizedBox(height: 2),
@@ -378,7 +378,7 @@ class SettingsScreen extends ConsumerWidget {
                                             .textTheme
                                             .bodySmall
                                             ?.copyWith(
-                                              color: AppTheme.colors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                       ),
                                     ],
@@ -386,7 +386,7 @@ class SettingsScreen extends ConsumerWidget {
                                 ),
                                 Icon(
                                   PhosphorIconsBold.caretRight,
-                                  color: AppTheme.colors.textSecondary,
+                                  color: context.colors.textSecondary,
                                   size: 20,
                                 ),
                               ],
@@ -396,7 +396,7 @@ class SettingsScreen extends ConsumerWidget {
                       );
                     },
                     loading: () => Material(
-                      color: AppTheme.colors.card,
+                      color: context.colors.card,
                       borderRadius: BorderRadius.circular(16),
                       child: Padding(
                         padding: const EdgeInsets.all(AppSpacing.md),
@@ -404,7 +404,7 @@ class SettingsScreen extends ConsumerWidget {
                           children: [
                             Icon(
                               PhosphorIconsBold.calendarHeart,
-                              color: AppTheme.colors.primary,
+                              color: context.colors.primary,
                               size: 24,
                             ),
                             const SizedBox(width: AppSpacing.md),
@@ -419,7 +419,7 @@ class SettingsScreen extends ConsumerWidget {
                                         .titleMedium
                                         ?.copyWith(
                                           fontWeight: FontWeight.w700,
-                                          color: AppTheme.colors.text,
+                                          color: context.colors.text,
                                         ),
                                   ),
                                   const SizedBox(height: 2),
@@ -429,7 +429,7 @@ class SettingsScreen extends ConsumerWidget {
                                         .textTheme
                                         .bodySmall
                                         ?.copyWith(
-                                          color: AppTheme.colors.textSecondary,
+                                          color: context.colors.textSecondary,
                                         ),
                                   ),
                                 ],
@@ -446,7 +446,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               // Pairing button
               Material(
-                color: AppTheme.colors.card,
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
@@ -477,7 +477,7 @@ class SettingsScreen extends ConsumerWidget {
                       children: [
                         Icon(
                           PhosphorIconsBold.heart,
-                          color: AppTheme.colors.primary,
+                          color: context.colors.primary,
                           size: 24,
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -492,7 +492,7 @@ class SettingsScreen extends ConsumerWidget {
                                     .titleMedium
                                     ?.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      color: AppTheme.colors.text,
+                                      color: context.colors.text,
                                     ),
                               ),
                               const SizedBox(height: 2),
@@ -502,7 +502,7 @@ class SettingsScreen extends ConsumerWidget {
                                     .textTheme
                                     .bodySmall
                                     ?.copyWith(
-                                      color: AppTheme.colors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                               ),
                             ],
@@ -510,7 +510,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         Icon(
                           PhosphorIconsBold.caretRight,
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                           size: 20,
                         ),
                       ],
@@ -521,7 +521,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               // Delete Account button
               Material(
-                color: AppTheme.colors.card,
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
@@ -532,7 +532,7 @@ class SettingsScreen extends ConsumerWidget {
                       children: [
                         Icon(
                           PhosphorIconsBold.trash,
-                          color: AppTheme.colors.love,
+                          color: context.colors.love,
                           size: 24,
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -547,7 +547,7 @@ class SettingsScreen extends ConsumerWidget {
                                     .titleMedium
                                     ?.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      color: AppTheme.colors.love,
+                                      color: context.colors.love,
                                     ),
                               ),
                               const SizedBox(height: 2),
@@ -557,7 +557,7 @@ class SettingsScreen extends ConsumerWidget {
                                     .textTheme
                                     .bodySmall
                                     ?.copyWith(
-                                      color: AppTheme.colors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                               ),
                             ],
@@ -565,7 +565,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         Icon(
                           PhosphorIconsBold.caretRight,
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                           size: 20,
                         ),
                       ],
@@ -576,7 +576,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               // Logout button
               Material(
-                color: AppTheme.colors.card,
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
@@ -587,7 +587,7 @@ class SettingsScreen extends ConsumerWidget {
                       children: [
                         Icon(
                           PhosphorIconsBold.signOut,
-                          color: AppTheme.colors.love,
+                          color: context.colors.love,
                           size: 24,
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -602,7 +602,7 @@ class SettingsScreen extends ConsumerWidget {
                                     .titleMedium
                                     ?.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      color: AppTheme.colors.text,
+                                      color: context.colors.text,
                                     ),
                               ),
                               const SizedBox(height: 2),
@@ -612,7 +612,7 @@ class SettingsScreen extends ConsumerWidget {
                                     .textTheme
                                     .bodySmall
                                     ?.copyWith(
-                                      color: AppTheme.colors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                               ),
                             ],
@@ -620,7 +620,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         Icon(
                           PhosphorIconsBold.caretRight,
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                           size: 20,
                         ),
                       ],

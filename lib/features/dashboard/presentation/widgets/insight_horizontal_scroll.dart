@@ -73,7 +73,7 @@ class _InsightSlide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const c = AppTheme.colors;
+    final c = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       child: Row(

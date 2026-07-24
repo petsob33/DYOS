@@ -140,7 +140,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: GestureDetector(
@@ -163,7 +163,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: IconButton(
                     icon: Icon(
                       PhosphorIconsBold.arrowLeft,
-                      color: AppTheme.colors.text,
+                      color: context.colors.text,
                     ),
                     onPressed: () => context.go('/login'),
                   ),
@@ -173,7 +173,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Icon(
                   PhosphorIconsBold.heart,
                   size: 80,
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 
@@ -182,7 +182,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   'Create account',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -191,7 +191,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Text(
                   'Sign up to get started',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -222,10 +222,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     labelText: 'Full name',
                     prefixIcon: Icon(
                       PhosphorIconsBold.user,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -233,7 +233,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.love,
+                        color: context.colors.love,
                         width: 1,
                       ),
                     ),
@@ -278,10 +278,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     labelText: 'Email',
                     prefixIcon: Icon(
                       PhosphorIconsBold.envelope,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -289,7 +289,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.love,
+                        color: context.colors.love,
                         width: 1,
                       ),
                     ),
@@ -332,14 +332,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     labelText: 'Password',
                     prefixIcon: Icon(
                       PhosphorIconsBold.lock,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
                             ? PhosphorIconsBold.eyeSlash
                             : PhosphorIconsBold.eye,
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                       onPressed: () {
                         setState(() {
@@ -348,7 +348,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       },
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -356,7 +356,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.love,
+                        color: context.colors.love,
                         width: 1,
                       ),
                     ),
@@ -397,14 +397,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     labelText: 'Confirm password',
                     prefixIcon: Icon(
                       PhosphorIconsBold.lock,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirmPassword
                             ? PhosphorIconsBold.eyeSlash
                             : PhosphorIconsBold.eye,
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                       onPressed: () {
                         setState(() {
@@ -413,7 +413,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       },
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -421,7 +421,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.love,
+                        color: context.colors.love,
                         width: 1,
                       ),
                     ),
@@ -443,14 +443,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: AppTheme.colors.love.withOpacity(0.1),
+                      color: context.colors.love.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           PhosphorIconsBold.warning,
-                          color: AppTheme.colors.love,
+                          color: context.colors.love,
                           size: 20,
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -461,7 +461,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
-                                  color: AppTheme.colors.love,
+                                  color: context.colors.love,
                                 ),
                           ),
                         ),
@@ -475,7 +475,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleRegister,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.colors.primary,
+                    backgroundColor: context.colors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.md,
@@ -511,7 +511,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     Expanded(
                       child: Divider(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                        color: context.colors.textSecondary.withOpacity(0.3),
                       ),
                     ),
                     Padding(
@@ -519,13 +519,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       child: Text(
                         'OR',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppTheme.colors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                       ),
                     ),
                     Expanded(
                       child: Divider(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                        color: context.colors.textSecondary.withOpacity(0.3),
                       ),
                     ),
                   ],
@@ -535,9 +535,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 OutlinedButton.icon(
                   onPressed: _isLoading ? null : _handleGoogleSignIn,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.colors.text,
+                    foregroundColor: context.colors.text,
                     side: BorderSide(
-                      color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                      color: context.colors.textSecondary.withOpacity(0.3),
                     ),
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.md,
@@ -549,12 +549,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   icon: Icon(
                     PhosphorIconsBold.googleLogo,
                     size: 20,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
                   label: Text(
                     'Continue with Google',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                           fontWeight: FontWeight.w600,
                         ),
                   ),
@@ -567,7 +567,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     Text(
                       'Already have an account? ',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                     ),
                     TextButton(
@@ -582,7 +582,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       child: Text(
                         'Sign in',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.colors.primary,
+                              color: context.colors.primary,
                               fontWeight: FontWeight.w600,
                             ),
                       ),

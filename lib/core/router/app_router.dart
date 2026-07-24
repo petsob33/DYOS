@@ -602,10 +602,10 @@ class RootShell extends ConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 6.0),
                           child: Material(
-                            color: AppTheme.colors.primary,
+                            color: context.colors.primary,
                             shape: const CircleBorder(),
                             elevation: 4,
-                            shadowColor: AppTheme.colors.shadow,
+                            shadowColor: context.colors.shadow,
                             child: InkWell(
                               customBorder: const CircleBorder(),
                               onTap: () {
@@ -735,7 +735,7 @@ class _QuickAddSheet extends ConsumerWidget {
             height: 6,
             margin: const EdgeInsets.only(bottom: AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppTheme.colors.textSecondary.withOpacity(0.3),
+              color: context.colors.textSecondary.withOpacity(0.3),
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -743,7 +743,7 @@ class _QuickAddSheet extends ConsumerWidget {
             'Quick actions',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: AppTheme.colors.text,
+              color: context.colors.text,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -809,7 +809,7 @@ class _QuickActionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppTheme.colors.background,
+      color: context.colors.background,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -836,12 +836,12 @@ class _QuickActionChip extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: AppTheme.colors.primary, size: 18),
+              Icon(icon, color: context.colors.primary, size: 18),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 label,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                   fontWeight: FontWeight.w600,
                 ),
               ),

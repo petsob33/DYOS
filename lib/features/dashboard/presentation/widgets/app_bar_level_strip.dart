@@ -17,7 +17,7 @@ class AppBarLevelStrip extends ConsumerWidget {
     final currentXp = ref.watch(currentXpProvider);
     final version = LevelManager.currentVersionString(currentXp);
     final progress = LevelManager.calculateProgress(currentXp);
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Padding(
       padding: const EdgeInsets.only(left: 0, right: 8, top: 8, bottom: 8),
       child: Material(

@@ -25,14 +25,14 @@ class IntimacySparkCard extends ConsumerWidget {
               children: [
                 Icon(
                   PhosphorIconsBold.heart,
-                  color: AppTheme.colors.love,
+                  color: context.colors.love,
                   size: 24,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'No activity yet',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -75,7 +75,7 @@ class IntimacySparkCard extends ConsumerWidget {
                 children: [
                   Icon(
                     PhosphorIconsBold.heart,
-                    color: AppTheme.colors.love,
+                    color: context.colors.love,
                     size: 20,
                   ),
                 ],
@@ -87,7 +87,7 @@ class IntimacySparkCard extends ConsumerWidget {
                     child: RichText(
                       text: TextSpan(
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                         children: [
                           const TextSpan(text: ''),
@@ -95,7 +95,7 @@ class IntimacySparkCard extends ConsumerWidget {
                             text: sparkText,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
-                                  color: AppTheme.colors.text,
+                                  color: context.colors.text,
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
@@ -103,7 +103,7 @@ class IntimacySparkCard extends ConsumerWidget {
                             text: ' $sparkEmoji',
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
-                                  color: AppTheme.colors.text,
+                                  color: context.colors.text,
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
@@ -123,7 +123,7 @@ class IntimacySparkCard extends ConsumerWidget {
           children: [
             Icon(
               PhosphorIconsBold.heart,
-              color: AppTheme.colors.love,
+              color: context.colors.love,
               size: 24,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -137,14 +137,14 @@ class IntimacySparkCard extends ConsumerWidget {
           children: [
             Icon(
               PhosphorIconsBold.heart,
-              color: AppTheme.colors.love,
+              color: context.colors.love,
               size: 24,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Error loading data',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],

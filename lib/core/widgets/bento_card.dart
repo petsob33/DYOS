@@ -21,15 +21,15 @@ class BentoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final card = Container(
       decoration: BoxDecoration(
-        color: background ?? AppTheme.colors.card,
+        color: background ?? context.colors.card,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppTheme.colors.shadow.withValues(alpha: 0.08),
+          color: context.colors.shadow.withValues(alpha: 0.08),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.colors.shadow.withValues(alpha: 0.16),
+            color: context.colors.shadow.withValues(alpha: 0.16),
             blurRadius: 26,
             offset: const Offset(0, 10),
           ),
@@ -45,7 +45,7 @@ class BentoCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
-        splashColor: AppTheme.colors.primary.withOpacity(0.08),
+        splashColor: context.colors.primary.withOpacity(0.08),
         highlightColor: Colors.transparent,
         onTap: onTap,
         child: card,

@@ -210,7 +210,7 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Firebase Connection Test'),
         actions: [
@@ -229,8 +229,8 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
             // Summary Card
             Card(
               color: _failedCount == 0
-                  ? AppTheme.colors.success.withOpacity(0.1)
-                  : AppTheme.colors.love.withOpacity(0.1),
+                  ? context.colors.success.withOpacity(0.1)
+                  : context.colors.love.withOpacity(0.1),
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
@@ -241,8 +241,8 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                           : PhosphorIconsBold.warning,
                       size: 48,
                       color: _failedCount == 0
-                          ? AppTheme.colors.success
-                          : AppTheme.colors.love,
+                          ? context.colors.success
+                          : context.colors.love,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
@@ -254,8 +254,8 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: _failedCount == 0
-                                ? AppTheme.colors.success
-                                : AppTheme.colors.love,
+                                ? context.colors.success
+                                : context.colors.love,
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -263,7 +263,7 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                     Text(
                       'Passed: $_passedCount / ${_results.length}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                     ),
                   ],
@@ -303,7 +303,7 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                       children: [
                         Icon(
                           PhosphorIconsBold.info,
-                          color: AppTheme.colors.primary,
+                          color: context.colors.primary,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
@@ -373,8 +373,8 @@ class _TestResultCard extends StatelessWidget {
                   ? PhosphorIconsBold.checkCircle
                   : PhosphorIconsBold.xCircle,
               color: result.passed
-                  ? AppTheme.colors.success
-                  : AppTheme.colors.love,
+                  ? context.colors.success
+                  : context.colors.love,
               size: 24,
             ),
             const SizedBox(width: AppSpacing.md),
@@ -388,15 +388,15 @@ class _TestResultCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: result.passed
-                              ? AppTheme.colors.success
-                              : AppTheme.colors.love,
+                              ? context.colors.success
+                              : context.colors.love,
                         ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     result.message,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                   ),
                 ],

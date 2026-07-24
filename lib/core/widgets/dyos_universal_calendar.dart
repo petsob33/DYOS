@@ -100,7 +100,7 @@ class OurOSUniversalCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultSelectedColor = selectedDayColor ?? AppTheme.colors.primary;
+    final defaultSelectedColor = selectedDayColor ?? context.colors.primary;
     final defaultTodayColor = todayColor ??
         defaultSelectedColor.withValues(alpha: 0.3);
 
@@ -125,27 +125,27 @@ class OurOSUniversalCalendar extends StatelessWidget {
             fontSize: 16,
           ),
           todayTextStyle: GoogleFonts.inter(
-            color: AppTheme.colors.text,
+            color: context.colors.text,
             fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
           defaultTextStyle: GoogleFonts.inter(
-            color: AppTheme.colors.text,
+            color: context.colors.text,
             fontWeight: FontWeight.w400,
             fontSize: 16,
           ),
           weekendTextStyle: GoogleFonts.inter(
-            color: AppTheme.colors.text,
+            color: context.colors.text,
             fontWeight: FontWeight.w400,
             fontSize: 16,
           ),
           outsideTextStyle: GoogleFonts.inter(
-            color: AppTheme.colors.textSecondary,
+            color: context.colors.textSecondary,
             fontWeight: FontWeight.w400,
             fontSize: 16,
           ),
           disabledTextStyle: GoogleFonts.inter(
-            color: AppTheme.colors.textSecondary.withValues(alpha: 0.5),
+            color: context.colors.textSecondary.withValues(alpha: 0.5),
             fontWeight: FontWeight.w400,
             fontSize: 16,
           ),
@@ -161,15 +161,15 @@ class OurOSUniversalCalendar extends StatelessWidget {
           titleTextStyle: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppTheme.colors.text,
+            color: context.colors.text,
           ),
           leftChevronIcon: Icon(
             Icons.chevron_left,
-            color: AppTheme.colors.text,
+            color: context.colors.text,
           ),
           rightChevronIcon: Icon(
             Icons.chevron_right,
-            color: AppTheme.colors.text,
+            color: context.colors.text,
           ),
           formatButtonVisible: false,
           titleCentered: true,
@@ -181,22 +181,22 @@ class OurOSUniversalCalendar extends StatelessWidget {
           weekdayStyle: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppTheme.colors.textSecondary,
+            color: context.colors.textSecondary,
           ),
           weekendStyle: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppTheme.colors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         );
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.colors.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(24.0),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.colors.shadow,
+            color: context.colors.shadow,
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

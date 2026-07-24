@@ -26,7 +26,7 @@ class ListsScreen extends ConsumerWidget {
           IconButton(
             icon: Icon(
               PhosphorIconsBold.plus,
-              color: AppTheme.colors.text,
+              color: context.colors.text,
             ),
             onPressed: () => context.push('/add-note?type=bucketList'),
             tooltip: 'Add note',
@@ -49,14 +49,14 @@ class ListsScreen extends ConsumerWidget {
                       'Bucket List',
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       'Things you want to do together',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                     ),
                   ],
@@ -75,7 +75,7 @@ class ListsScreen extends ConsumerWidget {
                             Icon(
                               PhosphorIconsBold.listChecks,
                               size: 48,
-                              color: AppTheme.colors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
@@ -84,7 +84,7 @@ class ListsScreen extends ConsumerWidget {
                                   .textTheme
                                   .titleMedium
                                   ?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                             ),
                             const SizedBox(height: AppSpacing.xs),
@@ -94,7 +94,7 @@ class ListsScreen extends ConsumerWidget {
                                   .textTheme
                                   .bodySmall
                                   ?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -142,7 +142,7 @@ class ListsScreen extends ConsumerWidget {
                           Icon(
                             PhosphorIconsBold.warning,
                             size: 48,
-                            color: AppTheme.colors.warning,
+                            color: context.colors.warning,
                           ),
                           const SizedBox(height: AppSpacing.md),
                           Text(
@@ -151,7 +151,7 @@ class ListsScreen extends ConsumerWidget {
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(
-                                  color: AppTheme.colors.text,
+                                  color: context.colors.text,
                                 ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
@@ -161,7 +161,7 @@ class ListsScreen extends ConsumerWidget {
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
-                                  color: AppTheme.colors.textSecondary,
+                                  color: context.colors.textSecondary,
                                 ),
                             textAlign: TextAlign.center,
                           ),
@@ -195,7 +195,7 @@ class _BucketListItem extends StatelessWidget {
               note.title!,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -203,7 +203,7 @@ class _BucketListItem extends StatelessWidget {
           Text(
             note.content,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                   height: 1.5,
                 ),
           ),
@@ -213,13 +213,13 @@ class _BucketListItem extends StatelessWidget {
               Icon(
                 PhosphorIconsBold.calendar,
                 size: 14,
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
                 _formatDate(note.createdAt),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
               ),
             ],

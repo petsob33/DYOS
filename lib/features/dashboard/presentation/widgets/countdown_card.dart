@@ -24,14 +24,14 @@ class CountdownCard extends ConsumerWidget {
                 Text(
                   'Countdown',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'No upcoming events',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -57,7 +57,7 @@ class CountdownCard extends ConsumerWidget {
               Text(
                 'Countdown',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -65,14 +65,14 @@ class CountdownCard extends ConsumerWidget {
                 '$daysUntil',
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'days until: ${event.title}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -88,7 +88,7 @@ class CountdownCard extends ConsumerWidget {
             Text(
               'Countdown',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -103,14 +103,14 @@ class CountdownCard extends ConsumerWidget {
             Text(
               'Countdown',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Error loading events',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],

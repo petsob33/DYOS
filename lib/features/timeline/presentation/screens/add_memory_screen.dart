@@ -93,7 +93,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error picking images: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -128,7 +128,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error picking image: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -158,10 +158,10 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppTheme.colors.primary,
+              primary: context.colors.primary,
               onPrimary: Colors.white,
-              surface: AppTheme.colors.card,
-              onSurface: AppTheme.colors.text,
+              surface: context.colors.card,
+              onSurface: context.colors.text,
             ),
           ),
           child: child!,
@@ -202,7 +202,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Memory updated'),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -227,7 +227,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
             content: const Text(
               'You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.',
             ),
-            backgroundColor: AppTheme.colors.warning,
+            backgroundColor: context.colors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -243,7 +243,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please add at least one image or a caption'),
-          backgroundColor: AppTheme.colors.love,
+          backgroundColor: context.colors.love,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -292,7 +292,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                         : 'Memory saved! XP for this activity is granted once per day.')
                     : 'Memory "${next.memory.caption.isEmpty ? 'Untitled' : next.memory.caption}" updated.',
               ),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -308,7 +308,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(next.message),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -321,7 +321,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: Text(_isEditMode ? 'Edit Memory' : 'Add Memory'),
         actions: [
@@ -345,7 +345,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
               child: Text(
                 'Save',
                 style: TextStyle(
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -379,29 +379,29 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                        color: context.colors.textSecondary.withValues(alpha: 0.2),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                        color: context.colors.textSecondary.withValues(alpha: 0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.primary,
+                        color: context.colors.primary,
                         width: 2,
                       ),
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     contentPadding: const EdgeInsets.all(AppSpacing.md),
                   ),
                   maxLines: 4,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                   validator: (value) {
                     // Optional validation - at least one field (image or caption) should be filled
@@ -446,7 +446,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                 ElevatedButton(
                   onPressed: (isUploading && !_isEditMode) ? null : _saveMemory,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.colors.primary,
+                    backgroundColor: context.colors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.md,
@@ -505,7 +505,7 @@ class _ImagePickerSection extends StatelessWidget {
           'Photos & Videos',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -566,7 +566,7 @@ class _ImagePickerSection extends StatelessWidget {
           label: Text(
             thumbnails.isEmpty ? 'Add Photos' : 'Add More Photos',
             style: TextStyle(
-              color: AppTheme.colors.primary,
+              color: context.colors.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -579,7 +579,7 @@ class _ImagePickerSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             side: BorderSide(
-              color: AppTheme.colors.primary,
+              color: context.colors.primary,
               width: 1.5,
             ),
           ),
@@ -608,12 +608,12 @@ class _DatePickerSection extends StatelessWidget {
           'Date',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Material(
-          color: AppTheme.colors.card,
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
@@ -624,7 +624,7 @@ class _DatePickerSection extends StatelessWidget {
                 children: [
                   Icon(
                     PhosphorIconsBold.calendar,
-                    color: AppTheme.colors.primary,
+                    color: context.colors.primary,
                     size: 24,
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -636,14 +636,14 @@ class _DatePickerSection extends StatelessWidget {
                           _formatDate(selectedDate),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _formatTime(selectedDate),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                         ),
                       ],
@@ -651,7 +651,7 @@ class _DatePickerSection extends StatelessWidget {
                   ),
                   Icon(
                     PhosphorIconsBold.caretRight,
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                     size: 20,
                   ),
                 ],
@@ -707,7 +707,7 @@ class _CategorySelectionSection extends StatelessWidget {
           'Category',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -740,18 +740,18 @@ class _CategorySelectionSection extends StatelessWidget {
                   onCategorySelected(category);
                 }
               },
-                selectedColor: AppTheme.colors.primary.withValues(alpha: 0.12),
-              checkmarkColor: AppTheme.colors.primary,
+                selectedColor: context.colors.primary.withValues(alpha: 0.12),
+              checkmarkColor: context.colors.primary,
               labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: isSelected
-                        ? AppTheme.colors.primary
-                        : AppTheme.colors.text,
+                        ? context.colors.primary
+                        : context.colors.text,
                   ),
-              backgroundColor: AppTheme.colors.card,
+              backgroundColor: context.colors.card,
                 side: BorderSide(
                 color: isSelected
-                    ? AppTheme.colors.primary
-                    : AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                    ? context.colors.primary
+                    : context.colors.textSecondary.withValues(alpha: 0.2),
                 width: isSelected ? 2 : 1.5,
               ),
               padding: const EdgeInsets.symmetric(
@@ -794,13 +794,13 @@ class _PlaceSection extends StatelessWidget {
           'Place',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         const SizedBox(height: AppSpacing.sm),
         if (!hasLocation)
           Material(
-            color: AppTheme.colors.card,
+            color: context.colors.card,
             borderRadius: BorderRadius.circular(16),
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
@@ -811,7 +811,7 @@ class _PlaceSection extends StatelessWidget {
                   children: [
                     Icon(
                       PhosphorIconsBold.mapPin,
-                      color: AppTheme.colors.primary,
+                      color: context.colors.primary,
                       size: 24,
                     ),
                     const SizedBox(width: AppSpacing.md),
@@ -820,13 +820,13 @@ class _PlaceSection extends StatelessWidget {
                         'Add place',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.colors.text,
+                              color: context.colors.text,
                             ),
                       ),
                     ),
                     Icon(
                       PhosphorIconsBold.caretRight,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                       size: 20,
                     ),
                   ],
@@ -836,7 +836,7 @@ class _PlaceSection extends StatelessWidget {
           )
         else
           Material(
-            color: AppTheme.colors.card,
+            color: context.colors.card,
             borderRadius: BorderRadius.circular(16),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
@@ -844,7 +844,7 @@ class _PlaceSection extends StatelessWidget {
                 children: [
                   Icon(
                     PhosphorIconsBold.mapPin,
-                    color: AppTheme.colors.primary,
+                    color: context.colors.primary,
                     size: 24,
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -856,7 +856,7 @@ class _PlaceSection extends StatelessWidget {
                           name ?? 'Location set',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                       ],
@@ -866,7 +866,7 @@ class _PlaceSection extends StatelessWidget {
                     onPressed: onChangePlace,
                     icon: Icon(
                       PhosphorIconsBold.pencilSimple,
-                      color: AppTheme.colors.primary,
+                      color: context.colors.primary,
                       size: 20,
                     ),
                     tooltip: 'Change place',
@@ -875,7 +875,7 @@ class _PlaceSection extends StatelessWidget {
                     onPressed: onRemovePlace,
                     icon: Icon(
                       PhosphorIconsBold.trash,
-                      color: AppTheme.colors.love,
+                      color: context.colors.love,
                       size: 20,
                     ),
                     tooltip: 'Remove place',

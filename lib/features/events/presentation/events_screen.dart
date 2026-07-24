@@ -37,14 +37,14 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     final eventsAsync = ref.watch(eventsStreamProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.colors.background,
+        backgroundColor: context.colors.background,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             PhosphorIconsBold.arrowLeft,
-            color: AppTheme.colors.text,
+            color: context.colors.text,
           ),
           onPressed: () {
             context.pop();
@@ -55,14 +55,14 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           'Events',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         actions: [
           IconButton(
             icon: Icon(
               PhosphorIconsBold.plus,
-              color: AppTheme.colors.text,
+              color: context.colors.text,
             ),
             onPressed: () {
               AddEventSheet.show(context);
@@ -103,13 +103,13 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                             padding: const EdgeInsets.all(8),
                             margin: const EdgeInsets.only(bottom: 8),
                             decoration: BoxDecoration(
-                              color: AppTheme.colors.primary.withOpacity(0.1),
+                              color: context.colors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               'Debug: ${events.length} events loaded',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.colors.primary,
+                                    color: context.colors.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
                             ),
@@ -155,7 +155,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                                 width: 6,
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: AppTheme.colors.primary,
+                                  color: context.colors.primary,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -202,7 +202,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                             Icon(
                               PhosphorIconsBold.calendar,
                               size: 64,
-                              color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
+                              color: context.colors.textSecondary.withValues(alpha: 0.4),
                             ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
@@ -210,7 +210,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                                   ? 'No events on this day'
                                   : 'No events yet',
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                             ),
                             const SizedBox(height: AppSpacing.sm),
@@ -255,7 +255,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   child: Text(
                     'Error loading events: $error',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.colors.love,
+                          color: context.colors.love,
                         ),
                   ),
                 ),
@@ -281,7 +281,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
-              foregroundColor: AppTheme.colors.love,
+              foregroundColor: context.colors.love,
             ),
             child: const Text('Delete'),
           ),
@@ -298,7 +298,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Please pair with a partner first'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -317,7 +317,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Event deleted successfully'),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -331,7 +331,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${e.toString()}'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -368,13 +368,13 @@ class _EventCard extends StatelessWidget {
                 _formatTime(event.date),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.colors.primary,
+                      color: context.colors.primary,
                     ),
               ),
               Text(
                 _formatDate(event.date),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
               ),
             ],
@@ -386,7 +386,7 @@ class _EventCard extends StatelessWidget {
               event.title,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
           ),
@@ -394,7 +394,7 @@ class _EventCard extends StatelessWidget {
           IconButton(
             icon: Icon(
               PhosphorIconsBold.trash,
-              color: AppTheme.colors.love,
+              color: context.colors.love,
               size: 20,
             ),
             onPressed: onDelete,
