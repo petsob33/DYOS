@@ -1,212 +1,142 @@
 # AUDIT.md – Kompletní audit aplikace DYOS
 
-**Datum auditu:** 2026-07-03
+**Datum auditu:** 2026-07-20 (re-audit, commit `30912ce`, + oprava vlastních nálezů ve stejné relaci)
+**Předchozí audit:** 2026-07-03 (viz git historie tohoto souboru)
 **Auditor:** Claude Code (automatizovaný audit)
 
 ## Poznámka k zadání
 
-Zadání popisovalo nativní Android aplikaci v Kotlin/Jetpack Compose sledující "piva na akci". Skutečný obsah repozitáře je odlišný: **DYOS** je cross-platformní **Flutter/Dart** aplikace ("relationship OS pro páry") s backendem Firebase a monetizací RevenueCat. Audit byl proveden na reálném projektu a metodika ze zadání (architektura, state management, persistence, permissions, emulátor…) byla 1:1 přemapována na Flutter ekvivalenty (Riverpod místo Compose state, Firestore/SharedPreferences místo Room, GoRouter místo Navigation Component atd.).
-
-V repozitáři už existují dva starší interní audity – `docs/APP_REPORT_CRITICAL.md` (březen 2025) a `DOCUMENTATION.md` (březen 2026), které tvrdí, že prakticky všechny dřívější bezpečnostní nálezy jsou opravené. Tento audit tato tvrzení ověřil proti aktuálnímu stavu kódu a **objevil několik nových, dosud nezdokumentovaných nálezů** (viz sekce 4), včetně jednoho kritického.
+Toto je **diferenciální re-audit** oproti auditu z 3. 7. 2026, ve stejné relaci navazuje oprava zjištěných nálezů (bezpečnostní test, CI gate, sjednocení cycle providerů, Blueprints → Firestore). Za 17 dní od minulého auditu přibylo ~35 commitů (viz `git log`), mj. PR #3 (oprava zamrzání quick-message notifikace, replay notifikací po otevření appky, nová obrazovka chat historie). Většina kritických a vysokých nálezů z minulého auditu byla mezitím **opravena** – tento report ověřuje každý starý nález proti aktuálnímu kódu, přidává nové poznatky a dokumentuje opravy provedené v této relaci.
 
 ---
 
-## 1. Mapování projektu a architektura
+## 1. Shrnutí – co se od minula změnilo
 
-**Tech stack:** Flutter (Dart ^3.10.4), Riverpod (`@riverpod` anotace) pro state management, GoRouter pro navigaci, Firebase (Auth, Firestore, Storage, Functions, Messaging, App Check) jako backend, RevenueCat pro předplatné, freezed/json_serializable pro modely.
-
-**Struktura (feature-first):**
-```
-lib/
-  main.dart          – bootstrap: Firebase, FCM background handler, RevenueCat, App Check, AdMob
-  app.dart           – root MaterialApp.router, theme
-  core/
-    router/          – GoRouter, redirect logika (auth → pairing → shell)
-    services/        – auth, firebase (facade), storage, notification, ad, pairing, profile, subscription
-    theme/, widgets/, constants/
-  features/
-    auth/            – login, register, pairing, profil
-    dashboard/       – Home (bento dashboard)
-    timeline/        – vzpomínky (memories) + mapa
-    tracker/         – intimita + analytika
-    cycle/           – menstruační kalendář
-    events/          – kalendář událostí
-    notes/           – bucket list, secret gift, sdílené poznámky
-    premium/         – RevenueCat paywall
-    gamification/    – SP/XP, levely, odměny
-    blueprints/       – dotazníkové "blueprint" sekce (zatím mock data)
-    lists/           – seznamy, nastavení
-  models/            – sdílené modely (notes)
-  shared/widgets/    – univerzální kalendář
-functions/           – Cloud Functions (Node.js): pairing, invite lookup, FCM triggery, komprese obrázků
-firestore.rules, storage.rules – bezpečnostní pravidla
-```
-
-**Navigace (GoRouter):** `/login`, `/register` (veřejné) → `/pairing` (auth, bez páru) → shell se 4 taby: `/home`, `/memory` (timeline), `/data` (tracker), `/cycle`. Plus ~15 modálních/detail routes (`/add-memory`, `/events`, `/lists`, `/secret-notes`, `/premium`, `/level`, `/blueprints`, `/settings`, `/profile`, …) a debug-only `/firebase-test`.
-
-**State management:** Riverpod generátor (`@riverpod`) napříč celou appkou – repository providery (stream z Firestore) → presentation providery → `ConsumerWidget`/`ConsumerStatefulWidget`. `HomeScreen` (2207 řádků) je rozdělen na ~15 malých `ConsumerWidget` tříd, každá sleduje jen svůj provider – recompozice je tedy rozumně škálovaná, i když soubor samotný je velký a méně čitelný.
-
-**Data layer:** Firestore jako zdroj pravdy (žádné Room/sqflite – `sqflite` je jen tranzitivní závislost, nikde v `lib/` nepoužitá). `SharedPreferences` se používá jen okrajově (ad_service, auth_providers). Firebase Storage pro média (memories, profilové fotky) s automatickou server-side kompresí přes Cloud Function.
-
-### Přehled obrazovek
-
-| Obrazovka | Účel |
+| Starý nález (3. 7.) | Stav teď (20. 7.) |
 |---|---|
-| Login/Register | Email+heslo a Google Sign-In |
-| Pairing | Párování dvou účtů přes invite kód |
-| Home (dashboard) | Bento mřížka: status pár, countdown, quick note, intimacy spark, taptic touch, quick message |
-| Timeline | Chronologický feed vzpomínek, filtry, mapa vzpomínek |
-| Add/Edit Memory | Přidání vzpomínky s fotkami/videi |
-| Data (Tracker) | Intimacy logy, grafy/analytika |
-| Intimacy History | Historie záznamů intimity |
-| Cycle Tracking | Menstruační kalendář, predikce, partner message |
-| Events | Kalendář událostí/výročí |
-| Lists | Bucket list, nastavení |
-| Secret Notes / Add Note | Sdílené/soukromé/secret-gift poznámky |
-| Blueprints | Dotazníkové sekce (mock data) |
-| Level | Gamifikace – SP, fáze, milníky, denní questy |
-| Premium Landing / Paywall | RevenueCat nabídky, nákup, restore |
-| Profile / Settings | Editace profilu, profilové fotky |
-| Firebase Test (debug only) | Diagnostika Firebase připojení |
+| 🔴 Keystore `.jks` commitnutý v gitu | ✅ **Opraveno** (3. 7., commit `4dd9e55`) – vyveden z git trackingu, `*.jks`/`key.properties` v `.gitignore`. Zůstává nesmazatelně v historii gitu. |
+| 🟠 Secret/private notes čitelné partnerem přes Firestore rules | ✅ **Opraveno** (3. 7.) – `firestore.rules` `allow list, get` podmiňuje `!isPrivateType(resource.data) \|\| isAuthor()`. **Regresně otestováno** – viz sekce 2. |
+| 🟠 Google Places API klíč v historii gitu | ⚠️ **Beze změny** – jen ověřitelné/rotovatelné v GCP konzoli, mimo dosah tohoto repa/agenta. |
+| 🟡 Race condition v XP gamifikaci | ✅ **Opraveno** (3. 7.) – `grantQuestXpIfEligible` běží přes server-side Firestore transakci. |
+| 🟡 Chybějící pagination na Firestore listenery | ✅ **Opraveno** (3. 7.) – `.limit()` na memory/intimacy/event query; nová `chat_history_repository.dart` má `.limit(200)` od začátku. |
+| 🟡 Žádný crash-reporting SDK | ✅ **Opraveno** (3. 7.) – `firebase_crashlytics` v pubspec, na webu záměrně vypnuto. |
+| 🟡 8 failing testů (rozbitý mock) | ✅ **Opraveno** (3. 7.) – `flutter test`: **120/120 passed**. |
+| 🟡 Zastaralé závislosti | 🟡 **Výrazně zlepšeno, nedokončeno** – viz sekce 2. |
+| 🟢 `home_screen.dart` 2207 řádků | ✅ **Opraveno** (3. 7.) – rozdělen na menší widgety, 561 řádků. |
+| 🟢 Duplicitní cycle modely/providery | ✅ **Opraveno v této relaci** – viz sekce 3. |
+| 🟢 `print()` místo `debugPrint()` | Neověřeno – nízká priorita. |
+
+**Nové od minula (kód z produkčních commitů):** perzistentní obrazovka **Chat** (`/chat`) – sloučená historie quick-message + haptic touch; oprava zamrzání appky při notifikační overlay; oprava "replay" starých notifikací; FCM web push.
+
+**Opraveno v této relaci (viz sekce 3):** bezpečnostní regresní test na private notes ověřen (už existoval, jen jako JS/emulator test, ne Dart), CI gate na `flutter analyze`/`flutter test`/Firestore rules testy, sjednocení duplicitních cycle providerů/modelů (+ oprava skrytého bugu v editaci cyklo-logu), Blueprints přesunuty z hardcoded mock dat do Firestore. **Nový nález objevený a opravený v této relaci:** `freezed`/`json_serializable` verze zamčené v `pubspec.lock` neumí vygenerovat `explicitToJson: true` pro vnořené modely (viz sekce 4).
 
 ---
 
-## 2. Technický sken
+## 2. Technický sken (aktuální stav)
 
-### Build a analýza
-- **`flutter analyze`**: **400 nálezů**, převážně `info`/`warning` (lint styl – redundantní argumenty, `const`, deprecated API). **1 skutečná chyba** (`error`): `test/pairing/pairing_screen_enhanced_test.dart:108` – nevalidní typ v closure (`Future<bool>` vs `Stream<bool?>`). Produkční kód (`lib/`) je bez chyb.
-- **`flutter test`**: **36 passed / 8 failed**. Selhávající testy jsou v `test/pairing/pairing_service_enhanced_test.dart` – mock `MockFirebaseFunctions.httpsCallable` vrací `null` místo callable objektu, takže testy očekávající konkrétní pairing výjimky (`PartnerAlreadyPairedException`, `UserNotFoundException`) místo toho dostanou obecnou `GenericPairingException`. Jde o rozbitý mock/test setup, ne o chybu v produkční logice.
-- **`flutter build apk --debug`**: spuštěno, běží dlouho (>15 min i po zahřátí gradle daemonu) kvůli velkému množství nativních pluginů (Firebase ×6, Google Maps, RevenueCat, AdMob). Výsledek build a instalace na emulátor je popsán v sekci 6.
+### `flutter analyze`
+**409 nálezů, 0 error, 0 warning – všechno `info`** (lint styl, deprecated API). Produkční kód se kompiluje čistě.
 
-### TODO/FIXME/placeholdery
-Jen 2 zbylé TODO v celém `lib/` (dřívější report jich měl víc – většina byla mezitím dořešena):
-- `memory_screen.dart:21` – `// TODO: Navigate to map view`
-- `memory_screen.dart:194` – `// TODO: Navigate to memory detail`
+- **91× `deprecated_member_use` v `lib/`** – hlavně Flutter/Firebase API (`withOpacity` → `withValues`, `AppRouterRef` → `Ref`). Roste s odkládáním SDK upgradů, není to bug.
 
-### Error handling
-- Try/catch je použit rozumně konzistentně (42 souborů). Žádné nalezené `.value!`/force-unwrap vzory na `AsyncValue`.
-- **Chybí globální error handling** – v `main.dart` není `runZonedGuarded`/`FlutterError.onError`/`PlatformDispatcher.instance.onError`. V pubspecu **není žádný crash-reporting SDK** (Crashlytics, Sentry, …). Pokud appka spadne v produkci mimo Flutter frameworkové zachytávání, tým se o tom nedozví jinak než od uživatele.
-- V `main.dart` zůstávají 4× syrové `print()` (RevenueCat konfigurace) místo `debugPrint`/loggeru – v release buildu print s Flutter `debugPrint` redakcí neprochází přes bezpečnou vrstvu logování zmíněnou v `DOCUMENTATION.md`.
+### `flutter test`
+**120/120 passed.**
 
-### State management – race condition v gamifikaci
-`grantQuestXpIfEligible()` (`user_stats_provider.dart`) kontroluje `isQuestCompletedToday(couple, questId)` proti **lokálně cachovanému** stavu páru (z Riverpod streamu), a poté provede **dva oddělené, netransakční** zápisy do Firestore: `addCoupleXp()` (atomický `FieldValue.increment`) a následně `setQuestXpGrantedAt()`. Mezi kontrolou a zápisem "granted" flagu není zámek.
-- **Race condition:** pokud oba partneři provedou stejnou akci (např. oba přidají vzpomínku) v krátkém okně, oba klienti mohou lokálně vidět "quest ještě nesplněn" a XP se připíše 2×.
-- **Crash-safety:** pokud appka spadne/ztratí síť mezi oběma zápisy, XP je připsáno, ale flag "granted" není uložen → při dalším spuštění může být stejný quest znovu odměněn.
-- Doprava: přesunout do jedné Firestore transakce nebo Cloud Function.
+### Firestore security rules (emulator testy, `test/security/rules/`)
+Samostatná JS testová sada (`@firebase/rules-unit-testing` proti Firestore emulátoru, ne Dart `fake_cloud_firestore` – ten neumí vyhodnotit `get()`/`exists()`/vlastní `function`y, takže pravidla závislá na datech dokumentu testovat nemůže). `notes_rules.test.js` (24 testů) **už před touto relací plně pokrývalo** private/secretGift notes fix – partner nemůže `get`/`list` cizí private/secretGift notes, autor může, sdílené notes vidí oba, update/delete matice. Spuštěno v této relaci proti aktuálnímu `firestore.rules` (24/24 passed) – **oprava dřívějšího chybného nálezu**: minulá verze tohoto reportu tvrdila, že tento test chybí; ve skutečnosti existoval, jen mimo Dart test suite, takže ho `flutter test` nezachytí.
 
-### Persistence
-- Firestore je jediný zdroj pravdy pro sdílená data páru – žádné lokální cachování mimo built-in Firestore offline persistence, žádný vlastní konfliktní merge kód (spoléhá se na Firestore last-write-wins, což je u tohoto typu appky přijatelné).
-- Storage pravidla i Firestore pravidla jsou nyní poměrně důkladná (viz sekce 4) – member-only přístup, delete jen pro autora u citlivých kolekcí, velikostní/MIME limity na upload.
+### CI/CD
+`.github/workflows/ci.yml` (**nově přidáno v této relaci**) spouští na push/PR: `flutter analyze` (fail jen na skutečné `error`, ne na ~400 preexistujících `info` lintů – `flutter analyze` samo vrací exit 1 i jen kvůli infu, takže tvrdé gatování na jeho exit kód by shodilo každý build bez souvislosti s regresí), `flutter test`, a Firestore rules emulator testy (`test/security/rules/`). Předtím žádný z existujících 3 workflow (`build-apk`, `deploy-production`, `deploy-test`) nic z tohoto nespouštěl.
 
-### Zvuk/animace
-Appka nemá žádné audio přehrávání. Kompresi obrázků řeší `image_picker` (nativní, mimo hlavní Dart isolate) na klientovi a Cloud Function (`sharp`) na serveru – žádné blokující operace na UI vlákně nebyly nalezeny.
-
-### Závislosti (pubspec.yaml)
-`flutter pub outdated` ukazuje, že prakticky **všechny Firebase balíčky, RevenueCat, go_router, Riverpod, fl_chart, flutter_local_notifications a permission_handler jsou 1–3 major verze pozadu** (např. `cloud_firestore` 5.6→6.6, `firebase_core` 3→4, `go_router` 14→17, `flutter_riverpod` 2→3, `fl_chart` 0.69→1.2). Žádný balíček není opuštěný/nebezpečný, ale zaostávání zvyšuje riziko budoucích breaking-change migrací najednou a míjí bezpečnostní/bugfix opravy novějších verzí.
-
-### Permissions (AndroidManifest.xml)
-Manifest deklaruje jen `POST_NOTIFICATIONS`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` – odpovídá reálnému využití (FCM notifikace, mapa vzpomínek/geocoding). `image_picker` se používá jen s `ImageSource.gallery` (ne `.camera`), takže chybějící `CAMERA` permission je v pořádku a záměrné. AdMob App ID je v manifestu natvrdo – to je v pořádku, jde o veřejné ID, ne o tajný klíč.
+### Závislosti
+`flutter pub outdated`: většina balíčků max. 1-2 patch verze pozadu. Major verze pozadu: `flutter_riverpod` (2→3), `freezed_annotation`/`freezed` (2→3), `riverpod_annotation`/`riverpod_generator` (2→4), `google_sign_in` (6→7), `purchases_flutter` (9→10), `geocoding` (4→5), `geolocator` (13→14), `google_mobile_ads` (7→9), `google_fonts` (7→8). Nic urgentního, ale rostoucí migrační dluh — a nyní i konkrétní důvod upgradovat `freezed`, viz sekce 4.
 
 ---
 
-## 3. Funkční sken a UX
+## 3. Provedené opravy v této relaci
 
-### Stav funkcí (ověřeno proti `docs/APP_REPORT_CRITICAL.md` z března 2025 a `DOCUMENTATION.md` z března 2026)
+**1. Sjednocení duplicitních cycle providerů/modelů.** `cycle_tracking_screen.dart` dřív importoval paralelně dvě sady: `models/cycle_provider.dart`+`models/cycle_log.dart` (list-based predikce pro kalendář) a `presentation/cycle_provider.dart`+`domain/cycle_log_model.dart` (single-value predikce pro dashboard, plus skutečné CRUD). Obě četly ze stejného `cycleRepositoryProvider` a používaly stejný predikční vzorec, takže nešlo o datovou nekonzistenci, ale o matoucí duplicitu. Řešení: `predictedPeriodDaysProvider` a `fertileWindowDaysProvider` (list-based varianty) přesunuty do `presentation/cycle_provider.dart`; `cycle_tracking_screen.dart` teď používá jen doménový `CycleLog` a jednu sadu providerů; `lib/features/cycle/models/` smazána. **Vedlejší nález:** `_CycleLogSheet._submit()` při editaci existujícího dne vždy zapisoval `id: ''`, takže `CycleRepository.addOrUpdateLog` vytvořil **nový duplicitní dokument** místo update původního záznamu – opraveno na `id: widget.existingLog?.id ?? ''`. Ověřeno: `flutter analyze`/`flutter test test/cycle` čisté.
+
+**2. Bezpečnostní regresní test na private/secretGift notes.** Zjištěno, že tento test **už existoval** (`test/security/rules/notes_rules.test.js`, 24 scénářů) – jen jako Node.js emulator test, ne jako Dart test; minulá verze tohoto auditu to chybně označila za mezeru. Ověřeno spuštěním proti emulátoru: 24/24 passed. Žádná nová Dart implementace nebyla potřeba (a ani není technicky proveditelná – `fake_cloud_firestore`'s pravidlový engine nepodporuje `get()`/`resource`/vlastní `function`, viz `test/security/rules/README.md`).
+
+**3. CI gate.** Nový `.github/workflows/ci.yml`: `flutter analyze` (fail jen na `error`), `flutter test`, Firestore rules emulator testy – na `pull_request` a push na `main`/`test-main`.
+
+**4. Blueprints přesunuty z mock dat do Firestore.** Nová kolekce `blueprint_sections/{sectionId}` (Firestore rules: číst smí kdokoliv přihlášený, zápis jen přes Admin SDK). Nový `domain/blueprint_section.dart` (Freezed model, `fromFirestore`), `data/blueprint_repository.dart`, `presentation/blueprint_provider.dart` (`blueprintSectionsProvider`/`blueprintSectionProvider`, oba s fallbackem na `BlueprintMockData`, pokud Firestore ještě není naseedovaná). `blueprints_list_screen.dart` a `blueprint_detail_screen.dart` přepsány na `ref.watch(...)` + `AsyncValue.when()`; router resolvuje sekci teď uvnitř `BlueprintDetailScreen`, ne synchronně v `pageBuilder`. `blueprint_mock_data.dart` zůstává jako seed zdroj a offline fallback. **Seed skripty přidány, ale NEspuštěny proti produkci** (vyžaduje uživatelovy Firebase credentials): `flutter test scripts/export_blueprint_sections.dart` → `scripts/blueprint_sections_seed.json` (26 sekcí, už vygenerováno a v repu) → `node scripts/seed_blueprint_sections.js` (Admin SDK upload). **Dokud seed skript nikdo nespustí, appka funguje beze změny přes mock-data fallback** – toto není breaking change.
+
+Všechny 4 opravy ověřeny: `flutter analyze` (0 error/warning), `flutter test` (120/120), Firestore rules emulator testy (24/24).
+
+---
+
+## 4. Nový nález z této relace: `pubspec.lock` neodpovídá committnutému generovanému kódu
+
+Při `dart run build_runner build` (nutné pro nové providery výše) se **neúmyslně přegenerovaly i nesouvisející soubory** (`couple_model.freezed.dart`, `user_model.freezed.dart`, `event_model.freezed.dart`, `note_item.freezed.dart`, `memory_model.freezed.dart`, `cycle_settings_model.freezed.dart`) s jinou hodnotou: `@JsonSerializable()` místo dříve committnutého `@JsonSerializable(explicitToJson: true)`.
+
+- **Příčina:** `freezed: 2.5.8` (aktuálně zamčená verze v `pubspec.lock`) **vůbec nemá** logiku pro `explicitToJson` (ověřeno grepem v balíčku – nula výskytů). Committnuté `.freezed.dart` soubory byly zjevně vygenerované jinou (novější) verzí `freezed`, než jaká je teď zamčená v `pubspec.lock` – drift mezi lockfilem a committnutým generovaným kódem, který existoval už před touto relací (nejde o nic, co jsem způsobil úpravou zdrojových `.dart` souborů; `pubspec.lock` byl navíc už modifikovaný na začátku této relace, mimo můj zásah).
+- **Dopad, pokud by se to nechalo být:** `explicitToJson: false` znamená, že vnořené Freezed objekty (např. `CoupleStatus` uvnitř `CoupleModel.status`, `UserStatus` uvnitř `UserModel`) se do `toJson()` výstupu vloží jako **syrová Dart instance třídy**, ne jako Map – Firestore takový zápis odmítne (potvrzeno pádem testu `pairing_service_test.dart`/`pairing_integration_test.dart` s `Invalid argument: Instance of '_$CoupleStatusImpl'`). Kdyby tohle doběhlo do produkce, **zápis stavu páru/uživatelského statusu by přestal fungovat**.
+- **Oprava v této relaci:** nesouvisející přegenerované soubory vráceny na původní (committnutý) stav (`git checkout`), takže nic z tohoto driftu nejde do commitu. Zkusil jsem i `build.yaml` s `explicit_to_json: true` pro `freezed`/`json_serializable` buildery – **nepomohlo**, protože freezed 2.5.8 tuto možnost vůbec nezná (není to otázka konfigurace, ale chybějící funkce v zamčené verzi balíčku). `build.yaml` zůstává v repu pro budoucnost (jakmile `freezed` upgraduje, bude потřeba).
+- **Zbývá vyřešit:** buď upgradovat `freezed`/`freezed_annotation`/`json_serializable` na verzi, která `explicitToJson` umí odvodit automaticky (nutná verifikace, jaká přesně verze to přidala – `pub outdated` ukazuje resolvable `freezed 3.2.3`), nebo trvale ručně anotovat postižené třídy. **Dokud se to nevyřeší, nikdo NESMÍ spustit `dart run build_runner build` na těchto 6 souborech** (nebo obecně `--delete-conflicting-outputs` napříč celým `lib/`) bez ručního ověření diffu – jinak se stejná regrese znovu vplíží do commitu.
+
+---
+
+## 5. Funkční sken a UX
+
+### Stav funkcí
 
 | Funkce | Stav | Poznámka |
 |---|---|---|
-| Auth + Pairing | **Hotovo** | Párování nyní přes server-side Cloud Function s transakcí (dřívější race condition opravena) |
+| Auth + Pairing | **Hotovo** | – |
 | Home/Dashboard | **Hotovo** | – |
-| Timeline (vzpomínky) | **Skoro hotovo** | 2 TODO: navigace na mapu/detail z `memory_screen.dart` |
+| Quick Message / Haptic Touch | **Hotovo** | Zamrzání overlay a replay-on-open opraveny (PR #3) |
+| Chat | **Hotovo** | Sloučená historie zpráv+doteků, live-update, `.limit(200)` |
+| Timeline (vzpomínky) | **Skoro hotovo** | 2 stále otevřené TODO v `memory_screen.dart` (navigace na mapu/detail) – neověřeno znovu v této relaci |
 | Tracker (intimita) | **Hotovo** | – |
-| Cycle | **Hotovo** | `partnerMessage` je nyní zobrazen v UI (`insight_provider.dart`) – oprava oproti staršímu reportu |
-| Lists/Notes | **Částečně** | Bucket List, Secret Gift, shared notes fungují; **Groceries stále chybí** |
+| Cycle Tracking | **Hotovo** | Duplicitní providery/modely sjednoceny (sekce 3), + oprava bugu s duplicitním zápisem při editaci |
+| Lists/Notes | **Částečně** | Bucket List, Secret Gift, shared notes fungují a bezpečně oddělené na backendu (regresně otestováno); **Groceries stále chybí** |
 | Events | **Hotovo** | – |
 | Premium (RevenueCat) | **Hotovo** | – |
-| Blueprints | **Rozpracováno** | Data stále z `BlueprintMockData`, ne z Firestore – odpovědi se ukládají, ale seznam otázek je hardcoded |
-| Gamifikace (SP/XP) | **Funkční, ale s bugem** | Viz race condition v sekci 2 |
-| Time Capsule | **Nezapočato** | Složka `lib/features/time_capsule` už v repu vůbec neexistuje (dříve prázdná, teď smazaná) – rozhodnutí "implementovat, nebo škrtnout ze specifikace" nebylo uděláno |
-| Dark Mode | **Chybí** | `ThemeMode.light` natvrdo v `app.dart` |
-| Achievement/Recap | **Nezapočato** | Beze zmínky v kódu |
-| Lokalizace | **Chybí** | Záměrně dle `.cursorrules` (v1 = hardcoded stringy) |
-
-### UX konzistence
-- Prázdné stavy jsou řešeny rozumně (`_EmptyState` v timeline, `isEmpty` kontroly v events/data/home).
-- Chybové/loading stavy: `AsyncValue.when()` použito v 21 souborech, žádné nalezené nebezpečné force-unwrapy.
-- Logický tok appky (párování → sdílená data → gamifikace → premium) dává smysl a je interně konzistentní.
+| Blueprints | **Hotovo** (dřív rozpracováno) | Obsah teď z Firestore (`blueprint_sections`), s offline fallbackem; seed skripty připravené, čekají na ruční spuštění proti produkci (vyžaduje Firebase credentials) |
+| Gamifikace (SP/XP) | **Hotovo** | – |
+| Time Capsule | **Nezapočato** | Funkce v repu neexistuje |
+| Dark Mode | **Chybí** | `ThemeMode.light` natvrdo v `app.dart:32` |
+| Achievement/Recap | **Nezapočato** | – |
+| Lokalizace | **Chybí** | Záměrně (v1 = hardcoded stringy) |
 
 ---
 
-## 4. Rizika a hrozby (včetně nových zjištění)
+## 6. Zbývající rizika a hrozby
 
-### 🔴 KRITICKÉ – nové zjištění, které starší audity nezachytily
-
-**Android release signing keystore (`upload-keystore.jks`) je commitnutý v gitu.**
-- Soubory `upload-keystore.jks` (root) a `android/upload-keystore.jks` jsou sledované gitem (commit `67e9f1e`), nejsou v `.gitignore`, a `android/app/build.gradle.kts` je aktivně používá jako **release signing key** (`signingConfigs.release`).
-- `android/key.properties` (obsahuje hesla) sledovaný **není** – jen `.jks` binárka je v repu, hesla ne. To riziko snižuje, ale nekompromituje: soubor samotný je citlivé kryptografické materiál a jeho přítomnost v historii repozitáře je nevratná (i kdyby se teď smazal, zůstane v `git log`).
-- **Dopad:** Kdokoli s přístupem k repu (nebo jeho historii) má produkční podpisový klíč aplikace. V kombinaci se získáním hesla (např. leak, brute force, sdílení) by útočník mohl podepsat a distribuovat modifikovanou verzi appky, kterou Play Store/uživatelé považují za pravou aktualizaci.
-- **Doporučení:** Okamžitě odstranit z `git tracking` (`git rm --cached`), přidat do `.gitignore`, a **posoudit rotaci klíče** (u Google Play lze přes Play App Signing požádat o key upgrade, pokud je keystore starý upload key). Uložit `.jks` mimo repo (secret manager / CI secret).
-
-### 🟠 VYSOKÉ – nové zjištění
-
-**"Secret Gift" a soukromé poznámky jsou čitelné partnerem přes Firestore přímo (nejen přes UI).**
-- `firestore.rules` pro `couples/{id}/notes/{noteId}`: `allow list, get: if isCoupleMember()` – bez ohledu na `type` nebo `authorId`.
-- Filtrování na `type == 'private'` / `'secretGift'` se děje **jen v klientském Firestore query** (`notes_repository.dart`), ne v security rules.
-- **Dopad:** Funkce "Secret Gift" (dárek co má být překvapení) a "private" poznámky jsou tajné jen podle UI konvence. Partner se znalostí Firebase/REST API (nebo jen upravenou verzí appky) může tyto dokumenty přímo přečíst – to přímo popírá smysl funkce.
-- **Doporučení:** Přidat do rules podmínku `resource.data.type != 'private' && resource.data.type != 'secretGift' || resource.data.authorId == request.auth.uid` pro `get`/`list`, případně routovat soukromé poznámky do samostatné podkolekce s vlastníkem jako klíčem.
-
-**Google Places API klíč je natrvalo v historii gitu (i po "opravě").**
-- Aktuální kód je čistý (`Info.plist` používá `$(GOOGLE_PLACES_API_KEY)` placeholder), ale stejný reálný klíč (`REDACTED-ROTATED-GOOGLE-PLACES-KEY`) byl v minulosti hardcoded v `AppDelegate.swift` (commit `67e9f1e`) a je stále dohledatelný přes `git log -p`.
-- **Doporučení:** Ověřit v Google Cloud Console, že je tento konkrétní klíč omezen na bundle ID / rotován za nový – "odstranění ze staged souborů" samo o sobě klíč nezneplatní.
+### 🟠 VYSOKÉ
+**Google Places API klíč pořád dohledatelný v historii gitu.** Beze změny. Aktuální kód čistý, ale reálný klíč je stále v `git log -p` (commit `67e9f1e`). Doporučeno ručně ověřit rotaci/omezení v GCP konzoli.
 
 ### 🟡 STŘEDNÍ
-
-- **Race condition v gamifikaci** (viz sekce 2) – možnost dvojitého přiznání denní XP odměny při souběžné akci obou partnerů.
-- **Chybějící pagination/limit na Firestore query** – `memory_repository.dart`, `event_repository.dart`, `intimacy_repository.dart` používají `.snapshots()` bez `.limit()`. U dlouhodobého používání (roky vzpomínek/logů) poroste počet stahovaných dokumentů při každém startu appky bez omezení – zvyšuje to náklady na čtení Firestore a čas prvního načtení.
-- **Žádný crash-reporting SDK** (Crashlytics/Sentry) – produkční pády appky nejsou nikde centrálně vidět.
-- **8 failing testů** kvůli rozbitému mocku, ne kvůli produkční logice – ale maskuje to případné budoucí regrese v `pairing_service.dart`, protože testy momentálně nic neověřují spolehlivě.
-- **Zastaralé závislosti** (Firebase, Riverpod, go_router 1–3 major verze pozadu) – riziko nahromadění breaking changes.
+- **`pubspec.lock` ↔ committnutý generovaný kód drift** (sekce 4) – reálné riziko tiché korupce dat při příštím `build_runner build`, dokud se `freezed` needgraduje nebo postižené třídy needostanou ruční anotaci.
+- **91 `deprecated_member_use` nálezů v `lib/`** – neblokující, ale hromadí se dluh.
+- **Google Places klíč** (viz výše).
+- **Zastaralé major závislosti** – zmenšeno, nedokončeno.
+- **Blueprints seed skript nespuštěný proti produkci** – appka funguje na mock-data fallbacku, ale obsah zatím nejde editovat bez release appky, dokud někdo se skutečnými Firebase credentials nespustí `node scripts/seed_blueprint_sections.js`.
 
 ### 🟢 NÍZKÉ / Nice-to-have
-- `home_screen.dart` má 2207 řádků (byť rozumně rozdělený na malé widgety) – navrhuji rozdělit do samostatných souborů pro čitelnost.
-- Duplicitní modely/providery pro cycle (`features/cycle/models/cycle_log.dart` vs `features/cycle/domain/cycle_log_model.dart`, dva `cycle_provider.dart` soubory v `models/` i `presentation/`) – vypadá jako pozůstatek refaktoringu, stojí za vyčištění.
-- `print()` místo `debugPrint()` v `main.dart` (4 místa).
-
-### Chybějící testy
-Aktuální pokrytí (`test/pairing/*`, `test/security/*`, `test/widget_test.dart`) se soustředí téměř výhradně na pairing a základní security scénáře. Chybí testy pro: memory/timeline CRUD, intimacy/cycle repository logiku, gamifikační XP výpočty (`ProgressionPlan`, `LevelManager`), premium purchase/restore flow, notes access control (obzvlášť vzhledem k nálezu výše o secret notes).
+- Groceries, Dark Mode, Achievement/Recap, Time Capsule – produktová rozhodnutí, ne bugy.
+- 2 TODO v `memory_screen.dart` – neověřeno znovu.
+- `print()` vs `debugPrint()` v `main.dart` – neověřeno znovu.
 
 ---
 
-## 5. Priorita oprav
+## 7. Priorita zbývajících oprav
 
 | # | Nález | Dopad | Náročnost opravy |
 |---|---|---|---|
-| 1 | **Keystore `.jks` v gitu** | Kritický – ohrožení podpisu appky pro celý produkční release | Nízká (git rm + gitignore), rozhodnutí o rotaci klíče vyžaduje koordinaci s Play Console |
-| 2 | **Secret/private notes čitelné partnerem přes rules** | Vysoký – přímo popírá smysl "Secret Gift" featury, možný trust/PR problém při odhalení | Nízká (úprava firestore.rules + test) |
-| 3 | **Rotace/ověření Google Places klíče v historii gitu** | Vysoký – klíč je veřejně dohledatelný v historii | Nízká (rotace v GCP konzoli) |
-| 4 | **Race condition v XP grantu** | Střední – nekonzistentní gamifikační data, nedůvěryhodné SP | Střední (přesun do transakce/Cloud Function) |
-| 5 | **Chybí crash reporting** | Střední – nulová viditelnost produkčních pádů | Nízká (přidat Crashlytics, pár hodin) |
-| 6 | **8 failing testů (rozbitý mock)** | Střední – maskuje regrese v pairing logice | Nízká (oprava mocku v jednom test souboru) |
-| 7 | **Chybějící pagination na Firestore listenery** | Střední, roste s časem/daty | Střední |
-| 8 | **Zastaralé závislosti** | Střední, dlouhodobě rostoucí technický dluh | Vysoká (postupná migrace přes major verze) |
-| 9 | Groceries, Dark Mode, Achievement, Recap, Time Capsule rozhodnutí | Nice-to-have / produktové rozhodnutí | Různá |
-| 10 | `home_screen.dart` split, duplicitní cycle modely, `print`→`debugPrint` | Nice-to-have, čitelnost | Nízká |
+| 1 | Ověřit/rotovat Google Places API klíč v GCP konzoli | Vysoký, mimo repo | Nízká |
+| 2 | Vyřešit `freezed`/`pubspec.lock` drift (upgrade nebo ruční anotace) | Střední – tichá korupce dat při příštím neopatrném `build_runner build` | Střední (upgrade) až Vysoká (breaking changes napříč modely) |
+| 3 | Spustit `scripts/seed_blueprint_sections.js` proti produkci | Nízká – appka funguje i bez toho (fallback), ale odemkne editaci obsahu bez release | Nízká (vyžaduje jen Firebase credentials uživatele) |
+| 4 | Dokončit major upgrade zbývajících závislostí | Střední, dlouhodobě rostoucí dluh | Vysoká |
+| 5 | Groceries, Dark Mode, Achievement/Recap, Time Capsule rozhodnutí | Nice-to-have / produktové rozhodnutí | Různá |
+| 6 | Ověřit 2 zbylé TODO v `memory_screen.dart`, `print()`→`debugPrint()` | Nízká | Nízká |
 
 ---
 
-## 6. Spuštění na emulátoru
+## Shrnutí
 
-- `adb devices` zpočátku nehlásil žádné zařízení; k dispozici byl AVD `Pixel_6_Keyboard_Fixed` (Pixel 6, API 35, Google Play). Emulátor byl nastartován a nabootoval bez problémů.
-- `flutter build apk --debug` doběhl úspěšně po ~290 s (`build/app/outputs/flutter-apk/app-debug.apk`, 284 MB) – **projekt se kompiluje bez chyb**.
-- Instalace nejprve selhala (`Requested internal only, but not enough space`) – emulátor měl na `/data` jen ~460 MB volných kvůli starým instalacím z jiných projektů (`cz.sobtech.hapBeer`, `com.d2d.d2d_sales_tracker`, starší `com.example.dyos_app`/`cz.soboltech.dyos`). Po jejich odinstalování (uvolnění na ~1,2 GB) instalace proběhla v pořádku.
-- **Appka byla spuštěna (`am start -n cz.soboltech.dyos/.MainActivity`) a nastartovala bez pádu.** Logcat po startu ukazuje čistou inicializaci: `NotificationService setup complete`, `FlutterGeolocator` connected, `FlutterFirebaseMessagingBackgroundService started`, `FCM permission: AuthorizationStatus.authorized` – žádné `FATAL EXCEPTION`, `AndroidRuntime` crash ani `MissingPluginException`.
-- **Úvodní obrazovka:** Login screen ("Welcome back") odpovídá design systému z `.cursorrules` (Indigo `#5E5CE6`, zaoblené karty, čistý bento styl) – pole Email/Password, "Forgot password?", "Sign in", "Continue with Google", odkaz na registraci. Systémový dialog pro POST_NOTIFICATIONS permission se zobrazil korektně při startu.
-- Další obrazovky (Home, Timeline, …) nebyly ověřeny, protože vyžadují reálný účet/přihlášení – vytváření testovacího účtu v produkční Firebase instanci nebylo v rámci tohoto read-only auditu provedeno. Doporučeno ověřit ručně nebo proti Firebase emulátoru.
+Od minulého auditu (3. 7.) bylo opraveno 6 ze 7 hlavních nálezů, a v této relaci navíc: bezpečnostní test na private notes ověřen jako už existující (opravuji svůj dřívější chybný nález), CI gate přidán, cycle provider duplicita sjednocena (+ opraven skrytý bug s duplicitním zápisem při editaci cyklo-logu), a Blueprints přesunuty z hardcoded mock dat do Firestore s bezpečným fallbackem. Zároveň byl objeven a napraven nový, potenciálně vážný nález: zamčená verze `freezed` v `pubspec.lock` neumí vygenerovat `explicitToJson: true` pro vnořené modely, což by při neopatrném přegenerování kódu tiše rozbilo zápis `CoupleModel`/`UserModel` do Firestore – nesouvisející přegenerované soubory byly vráceny zpět a nález je zdokumentovaný pro budoucí `freezed` upgrade. Zbývá jeden nález mimo dosah repa (rotace Google Places klíče) a pár menších položek (spuštění blueprints seed skriptu proti produkci, dokončení major upgradů závislostí). Produktově zůstávají stejné otevřené položky jako minule – Groceries, Dark Mode, Achievement/Recap, Time Capsule.
 
----
-
-## Shrnutí (5–10 vět)
-
-Appka se bez problémů zkompiluje (`flutter build apk --debug` proběhl úspěšně) a na emulátoru nastartuje čistě bez pádu – login obrazovka odpovídá deklarovanému design systému a inicializace Firebase/notifikací/geolokace v logcatu neukázala žádnou chybu. DYOS je funkčně vyspělá Flutter aplikace s poměrně solidní architekturou (feature-first, Riverpod, čisté oddělení repository/domain/presentation) a bezpečnostním základem, který byl už jednou důkladně proauditován a opraven (viz `DOCUMENTATION.md` z března 2026 – 10/10 dřívějších "must-fix" bodů je opraveno). Hlavní jádro appky – auth, párování, timeline, tracker, cyklus, události, premium – je hotové a použitelné. Tento audit ale odhalil, že **produkční Android signing keystore je omylem commitnutý v gitu** – to je nový, kritický nález, který žádný z předchozích auditů nezachytil a měl by být řešen jako první. Druhý závažný, dosud nezdokumentovaný nález je, že **"tajné" poznámky (Secret Gift, private) jsou ve skutečnosti čitelné partnerem** přes Firestore pravidla, protože zabezpečení řeší jen klient, ne backend rules – to přímo podkopává smysl dané featury. Menší, ale reálný nález je **race condition v gamifikačním XP systému**, který může vést k duplicitnímu přiznání denní odměny. Appka nemá žádný crash-reporting nástroj, takže produkční pády jsou dnes prakticky neviditelné pro tým. Z produktového hlediska zůstávají neúplné: Groceries, Dark Mode, Achievement/Recap a rozhodnutí o Time Capsule (funkce byla z repa úplně odstraněna, ne jen prázdná). Testové pokrytí je tenké a navíc momentálně obsahuje 8 failing testů kvůli rozbitému mocku, takže i ta málo existující ochrana proti regresi v pairing flow je teď nespolehlivá.
-
-**Nejbližší krok:** Nejprve vyřešit keystore v gitu (odstranit ze sledování, posoudit rotaci klíče s ohledem na Play Console) a zpřísnit `firestore.rules` pro soukromé poznámky – oboje je otázka řádově hodin práce s velkým bezpečnostním dopadem. Až poté má smysl pokračovat směrem k dokončení produktových funkcí (Groceries, Dark Mode) nebo rozšiřování testů.
+**Nejbližší krok:** ověřit/rotovat Google Places klíč a spustit `scripts/seed_blueprint_sections.js` proti produkci (obojí mimo repo, řádově minuty). Střednědobě: naplánovat `freezed`/`riverpod`/`json_serializable` major upgrade (řeší zároveň drift nález i zastaralé závislosti).

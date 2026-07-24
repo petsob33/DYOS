@@ -8,28 +8,23 @@ import '../../../../core/services/firebase_service.dart';
 import '../../../auth/domain/couple_model.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
-import '../../data/blueprint_mock_data.dart';
 import '../../domain/blueprint_question.dart';
+import '../../domain/blueprint_section.dart';
+import '../blueprint_provider.dart';
 import '../widgets/blueprint_question_card.dart';
 
-/// Renders a Blueprint (preference questionnaire) section with dynamic questions.
-/// When [sectionId] is set, answers are loaded/saved from Firestore and partner's answer is shown.
-/// XP for completing is awarded only once per section per couple.
+/// Renders a Blueprint (preference questionnaire) section, loaded from
+/// Firestore (see [blueprintSectionProvider]) by [sectionId]. Answers are
+/// persisted and the partner's answers are shown; XP for completing is
+/// awarded only once per section per couple.
 class BlueprintDetailScreen extends ConsumerStatefulWidget {
   const BlueprintDetailScreen({
     super.key,
-    required this.sectionTitle,
-    required this.sectionEmoji,
-    required this.questions,
-    this.sectionId,
+    required this.sectionId,
     this.onSectionComplete,
   });
 
-  final String sectionTitle;
-  final String sectionEmoji;
-  final List<BlueprintQuestion> questions;
-  /// If set, answers are persisted and partner's answers shown. XP given only once per section.
-  final String? sectionId;
+  final String sectionId;
   final VoidCallback? onSectionComplete;
 
   @override
@@ -40,9 +35,9 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
   final Map<String, dynamic> _answers = {};
   bool _initialLoadDone = false;
 
-  int get _answeredCount {
+  int _answeredCountFor(List<BlueprintQuestion> questions) {
     var count = 0;
-    for (final q in widget.questions) {
+    for (final q in questions) {
       final v = _answers[q.id];
       if (q.type == BlueprintQuestionType.multiSelect) {
         if (v is List && v.isNotEmpty) count++;
@@ -53,12 +48,12 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
     return count;
   }
 
-  double get _progress =>
-      widget.questions.isEmpty ? 1.0 : _answeredCount / widget.questions.length;
+  double _progressFor(List<BlueprintQuestion> questions, int answeredCount) =>
+      questions.isEmpty ? 1.0 : answeredCount / questions.length;
 
   Map<String, dynamic>? _partnerAnswersForSection(CoupleModel? couple, String? currentUserId) {
-    if (couple?.blueprintAnswers == null || widget.sectionId == null || currentUserId == null) return null;
-    final bySection = couple!.blueprintAnswers![widget.sectionId!];
+    if (couple?.blueprintAnswers == null || currentUserId == null) return null;
+    final bySection = couple!.blueprintAnswers![widget.sectionId];
     if (bySection is! Map) return null;
     final other = couple.members.where((id) => id != currentUserId).toList();
     final partnerId = other.isEmpty ? null : other.first;
@@ -69,10 +64,10 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
   }
 
   void _loadInitialAnswers(CoupleModel? couple, String? userId) {
-    if (widget.sectionId == null || userId == null || _initialLoadDone) return;
+    if (userId == null || _initialLoadDone) return;
     if (couple == null) return;
     _initialLoadDone = true;
-    final bySection = couple.blueprintAnswers?[widget.sectionId!];
+    final bySection = couple.blueprintAnswers?[widget.sectionId];
     if (bySection is Map) {
       final my = bySection[userId];
       if (my is Map<String, dynamic>) {
@@ -86,7 +81,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
     final coupleId = user?.coupleId;
     final sectionId = widget.sectionId;
 
-    if (sectionId != null && coupleId != null) {
+    if (coupleId != null) {
       final firebase = ref.read(firebaseServiceProvider);
       final serialized = _serializeAnswers(_answers);
       await firebase.saveBlueprintAnswers(
@@ -145,11 +140,50 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final c = AppTheme.colors;
-    final total = widget.questions.length;
+    final sectionAsync = ref.watch(blueprintSectionProvider(widget.sectionId));
+
+    return sectionAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: c.background,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => Scaffold(
+        backgroundColor: c.background,
+        appBar: AppBar(backgroundColor: c.background, elevation: 0),
+        body: Center(
+          child: Text(
+            'Could not load this Blueprint section.',
+            style: GoogleFonts.inter(color: c.textSecondary),
+          ),
+        ),
+      ),
+      data: (section) {
+        if (section == null) {
+          return Scaffold(
+            backgroundColor: c.background,
+            appBar: AppBar(backgroundColor: c.background, elevation: 0),
+            body: Center(
+              child: Text(
+                'Blueprint section not found.',
+                style: GoogleFonts.inter(color: c.textSecondary),
+              ),
+            ),
+          );
+        }
+        return _buildContent(context, section);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, BlueprintSection section) {
+    final c = AppTheme.colors;
+    final total = section.questions.length;
     final couple = ref.watch(coupleProvider).valueOrNull;
     final currentUserId = ref.watch(currentUserDataProvider).valueOrNull?.uid;
     _loadInitialAnswers(couple, currentUserId);
     final partnerAnswers = _partnerAnswersForSection(couple, currentUserId);
+    final answeredCount = _answeredCountFor(section.questions);
+    final progress = _progressFor(section.questions, answeredCount);
 
     return Scaffold(
       backgroundColor: c.background,
@@ -158,7 +192,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
         foregroundColor: c.text,
         elevation: 0,
         title: Text(
-          '${widget.sectionTitle} ${widget.sectionEmoji}',
+          '${section.title} ${section.emoji}',
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -176,7 +210,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      '${widget.sectionTitle} ${widget.sectionEmoji}',
+                      '${section.title} ${section.emoji}',
                       style: GoogleFonts.inter(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -190,7 +224,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(6),
                             child: LinearProgressIndicator(
-                              value: _progress,
+                              value: progress,
                               minHeight: 8,
                               backgroundColor: c.background,
                               valueColor: AlwaysStoppedAnimation<Color>(c.primary),
@@ -199,7 +233,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          '$_answeredCount / $total',
+                          '$answeredCount / $total',
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             color: c.textSecondary,
@@ -216,7 +250,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final q = widget.questions[index];
+                  final q = section.questions[index];
                   return Padding(
                     padding: const EdgeInsets.only(
                       left: AppSpacing.lg,
@@ -231,7 +265,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
                     ),
                   );
                 },
-                childCount: widget.questions.length,
+                childCount: section.questions.length,
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
@@ -262,24 +296,6 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Convenience screen for "Travel Config" using mock data.
-class TravelConfigBlueprintScreen extends StatelessWidget {
-  const TravelConfigBlueprintScreen({super.key, this.onSectionComplete});
-
-  final VoidCallback? onSectionComplete;
-
-  @override
-  Widget build(BuildContext context) {
-    return BlueprintDetailScreen(
-      sectionTitle: BlueprintMockData.travelConfigSectionTitle,
-      sectionEmoji: BlueprintMockData.travelConfigSectionEmoji,
-      questions: BlueprintMockData.travelConfigQuestions,
-      sectionId: 'travel',
-      onSectionComplete: onSectionComplete,
     );
   }
 }

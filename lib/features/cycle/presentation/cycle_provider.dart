@@ -80,7 +80,7 @@ FertileWindow? fertileWindow(FertileWindowRef ref) {
 }
 
 /// Provider that calculates the ovulation day
-/// 
+///
 /// Ovulation typically occurs approximately 14 days before the next period.
 /// This is calculated as (lastPeriodDate + averageCycleLength - 14).
 /// Returns null if settings are not available or lastPeriodDate is null.
@@ -98,6 +98,53 @@ DateTime? ovulationDay(OvulationDayRef ref) {
   // Next period = lastPeriodDate + averageCycleLength
   // Ovulation = nextPeriod - 14 = lastPeriodDate + averageCycleLength - 14
   return lastPeriodDate.add(Duration(days: settings.averageCycleLength - 14));
+}
+
+/// Provider that calculates the next 6 predicted period start dates.
+///
+/// Used by the calendar view to mark upcoming predicted periods (as
+/// opposed to [nextPredictedPeriodDateProvider], which only exposes the
+/// single next date for dashboard/insight display).
+/// Returns an empty list if settings are not available.
+@riverpod
+List<DateTime> predictedPeriodDays(PredictedPeriodDaysRef ref) {
+  final settingsAsync = ref.watch(cycleSettingsStreamProvider);
+  final settings = settingsAsync.valueOrNull;
+
+  if (settings == null || settings.lastPeriodDate == null) {
+    return [];
+  }
+
+  final lastPeriodDate = settings.lastPeriodDate!;
+  final averageCycleLength = settings.averageCycleLength;
+
+  return [
+    for (var i = 1; i <= 6; i++)
+      lastPeriodDate.add(Duration(days: averageCycleLength * i)),
+  ];
+}
+
+/// Provider that calculates every day of the fertile window (days 10-15
+/// of the cycle) as a list.
+///
+/// Used by the calendar view to mark each fertile day (as opposed to
+/// [fertileWindowProvider], which only exposes the window's start/end for
+/// dashboard/insight display).
+/// Returns an empty list if settings are not available.
+@riverpod
+List<DateTime> fertileWindowDays(FertileWindowDaysRef ref) {
+  final settingsAsync = ref.watch(cycleSettingsStreamProvider);
+  final settings = settingsAsync.valueOrNull;
+
+  if (settings == null || settings.lastPeriodDate == null) {
+    return [];
+  }
+
+  final lastPeriodDate = settings.lastPeriodDate!;
+
+  return [
+    for (var i = 10; i <= 15; i++) lastPeriodDate.add(Duration(days: i)),
+  ];
 }
 
 /// Data class representing a fertile window period

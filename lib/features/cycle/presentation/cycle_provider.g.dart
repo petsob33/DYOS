@@ -121,6 +121,57 @@ final ovulationDayProvider = AutoDisposeProvider<DateTime?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef OvulationDayRef = AutoDisposeProviderRef<DateTime?>;
+String _$predictedPeriodDaysHash() =>
+    r'03b86e33cb2b27203c0d5c6101e89811b6a03826';
+
+/// Provider that calculates the next 6 predicted period start dates.
+///
+/// Used by the calendar view to mark upcoming predicted periods (as
+/// opposed to [nextPredictedPeriodDateProvider], which only exposes the
+/// single next date for dashboard/insight display).
+/// Returns an empty list if settings are not available.
+///
+/// Copied from [predictedPeriodDays].
+@ProviderFor(predictedPeriodDays)
+final predictedPeriodDaysProvider =
+    AutoDisposeProvider<List<DateTime>>.internal(
+      predictedPeriodDays,
+      name: r'predictedPeriodDaysProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$predictedPeriodDaysHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PredictedPeriodDaysRef = AutoDisposeProviderRef<List<DateTime>>;
+String _$fertileWindowDaysHash() => r'76a0d19d179dedeb2e34777f668ba18354c0164c';
+
+/// Provider that calculates every day of the fertile window (days 10-15
+/// of the cycle) as a list.
+///
+/// Used by the calendar view to mark each fertile day (as opposed to
+/// [fertileWindowProvider], which only exposes the window's start/end for
+/// dashboard/insight display).
+/// Returns an empty list if settings are not available.
+///
+/// Copied from [fertileWindowDays].
+@ProviderFor(fertileWindowDays)
+final fertileWindowDaysProvider = AutoDisposeProvider<List<DateTime>>.internal(
+  fertileWindowDays,
+  name: r'fertileWindowDaysProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$fertileWindowDaysHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef FertileWindowDaysRef = AutoDisposeProviderRef<List<DateTime>>;
 String _$cycleProviderNotifierHash() =>
     r'26a0fc4a55dba596a32da95a97b575e4e8662dc2';
 

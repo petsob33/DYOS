@@ -1,0 +1,61 @@
+name: CI (analyze + test)
+
+# Gates pushes/PRs on the things that were previously only checked
+# manually: static analysis errors, the Dart test suite, and the Firestore
+# security rules emulator tests (the only regression coverage for the
+# private/secretGift notes access-control fix in firestore.rules).
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - test-main
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pinned just before Flutter's IconData became a `final` class
+      # (flutter/flutter#181345, landed 2026-03-24): phosphor_flutter 2.1.0
+      # (last published 2023, unmaintained) subclasses IconData and fails to
+      # compile on anything newer. Bump this once phosphor_flutter is
+      # replaced or patched to not extend IconData.
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.5'
+
+      - run: flutter pub get
+
+      # flutter analyze's own exit code is 1 whenever *any* issue exists,
+      # including the ~400 pre-existing style-only `info` lints in this
+      # repo - gating on that exit code directly would fail every build
+      # regardless of whether anything is actually broken. Instead fail
+      # only when a real `error` shows up, so this still catches genuine
+      # compile/type problems without blocking on lint-cleanup debt.
+      - name: flutter analyze (fail only on real errors)
+        run: |
+          set -o pipefail
+          flutter analyze | tee analyze_output.txt
+          if grep -qE '^\s*error •' analyze_output.txt; then
+            echo "::error::flutter analyze found real errors (see above)"
+            exit 1
+          fi
+
+      - name: flutter test
+        run: flutter test
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Firestore rules test dependencies
+        working-directory: test/security/rules
+        run: npm ci
+
+      - name: Firestore security rules tests (emulator)
+        run: |
+          npx firebase-tools emulators:exec --project demo-dyos-rules-test --only firestore \
+            "cd test/security/rules && npm test"

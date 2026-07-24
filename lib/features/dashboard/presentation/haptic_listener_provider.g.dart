@@ -7,7 +7,7 @@ part of 'haptic_listener_provider.dart';
 // **************************************************************************
 
 String _$hapticSignalsStreamHash() =>
-    r'1d31ac85b9734bb2adc3bd9c94831031987016ad';
+    r'5c63ce66931debaa69056d06acaee9fc2c2813ef';
 
 /// Provider that listens for haptic signals from partner
 ///
@@ -28,7 +28,7 @@ final hapticSignalsStreamProvider =
 // ignore: unused_element
 typedef HapticSignalsStreamRef = AutoDisposeStreamProviderRef<DateTime?>;
 String _$quickMessagesStreamHash() =>
-    r'894b0f41787179c6f7890097873f657da9462efe';
+    r'e6945aa1e6786a463c60a1527da2a309ee83c1e9';
 
 /// Provider that listens for quick messages from partner
 ///
