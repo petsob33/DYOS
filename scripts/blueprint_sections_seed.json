@@ -1,0 +1,1186 @@
+[
+  {
+    "id": "travel",
+    "title": "Travel Config",
+    "emoji": "✈️",
+    "order": 0,
+    "questions": [
+      {
+        "id": "travel_pace",
+        "title": "Pace",
+        "type": "slider",
+        "sliderLeftLabel": "Relax",
+        "sliderRightLabel": "Adventure",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "travel_transport",
+        "title": "Transport",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Plane",
+          "Car",
+          "Train"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "travel_budget",
+        "title": "Budget Priority",
+        "type": "slider",
+        "sliderLeftLabel": "Food",
+        "sliderRightLabel": "Accommodation",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "travel_morning",
+        "title": "Morning Person?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "gift",
+    "title": "Gift Protocol",
+    "emoji": "🎁",
+    "order": 1,
+    "questions": [
+      {
+        "id": "gift_style",
+        "title": "Preferred style",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Silver",
+          "Gold",
+          "Rose Gold",
+          "No preference"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "gift_occasion",
+        "title": "Important occasions",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Birthday",
+          "Anniversary",
+          "Christmas",
+          "Just because"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "food",
+    "title": "Food Preferences",
+    "emoji": "🍽️",
+    "order": 2,
+    "questions": [
+      {
+        "id": "food_allergies",
+        "title": "Allergies or avoid",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Nuts",
+          "Dairy",
+          "Gluten",
+          "Shellfish",
+          "None"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "food_favorite",
+        "title": "Favorite cuisine",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Italian",
+          "Asian",
+          "Mexican",
+          "Home cooking",
+          "Mixed"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "date_night",
+    "title": "Date Night",
+    "emoji": "🌙",
+    "order": 3,
+    "questions": [
+      {
+        "id": "date_frequency",
+        "title": "Ideal date night frequency",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Weekly",
+          "Twice a month",
+          "Monthly",
+          "Whenever we feel like it"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "date_style",
+        "title": "Preferred date style",
+        "type": "slider",
+        "sliderLeftLabel": "Cozy at home",
+        "sliderRightLabel": "Out and about",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "date_activities",
+        "title": "Favorite date activities",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Dinner out",
+          "Movie",
+          "Walk",
+          "Cooking together",
+          "Games",
+          "Concert",
+          "Sport"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "weekend",
+    "title": "Weekend Style",
+    "emoji": "📅",
+    "order": 4,
+    "questions": [
+      {
+        "id": "weekend_energy",
+        "title": "Weekend energy level",
+        "type": "slider",
+        "sliderLeftLabel": "Rest & recharge",
+        "sliderRightLabel": "Go go go",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "weekend_social",
+        "title": "Prefer weekends with",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Just us two",
+          "Friends",
+          "Family",
+          "Mix of both"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "weekend_planning",
+        "title": "Plan weekends in advance?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "music",
+    "title": "Music & Playlists",
+    "emoji": "🎵",
+    "order": 5,
+    "questions": [
+      {
+        "id": "music_genres",
+        "title": "Favorite genres",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Pop",
+          "Rock",
+          "Electronic",
+          "Jazz",
+          "Classical",
+          "Hip-hop",
+          "Indie",
+          "Country"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "music_mood",
+        "title": "Music when together",
+        "type": "slider",
+        "sliderLeftLabel": "Background",
+        "sliderRightLabel": "Main focus",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "music_concerts",
+        "title": "Love live concerts?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "movies",
+    "title": "Movies & Series",
+    "emoji": "🎬",
+    "order": 6,
+    "questions": [
+      {
+        "id": "movies_genres",
+        "title": "Favorite movie genres",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Comedy",
+          "Drama",
+          "Action",
+          "Romance",
+          "Thriller",
+          "Sci-fi",
+          "Documentary",
+          "Horror"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "movies_vs_series",
+        "title": "Prefer",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Movies",
+          "TV series",
+          "Both equally"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "movies_subtitles",
+        "title": "Subtitles on?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "fitness",
+    "title": "Fitness & Health",
+    "emoji": "💪",
+    "order": 7,
+    "questions": [
+      {
+        "id": "fitness_level",
+        "title": "Activity level",
+        "type": "slider",
+        "sliderLeftLabel": "Couch potato",
+        "sliderRightLabel": "Gym every day",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "fitness_activities",
+        "title": "Preferred activities",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Running",
+          "Gym",
+          "Yoga",
+          "Swimming",
+          "Hiking",
+          "Cycling",
+          "Team sports",
+          "Home workout"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "fitness_together",
+        "title": "Work out together?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "home",
+    "title": "Home & Living",
+    "emoji": "🏠",
+    "order": 8,
+    "questions": [
+      {
+        "id": "home_temperature",
+        "title": "Ideal room temperature",
+        "type": "slider",
+        "sliderLeftLabel": "Cool",
+        "sliderRightLabel": "Warm",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "home_tidiness",
+        "title": "Tidiness preference",
+        "type": "slider",
+        "sliderLeftLabel": "Relaxed",
+        "sliderRightLabel": "Everything in place",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "home_decor",
+        "title": "Decor style",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Minimal",
+          "Cozy",
+          "Modern",
+          "Vintage",
+          "Colorful",
+          "No strong preference"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "pets",
+    "title": "Pets",
+    "emoji": "🐾",
+    "order": 9,
+    "questions": [
+      {
+        "id": "pets_have",
+        "title": "Want pets?",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Yes, already have",
+          "Yes, in future",
+          "Maybe",
+          "No"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "pets_type",
+        "title": "Preferred pets",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Dog",
+          "Cat",
+          "Small animal",
+          "Bird",
+          "Fish",
+          "Reptile",
+          "None"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "pets_bed",
+        "title": "Pets in bed?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "family",
+    "title": "Family & Kids",
+    "emoji": "👨‍👩‍👧",
+    "order": 10,
+    "questions": [
+      {
+        "id": "family_kids",
+        "title": "Want kids?",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Yes",
+          "Maybe",
+          "No",
+          "Already have"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "family_timing",
+        "title": "When (if yes)",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Soon",
+          "In a few years",
+          "No rush",
+          "Not sure"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "family_visits",
+        "title": "Family visit frequency",
+        "type": "slider",
+        "sliderLeftLabel": "Rarely",
+        "sliderRightLabel": "Very often",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "money",
+    "title": "Money & Spending",
+    "emoji": "💰",
+    "order": 11,
+    "questions": [
+      {
+        "id": "money_style",
+        "title": "Spending style",
+        "type": "slider",
+        "sliderLeftLabel": "Saver",
+        "sliderRightLabel": "Spender",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "money_joint",
+        "title": "Prefer joint finances?",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Fully joint",
+          "Partly joint",
+          "Separate",
+          "Not decided"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "money_big_purchases",
+        "title": "Discuss big purchases together?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "communication",
+    "title": "Communication Style",
+    "emoji": "💬",
+    "order": 12,
+    "questions": [
+      {
+        "id": "comm_style",
+        "title": "Communication style",
+        "type": "slider",
+        "sliderLeftLabel": "Need time to process",
+        "sliderRightLabel": "Talk it out immediately",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "comm_texts",
+        "title": "Texting frequency when apart",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "All day",
+          "A few times",
+          "Once in a while",
+          "Rarely"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "comm_affection",
+        "title": "Express affection verbally?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "conflict",
+    "title": "Conflict Resolution",
+    "emoji": "🤝",
+    "order": 13,
+    "questions": [
+      {
+        "id": "conflict_style",
+        "title": "When we disagree I tend to",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Take space first",
+          "Talk it through",
+          "Compromise quickly",
+          "Need time to think"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "conflict_apology",
+        "title": "Apologizing is",
+        "type": "slider",
+        "sliderLeftLabel": "Hard for me",
+        "sliderRightLabel": "Easy for me",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "conflict_cool_off",
+        "title": "Prefer cool-off before talking?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "intimacy",
+    "title": "Intimacy & Affection",
+    "emoji": "💕",
+    "order": 14,
+    "questions": [
+      {
+        "id": "intimacy_love_language",
+        "title": "Primary love language",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Words",
+          "Touch",
+          "Gifts",
+          "Acts of service",
+          "Quality time"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "intimacy_affection",
+        "title": "Public affection",
+        "type": "slider",
+        "sliderLeftLabel": "Keep it private",
+        "sliderRightLabel": "No problem with PDA",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "intimacy_touch",
+        "title": "Physical touch importance",
+        "type": "slider",
+        "sliderLeftLabel": "Nice but not essential",
+        "sliderRightLabel": "Very important",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "social",
+    "title": "Social Life",
+    "emoji": "🎉",
+    "order": 15,
+    "questions": [
+      {
+        "id": "social_frequency",
+        "title": "Going out with friends",
+        "type": "slider",
+        "sliderLeftLabel": "Rarely",
+        "sliderRightLabel": "All the time",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "social_parties",
+        "title": "Party person?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "social_new_people",
+        "title": "Meeting new people",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Love it",
+          "Okay sometimes",
+          "Prefer close circle",
+          "Draining"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "morning",
+    "title": "Morning Routine",
+    "emoji": "☀️",
+    "order": 16,
+    "questions": [
+      {
+        "id": "morning_person",
+        "title": "Morning person?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "morning_routine",
+        "title": "Morning routine",
+        "type": "slider",
+        "sliderLeftLabel": "Roll out of bed",
+        "sliderRightLabel": "Strict routine",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "morning_breakfast",
+        "title": "Breakfast together?",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Always",
+          "Often",
+          "Sometimes",
+          "Rarely"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "sleep",
+    "title": "Sleep Habits",
+    "emoji": "😴",
+    "order": 17,
+    "questions": [
+      {
+        "id": "sleep_schedule",
+        "title": "Bedtime preference",
+        "type": "slider",
+        "sliderLeftLabel": "Early bird",
+        "sliderRightLabel": "Night owl",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "sleep_shared",
+        "title": "Same bed always?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "sleep_environment",
+        "title": "Sleep environment",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Dark",
+          "Quiet",
+          "Cool",
+          "White noise",
+          "No preference"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "holidays",
+    "title": "Holidays & Celebrations",
+    "emoji": "🎄",
+    "order": 18,
+    "questions": [
+      {
+        "id": "holidays_celebrate",
+        "title": "Which to celebrate together",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Christmas",
+          "New Year",
+          "Valentine's",
+          "Anniversary",
+          "Birthdays",
+          "Easter",
+          "Thanksgiving"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "holidays_style",
+        "title": "Holiday style",
+        "type": "slider",
+        "sliderLeftLabel": "Low key",
+        "sliderRightLabel": "Go all out",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "holidays_family",
+        "title": "Spend holidays with family?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "chores",
+    "title": "Chores & Household",
+    "emoji": "🧹",
+    "order": 19,
+    "questions": [
+      {
+        "id": "chores_split",
+        "title": "Chores should be",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "50/50",
+          "Who has time",
+          "By preference",
+          "One does more"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "chores_clean",
+        "title": "Cleanliness priority",
+        "type": "slider",
+        "sliderLeftLabel": "Good enough",
+        "sliderRightLabel": "Spotless",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "chores_cook",
+        "title": "Who cooks more?",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Me",
+          "Partner",
+          "Both equally",
+          "Takeout often"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "tech",
+    "title": "Tech & Screens",
+    "emoji": "📱",
+    "order": 20,
+    "questions": [
+      {
+        "id": "tech_screen_time",
+        "title": "Screen time when together",
+        "type": "slider",
+        "sliderLeftLabel": "Phones away",
+        "sliderRightLabel": "No problem",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "tech_bed",
+        "title": "Phones in bed?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "tech_social",
+        "title": "Social media sharing",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Share everything",
+          "Some things",
+          "Keep separate",
+          "Barely use"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "future",
+    "title": "Future Plans",
+    "emoji": "🔮",
+    "order": 21,
+    "questions": [
+      {
+        "id": "future_location",
+        "title": "Where to live long-term",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Stay here",
+          "Move city",
+          "Move country",
+          "Flexible",
+          "Not sure"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "future_career",
+        "title": "Career vs relationship priority",
+        "type": "slider",
+        "sliderLeftLabel": "Relationship first",
+        "sliderRightLabel": "Career can lead",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "future_bucket",
+        "title": "Bucket list together",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Travel",
+          "House",
+          "Kids",
+          "Business",
+          "Adventure",
+          "Quiet life",
+          "Other"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "values",
+    "title": "Values & Priorities",
+    "emoji": "⭐",
+    "order": 22,
+    "questions": [
+      {
+        "id": "values_trust",
+        "title": "Most important in relationship",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Trust",
+          "Communication",
+          "Fun",
+          "Stability",
+          "Growth",
+          "Adventure"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "values_religion",
+        "title": "Religion / spirituality",
+        "type": "slider",
+        "sliderLeftLabel": "Not important",
+        "sliderRightLabel": "Very important",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "values_politics",
+        "title": "Political alignment matters?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "adventure",
+    "title": "Adventure & Risk",
+    "emoji": "🏔️",
+    "order": 23,
+    "questions": [
+      {
+        "id": "adventure_level",
+        "title": "Adventure level",
+        "type": "slider",
+        "sliderLeftLabel": "Safe & familiar",
+        "sliderRightLabel": "Try anything once",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "adventure_activities",
+        "title": "Want to try",
+        "type": "multiSelect",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Skydiving",
+          "Scuba",
+          "Road trip",
+          "Camping",
+          "New cuisine",
+          "Learning new skill",
+          "Moving abroad"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "adventure_spontaneous",
+        "title": "Spontaneous plans?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "quality_time",
+    "title": "Quality Time",
+    "emoji": "⏰",
+    "order": 24,
+    "questions": [
+      {
+        "id": "qt_quantity",
+        "title": "How much quality time needed",
+        "type": "slider",
+        "sliderLeftLabel": "Some is enough",
+        "sliderRightLabel": "As much as possible",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "qt_definition",
+        "title": "Quality time is",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Talking",
+          "Doing something",
+          "Just being together",
+          "All of the above"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "qt_screens",
+        "title": "Screen-free time together?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  },
+  {
+    "id": "humor",
+    "title": "Humor & Fun",
+    "emoji": "😂",
+    "order": 25,
+    "questions": [
+      {
+        "id": "humor_type",
+        "title": "Humor style",
+        "type": "choiceChips",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": [
+          "Silly",
+          "Sarcastic",
+          "Dark",
+          "Dad jokes",
+          "Witty",
+          "Mixed"
+        ],
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "humor_importance",
+        "title": "Shared humor importance",
+        "type": "slider",
+        "sliderLeftLabel": "Nice to have",
+        "sliderRightLabel": "Essential",
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      },
+      {
+        "id": "humor_tease",
+        "title": "Playful teasing okay?",
+        "type": "switchType",
+        "sliderLeftLabel": null,
+        "sliderRightLabel": null,
+        "options": null,
+        "measurementSuffix": null,
+        "measurementPlaceholder": null
+      }
+    ]
+  }
+]

@@ -55,6 +55,7 @@ android/key.properties
 functions/node_modules/
 test/security/rules/node_modules/
 test/gamification/emulator/node_modules/
+scripts/node_modules/
 
 # Scratch / local snapshots
 tmp/
