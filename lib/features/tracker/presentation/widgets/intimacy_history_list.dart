@@ -110,9 +110,9 @@ class IntimacyHistoryList extends ConsumerWidget {
                     icon: const Icon(PhosphorIconsBold.arrowRight),
                     label: const Text('View All'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.colors.primary,
+                      foregroundColor: context.colors.primary,
                       side: BorderSide(
-                        color: AppTheme.colors.primary,
+                        color: context.colors.primary,
                         width: 2,
                       ),
                       padding: const EdgeInsets.symmetric(
@@ -248,7 +248,7 @@ class _IntimacyMonthSection extends StatelessWidget {
             month,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                 ),
           ),
         ),
@@ -380,7 +380,7 @@ class _DateSection extends StatelessWidget {
           date.day.toString(),
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
                 height: 1.0,
               ),
         ),
@@ -388,7 +388,7 @@ class _DateSection extends StatelessWidget {
           months[date.month - 1],
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w500,
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.0,
               ),
         ),
@@ -425,13 +425,13 @@ class _TagsAndRatingSection extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                  color: context.colors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   tag,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: AppTheme.colors.primary,
+                        color: context.colors.primary,
                         fontWeight: FontWeight.w600,
                         fontSize: 10,
                       ),
@@ -454,8 +454,8 @@ class _TagsAndRatingSection extends StatelessWidget {
                 PhosphorIconsBold.fire,
                 size: 14,
                 color: isFilled
-                    ? AppTheme.colors.love
-                    : AppTheme.colors.textSecondary.withValues(alpha: 0.3),
+                    ? context.colors.love
+                    : context.colors.textSecondary.withValues(alpha: 0.3),
               ),
             );
           }),
@@ -480,8 +480,8 @@ class _InitiatorIndicator extends StatelessWidget {
     return CircleAvatar(
       radius: 16,
       backgroundColor: isCurrentUser
-          ? AppTheme.colors.primary.withValues(alpha: 0.12)
-          : AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+          ? context.colors.primary.withValues(alpha: 0.12)
+          : context.colors.textSecondary.withValues(alpha: 0.1),
       backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
           ? CachedNetworkImageProvider(photoUrl!)
           : null,
@@ -490,8 +490,8 @@ class _InitiatorIndicator extends StatelessWidget {
               PhosphorIconsBold.user,
               size: 18,
               color: isCurrentUser
-                  ? AppTheme.colors.primary
-                  : AppTheme.colors.textSecondary,
+                  ? context.colors.primary
+                  : context.colors.textSecondary,
             )
           : null,
     );
@@ -516,13 +516,13 @@ class _OrgasmsDisplay extends StatelessWidget {
         Icon(
           PhosphorIconsBold.sparkle,
           size: 14,
-          color: AppTheme.colors.love,
+          color: context.colors.love,
         ),
         const SizedBox(width: 4),
         Text(
           '$orgasmsMe / $orgasmsPartner',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -545,13 +545,13 @@ class _DurationDisplay extends StatelessWidget {
         Icon(
           PhosphorIconsBold.clock,
           size: 14,
-          color: AppTheme.colors.textSecondary,
+          color: context.colors.textSecondary,
         ),
         const SizedBox(width: 4),
         Text(
           '$durationMinutes min',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -574,13 +574,13 @@ class _LocationDisplay extends StatelessWidget {
         Icon(
           PhosphorIconsBold.mapPin,
           size: 14,
-          color: AppTheme.colors.textSecondary,
+          color: context.colors.textSecondary,
         ),
         const SizedBox(width: 4),
         Text(
           location,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -624,7 +624,7 @@ class _LogCardSkeleton extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                  color: context.colors.textSecondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -633,7 +633,7 @@ class _LogCardSkeleton extends StatelessWidget {
                 width: 24,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                  color: context.colors.textSecondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -649,7 +649,7 @@ class _LogCardSkeleton extends StatelessWidget {
                   width: 120,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                    color: context.colors.textSecondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -658,7 +658,7 @@ class _LogCardSkeleton extends StatelessWidget {
                   width: 80,
                   height: 14,
                   decoration: BoxDecoration(
-                    color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                    color: context.colors.textSecondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -671,7 +671,7 @@ class _LogCardSkeleton extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+              color: context.colors.textSecondary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
           ),
@@ -698,21 +698,21 @@ class _ErrorState extends StatelessWidget {
             Icon(
               PhosphorIconsBold.warning,
               size: 64,
-              color: AppTheme.colors.love,
+              color: context.colors.love,
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Error loading logs',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               error,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -738,21 +738,21 @@ class _EmptyState extends StatelessWidget {
             Icon(
               PhosphorIconsBold.heart,
               size: 64,
-              color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
+              color: context.colors.textSecondary.withValues(alpha: 0.4),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
               'No memories yet',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Time to change that? 😉',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
               textAlign: TextAlign.center,
             ),

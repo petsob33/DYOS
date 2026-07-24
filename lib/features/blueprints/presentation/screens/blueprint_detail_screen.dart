@@ -139,7 +139,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final sectionAsync = ref.watch(blueprintSectionProvider(widget.sectionId));
 
     return sectionAsync.when(
@@ -176,7 +176,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
   }
 
   Widget _buildContent(BuildContext context, BlueprintSection section) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final total = section.questions.length;
     final couple = ref.watch(coupleProvider).valueOrNull;
     final currentUserId = ref.watch(currentUserDataProvider).valueOrNull?.uid;

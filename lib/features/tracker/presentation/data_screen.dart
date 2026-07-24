@@ -21,7 +21,7 @@ class DataScreen extends ConsumerWidget {
     final currentUserAsync = ref.watch(userProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(title: const Text('Data & Analytics')),
       body: SafeArea(
         child: logsAsync.when(
@@ -39,14 +39,14 @@ class DataScreen extends ConsumerWidget {
                           'Relationship Insights',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           'Track patterns and trends in your relationship',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ],
@@ -90,7 +90,7 @@ class DataScreen extends ConsumerWidget {
                       'History',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                           ),
                     ),
                   ),
@@ -155,7 +155,7 @@ class _StatsRow extends StatelessWidget {
             title: 'Total Count',
             value: totalCount.toString(),
             subtitle: 'All time',
-            color: AppTheme.colors.love,
+            color: context.colors.love,
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -165,7 +165,7 @@ class _StatsRow extends StatelessWidget {
             title: 'Avg/Week',
             value: avgPerWeek.toStringAsFixed(1),
             subtitle: 'Average',
-            color: AppTheme.colors.primary,
+            color: context.colors.primary,
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -175,7 +175,7 @@ class _StatsRow extends StatelessWidget {
             title: 'Favorite Day',
             value: favoriteDay,
             subtitle: 'Most active',
-            color: AppTheme.colors.warning,
+            color: context.colors.warning,
           ),
         ),
       ],
@@ -248,7 +248,7 @@ class _FrequencyChart extends StatelessWidget {
             children: [
               Icon(
                 PhosphorIconsBold.chartBar,
-                color: AppTheme.colors.primary,
+                color: context.colors.primary,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -256,7 +256,7 @@ class _FrequencyChart extends StatelessWidget {
                 'Frequency Chart',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                 ),
               ),
             ],
@@ -271,7 +271,7 @@ class _FrequencyChart extends StatelessWidget {
                 barTouchData: BarTouchData(
                   enabled: true,
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => AppTheme.colors.card,
+                    getTooltipColor: (_) => context.colors.card,
                     tooltipBorderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -287,7 +287,7 @@ class _FrequencyChart extends StatelessWidget {
                             child: Text(
                               monthLabels[value.toInt()],
                               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                             ),
                           );
@@ -306,7 +306,7 @@ class _FrequencyChart extends StatelessWidget {
                           return Text(
                             value.toInt().toString(),
                             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppTheme.colors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           );
                         }
@@ -327,7 +327,7 @@ class _FrequencyChart extends StatelessWidget {
                   horizontalInterval: 1,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                      color: context.colors.textSecondary.withValues(alpha: 0.1),
                       strokeWidth: 1,
                     );
                   },
@@ -380,7 +380,7 @@ class _InitiatorChart extends StatelessWidget {
             children: [
               Icon(
                 PhosphorIconsBold.chartPieSlice,
-                color: AppTheme.colors.primary,
+                color: context.colors.primary,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -388,7 +388,7 @@ class _InitiatorChart extends StatelessWidget {
                 'Initiator Chart',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                 ),
               ),
             ],
@@ -407,7 +407,7 @@ class _InitiatorChart extends StatelessWidget {
                         PieChartSectionData(
                           value: currentUserCount.toDouble(),
                           title: '$currentUserPercent%',
-                          color: AppTheme.colors.primary,
+                          color: context.colors.primary,
                           radius: 60,
                           titleStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: Colors.white,
@@ -417,7 +417,7 @@ class _InitiatorChart extends StatelessWidget {
                         PieChartSectionData(
                           value: partnerCount.toDouble(),
                           title: '$partnerPercent%',
-                          color: AppTheme.colors.love,
+                          color: context.colors.love,
                           radius: 60,
                           titleStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: Colors.white,
@@ -434,13 +434,13 @@ class _InitiatorChart extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _LegendItem(
-                      color: AppTheme.colors.primary,
+                      color: context.colors.primary,
                       label: 'You',
                       count: currentUserCount,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     _LegendItem(
-                      color: AppTheme.colors.love,
+                      color: context.colors.love,
                       label: 'Partner',
                       count: partnerCount,
                     ),
@@ -483,7 +483,7 @@ class _LegendItem extends StatelessWidget {
         Text(
           '$label ($count)',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppTheme.colors.text,
+            color: context.colors.text,
           ),
         ),
       ],
@@ -522,7 +522,7 @@ class _TagsRadarChart extends StatelessWidget {
               children: [
                 Icon(
                   PhosphorIconsBold.chartPolar,
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                   size: 24,
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -530,7 +530,7 @@ class _TagsRadarChart extends StatelessWidget {
                   'Tags Radar',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
                 ),
               ],
@@ -540,7 +540,7 @@ class _TagsRadarChart extends StatelessWidget {
               child: Text(
                 'No tags yet',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ),
@@ -563,7 +563,7 @@ class _TagsRadarChart extends StatelessWidget {
             children: [
               Icon(
                 PhosphorIconsBold.chartPolar,
-                color: AppTheme.colors.primary,
+                color: context.colors.primary,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -571,7 +571,7 @@ class _TagsRadarChart extends StatelessWidget {
                 'Tags Radar',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                 ),
               ),
             ],
@@ -583,18 +583,18 @@ class _TagsRadarChart extends StatelessWidget {
               RadarChartData(
                 dataSets: [
                   RadarDataSet(
-                    fillColor: AppTheme.colors.primary.withValues(alpha: 0.2),
-                    borderColor: AppTheme.colors.primary,
+                    fillColor: context.colors.primary.withValues(alpha: 0.2),
+                    borderColor: context.colors.primary,
                     borderWidth: 2,
                     dataEntries: radarData.map((value) => RadarEntry(value: value)).toList(),
                   ),
                 ],
                 tickCount: 4,
                 ticksTextStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 radarBorderData: BorderSide(
-                  color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                  color: context.colors.textSecondary.withValues(alpha: 0.2),
                   width: 1,
                 ),
                 getTitle: (index, angle) {
@@ -650,7 +650,7 @@ class _StatCard extends StatelessWidget {
           Text(
             title,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppTheme.colors.textSecondary,
+              color: context.colors.textSecondary,
               fontSize: 11,
             ),
           ),
@@ -659,14 +659,14 @@ class _StatCard extends StatelessWidget {
             value,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w800,
-              color: AppTheme.colors.text,
+              color: context.colors.text,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppTheme.colors.textSecondary,
+              color: context.colors.textSecondary,
               fontSize: 10,
             ),
           ),

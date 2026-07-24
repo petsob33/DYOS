@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ouros_app/core/theme/app_theme.dart';
 import 'package:ouros_app/features/auth/presentation/pairing_screen.dart';
 import 'package:ouros_app/core/services/firebase_service.dart';
 import 'package:ouros_app/core/services/pairing_exceptions.dart';
@@ -109,7 +110,7 @@ void main() {
         ...overrides,
       ],
       child: MaterialApp.router(
-        theme: ThemeData(useMaterial3: true),
+        theme: AppTheme.light,
         routerConfig: router,
       ),
     );

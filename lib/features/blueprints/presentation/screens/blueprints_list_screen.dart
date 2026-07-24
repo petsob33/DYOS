@@ -15,7 +15,7 @@ class BlueprintsListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final sectionsAsync = ref.watch(blueprintSectionsProvider);
 
     return Scaffold(

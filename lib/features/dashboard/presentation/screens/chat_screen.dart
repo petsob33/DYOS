@@ -55,7 +55,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Could not send message: $e'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -77,7 +77,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Could not send touch: $e'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -87,7 +87,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final coupleAsync = ref.watch(currentCoupleProvider);
     final currentUserAsync = ref.watch(currentUserDataProvider);
     final partnerAsync = ref.watch(partnerProvider);
@@ -138,7 +138,7 @@ class _ChatHistoryList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final historyAsync = ref.watch(chatHistoryProvider(coupleId));
 
     return historyAsync.when(
@@ -189,7 +189,7 @@ class _ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final time = DateFormat.MMMd().add_Hm().format(event.timestamp);
     final bubbleColor = isMine ? c.primary : c.card;
     final textColor = isMine ? Colors.white : c.text;
@@ -253,7 +253,7 @@ class _Composer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return Material(
       color: c.card,
       child: SafeArea(

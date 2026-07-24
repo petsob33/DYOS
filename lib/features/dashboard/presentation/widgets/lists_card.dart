@@ -19,7 +19,7 @@ class ListsCard extends ConsumerWidget {
 
     return bucketListNotesAsync.when(
       data: (notes) {
-        final c = AppTheme.colors;
+        final c = context.colors;
 
         return BentoCard(
           onTap: () {
@@ -36,7 +36,7 @@ class ListsCard extends ConsumerWidget {
         );
       },
       loading: () {
-        final c = AppTheme.colors;
+        final c = context.colors;
         return BentoCard(
           onTap: () {
             context.push('/lists');
@@ -52,7 +52,7 @@ class ListsCard extends ConsumerWidget {
         );
       },
       error: (error, stackTrace) {
-        final c = AppTheme.colors;
+        final c = context.colors;
         return BentoCard(
           onTap: () {
             context.push('/lists');

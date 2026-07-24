@@ -91,7 +91,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
               content: const Text(
                 'Add GOOGLE_MAPS_API_KEY to android/local.properties (Android) or GOOGLE_PLACES_API_KEY in ios Secrets.xcconfig, then rebuild. You can still search by address.',
               ),
-              backgroundColor: AppTheme.colors.warning,
+              backgroundColor: context.colors.warning,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 6),
             ),
@@ -126,7 +126,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Places: ${error.message}'),
-                backgroundColor: AppTheme.colors.love,
+                backgroundColor: context.colors.love,
                 behavior: SnackBarBehavior.floating,
                 duration: const Duration(seconds: 5),
                 action: SnackBarAction(
@@ -149,7 +149,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Search suggestions unavailable. Use the search icon to find places.'),
-              backgroundColor: AppTheme.colors.warning,
+              backgroundColor: context.colors.warning,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 4),
             ),
@@ -194,7 +194,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Could not load place details'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -218,7 +218,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('No results found for this address'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -239,7 +239,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Search failed: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -258,7 +258,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Location services are disabled'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -274,7 +274,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Location permission denied'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -299,7 +299,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -368,12 +368,12 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
           );
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.colors.background,
+        backgroundColor: context.colors.background,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(PhosphorIconsBold.arrowLeft, color: AppTheme.colors.text),
+          icon: Icon(PhosphorIconsBold.arrowLeft, color: context.colors.text),
           onPressed: () => Navigator.of(context).pop(),
           tooltip: 'Back',
         ),
@@ -381,7 +381,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
           'Pick a place',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
       ),
@@ -389,7 +389,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         children: [
           Expanded(
             child: Container(
-              color: AppTheme.colors.textSecondary.withValues(alpha: 0.12),
+              color: context.colors.textSecondary.withValues(alpha: 0.12),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -420,7 +420,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                   'Map preview needs a Google Maps API key in the native build (see docs/ANDROID_GOOGLE_API_KEY.md). Search by address works below.',
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: AppTheme.colors.textSecondary,
+                                        color: context.colors.textSecondary,
                                       ),
                                 ),
                               ),
@@ -437,7 +437,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                           children: [
                             Expanded(
                               child: Material(
-                                color: AppTheme.colors.card,
+                                color: context.colors.card,
                                 borderRadius: BorderRadius.circular(12),
                                 child: TextField(
                                   controller: _searchController,
@@ -460,7 +460,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                         : IconButton(
                                             icon: Icon(
                                               PhosphorIconsBold.magnifyingGlass,
-                                              color: AppTheme.colors.primary,
+                                              color: context.colors.primary,
                                             ),
                                             onPressed: _isSearching ? null : _searchAddress,
                                           ),
@@ -470,14 +470,14 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                       : null,
                                   onSubmitted: (_) => _searchAddress(),
                                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        color: AppTheme.colors.text,
+                                        color: context.colors.text,
                                       ),
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
                             Material(
-                              color: AppTheme.colors.card,
+                              color: context.colors.card,
                               borderRadius: BorderRadius.circular(12),
                               child: IconButton(
                                 onPressed: _isGettingLocation ? null : _goToMyLocation,
@@ -489,7 +489,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                       )
                                     : Icon(
                                         PhosphorIconsBold.navigationArrow,
-                                        color: AppTheme.colors.primary,
+                                        color: context.colors.primary,
                                       ),
                                 tooltip: 'My location',
                               ),
@@ -501,7 +501,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                           Material(
                             elevation: 4,
                             borderRadius: BorderRadius.circular(12),
-                            color: AppTheme.colors.card,
+                            color: context.colors.card,
                             child: ConstrainedBox(
                               constraints: const BoxConstraints(maxHeight: 240),
                               child: ListView.separated(
@@ -510,7 +510,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                 itemCount: _predictions.length,
                                 separatorBuilder: (_, __) => Divider(
                                   height: 1,
-                                  color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                                  color: context.colors.textSecondary.withValues(alpha: 0.2),
                                 ),
                                 itemBuilder: (context, index) {
                                   final p = _predictions[index];
@@ -518,13 +518,13 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                     leading: Icon(
                                       PhosphorIconsBold.mapPin,
                                       size: 20,
-                                      color: AppTheme.colors.primary,
+                                      color: context.colors.primary,
                                     ),
                                     title: Text(
                                       p.title ?? p.structuredFormatting?.mainText ?? '',
                                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                             fontWeight: FontWeight.w600,
-                                            color: AppTheme.colors.text,
+                                            color: context.colors.text,
                                           ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -534,7 +534,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                         ? Text(
                                             p.description ?? p.structuredFormatting?.secondaryText ?? '',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  color: AppTheme.colors.textSecondary,
+                                                  color: context.colors.textSecondary,
                                                 ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -559,13 +559,13 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppTheme.colors.card,
+              color: context.colors.card,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(24),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.colors.shadow,
+                  color: context.colors.shadow,
                   blurRadius: 20,
                   offset: const Offset(0, -4),
                 ),
@@ -577,7 +577,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                   ? Text(
                       'Tap on the map to set the memory location',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                     )
                   : Column(
@@ -588,7 +588,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                           'Place name (optional)',
                           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -599,31 +599,31 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide(
-                                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                                color: context.colors.textSecondary.withValues(alpha: 0.2),
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide(
-                                color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                                color: context.colors.textSecondary.withValues(alpha: 0.2),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide(
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                                 width: 2,
                               ),
                             ),
                             filled: true,
-                            fillColor: AppTheme.colors.background,
+                            fillColor: context.colors.background,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.md,
                               vertical: AppSpacing.sm,
                             ),
                           ),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: AppSpacing.md),
@@ -633,9 +633,9 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                               child: OutlinedButton(
                                 onPressed: () => Navigator.of(context).pop(),
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppTheme.colors.textSecondary,
+                                  foregroundColor: context.colors.textSecondary,
                                   side: BorderSide(
-                                    color: AppTheme.colors.textSecondary.withValues(alpha: 0.5),
+                                    color: context.colors.textSecondary.withValues(alpha: 0.5),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: AppSpacing.md,
@@ -652,7 +652,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                               child: ElevatedButton(
                                 onPressed: _confirm,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.colors.primary,
+                                  backgroundColor: context.colors.primary,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                     vertical: AppSpacing.md,

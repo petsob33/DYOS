@@ -10,7 +10,7 @@ class IntimacyHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Intimacy History'),
       ),

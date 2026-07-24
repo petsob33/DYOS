@@ -23,7 +23,7 @@ class BlueprintsCard extends ConsumerWidget {
       isPremium,
     );
 
-    final c = AppTheme.colors;
+    final c = context.colors;
 
     return BentoCard(
       onTap: () => unlocked

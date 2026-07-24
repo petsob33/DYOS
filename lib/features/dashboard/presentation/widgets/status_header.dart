@@ -36,7 +36,7 @@ class StatusHeader extends StatelessWidget {
               child: Text(
                 'Pair with your partner to view status',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -84,7 +84,7 @@ class StatusHeader extends StatelessWidget {
                       Container(
                         width: 1,
                         height: 40,
-                        color: AppTheme.colors.textSecondary.withValues(
+                        color: context.colors.textSecondary.withValues(
                           alpha: 0.1,
                         ),
                       ),
@@ -119,7 +119,7 @@ class StatusHeader extends StatelessWidget {
                     Container(
                       width: 1,
                       height: 40,
-                      color: AppTheme.colors.textSecondary.withValues(
+                      color: context.colors.textSecondary.withValues(
                         alpha: 0.1,
                       ),
                     ),
@@ -153,7 +153,7 @@ class StatusHeader extends StatelessWidget {
                       Container(
                         width: 1,
                         height: 40,
-                        color: AppTheme.colors.textSecondary.withValues(
+                        color: context.colors.textSecondary.withValues(
                           alpha: 0.1,
                         ),
                       ),
@@ -225,7 +225,7 @@ class AvatarStatus extends ConsumerWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: AppTheme.colors.background,
+            backgroundColor: context.colors.background,
             backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
                 ? CachedNetworkImageProvider(photoUrl!)
                 : null,
@@ -243,7 +243,7 @@ class AvatarStatus extends ConsumerWidget {
                   name,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                     fontSize: 14,
                   ),
                 ),
@@ -254,7 +254,7 @@ class AvatarStatus extends ConsumerWidget {
                       child: Text(
                         status,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                           fontSize: 12,
                         ),
                       ),
@@ -263,7 +263,7 @@ class AvatarStatus extends ConsumerWidget {
                       Icon(
                         PhosphorIconsBold.pencilSimple,
                         size: 12,
-                        color: AppTheme.colors.textSecondary.withValues(
+                        color: context.colors.textSecondary.withValues(
                           alpha: 0.5,
                         ),
                       ),
@@ -326,7 +326,7 @@ class AvatarStatus extends ConsumerWidget {
               'Update Status',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
             ),
             content: SingleChildScrollView(
@@ -337,7 +337,7 @@ class AvatarStatus extends ConsumerWidget {
                   Text(
                     'Choose emoji',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -354,15 +354,15 @@ class AvatarStatus extends ConsumerWidget {
                           height: 44,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppTheme.colors.primary.withValues(
+                                ? context.colors.primary.withValues(
                                     alpha: 0.15,
                                   )
-                                : AppTheme.colors.background,
+                                : context.colors.background,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected
-                                  ? AppTheme.colors.primary
-                                  : AppTheme.colors.textSecondary.withValues(
+                                  ? context.colors.primary
+                                  : context.colors.textSecondary.withValues(
                                       alpha: 0.2,
                                     ),
                               width: isSelected ? 2 : 1,
@@ -394,7 +394,7 @@ class AvatarStatus extends ConsumerWidget {
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppTheme.colors.textSecondary),
+                  style: TextStyle(color: context.colors.textSecondary),
                 ),
               ),
               TextButton(
@@ -409,7 +409,7 @@ class AvatarStatus extends ConsumerWidget {
                 child: Text(
                   'Save',
                   style: TextStyle(
-                    color: AppTheme.colors.primary,
+                    color: context.colors.primary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -436,7 +436,7 @@ class AvatarStatus extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Status updated'),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -449,7 +449,7 @@ class AvatarStatus extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error updating status: $e'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

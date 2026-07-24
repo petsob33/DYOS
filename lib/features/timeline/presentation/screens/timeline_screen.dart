@@ -48,7 +48,7 @@ class TimelineScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Timeline'),
         actions: [
@@ -105,7 +105,7 @@ class TimelineScreen extends ConsumerWidget {
                 content: const Text(
                   'You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.',
                 ),
-                backgroundColor: AppTheme.colors.warning,
+                backgroundColor: context.colors.warning,
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -115,7 +115,7 @@ class TimelineScreen extends ConsumerWidget {
 
           context.push('/add-memory');
         },
-        backgroundColor: AppTheme.colors.primary,
+        backgroundColor: context.colors.primary,
         child: const Icon(
           PhosphorIconsBold.plus,
           color: Colors.white,
@@ -240,7 +240,7 @@ class _MemoriesLimitBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final progress = (currentCount / limit).clamp(0.0, 1.0);
 
     return Padding(
@@ -321,21 +321,21 @@ class _ErrorState extends StatelessWidget {
             Icon(
               PhosphorIconsBold.warning,
               size: 64,
-              color: AppTheme.colors.love,
+              color: context.colors.love,
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Error loading memories',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               error,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -359,21 +359,21 @@ class _EmptyState extends StatelessWidget {
             Icon(
               PhosphorIconsBold.images,
               size: 64,
-              color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
+              color: context.colors.textSecondary.withValues(alpha: 0.4),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
               'No memories yet',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Start creating memories with your partner!',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -405,7 +405,7 @@ class _TimelineMonthSection extends StatelessWidget {
             month,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                 ),
           ),
         ),
@@ -446,11 +446,11 @@ class _MemoryCardState extends State<MemoryCard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.colors.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.colors.shadow,
+            color: context.colors.shadow,
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -480,7 +480,7 @@ class _MemoryCardState extends State<MemoryCard> {
                         child: Text(
                           widget.memory.caption,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                                 fontWeight: FontWeight.w600,
                                 height: 1.5,
                               ),
@@ -493,7 +493,7 @@ class _MemoryCardState extends State<MemoryCard> {
                         vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.colors.primary.withValues(alpha: 0.12),
+                        color: context.colors.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -507,7 +507,7 @@ class _MemoryCardState extends State<MemoryCard> {
                           Text(
                             widget.memory.category.displayName,
                             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: AppTheme.colors.primary,
+                                  color: context.colors.primary,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                 ),
@@ -526,7 +526,7 @@ class _MemoryCardState extends State<MemoryCard> {
                   child: Text(
                     _formatDate(widget.memory.date),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                           fontWeight: FontWeight.w500,
                           fontSize: 11,
                         ),
@@ -586,7 +586,7 @@ class _MemoryCardState extends State<MemoryCard> {
                           vertical: AppSpacing.xs,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.colors.card.withValues(alpha: 0.95),
+                          color: context.colors.card.withValues(alpha: 0.95),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
@@ -602,7 +602,7 @@ class _MemoryCardState extends State<MemoryCard> {
                             Icon(
                               PhosphorIconsBold.mapPin,
                               size: 14,
-                              color: AppTheme.colors.primary,
+                              color: context.colors.primary,
                             ),
                             const SizedBox(width: AppSpacing.xs),
                             Text(
@@ -611,7 +611,7 @@ class _MemoryCardState extends State<MemoryCard> {
                                   .textTheme
                                   .labelSmall
                                   ?.copyWith(
-                                    color: AppTheme.colors.text,
+                                    color: context.colors.text,
                                     fontWeight: FontWeight.w600,
                                     fontSize: 11,
                                   ),
@@ -645,7 +645,7 @@ class _MemoryCardState extends State<MemoryCard> {
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+                color: context.colors.textSecondary.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(24),
                 ),
@@ -654,7 +654,7 @@ class _MemoryCardState extends State<MemoryCard> {
                 child: Icon(
                   PhosphorIconsBold.image,
                   size: 48,
-                  color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
+                  color: context.colors.textSecondary.withValues(alpha: 0.4),
                 ),
               ),
             ),
@@ -668,13 +668,13 @@ class _MemoryCardState extends State<MemoryCard> {
                   Icon(
                     PhosphorIconsBold.mapPin,
                     size: 16,
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     locationName,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                   ),
@@ -717,16 +717,16 @@ class _MemoryImage extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       placeholder: (context, url) => Container(
-        color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+        color: context.colors.textSecondary.withValues(alpha: 0.1),
         child: Center(
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            color: AppTheme.colors.primary,
+            color: context.colors.primary,
           ),
         ),
       ),
       errorWidget: (context, url, error) => Container(
-        color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+        color: context.colors.textSecondary.withValues(alpha: 0.1),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -734,13 +734,13 @@ class _MemoryImage extends StatelessWidget {
               Icon(
                 PhosphorIconsBold.image,
                 size: 32,
-                color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
+                color: context.colors.textSecondary.withValues(alpha: 0.4),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Failed to load',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
               ),
             ],
@@ -787,7 +787,7 @@ class _MemoryCardSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.colors.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -802,7 +802,7 @@ class _MemoryCardSkeleton extends StatelessWidget {
                   child: Container(
                     height: 16,
                     decoration: BoxDecoration(
-                      color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                      color: context.colors.textSecondary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
@@ -812,7 +812,7 @@ class _MemoryCardSkeleton extends StatelessWidget {
                   width: 80,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                    color: context.colors.textSecondary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -824,7 +824,7 @@ class _MemoryCardSkeleton extends StatelessWidget {
             height: 300,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppTheme.colors.textSecondary.withValues(alpha: 0.1),
+              color: context.colors.textSecondary.withValues(alpha: 0.1),
             ),
           ),
           // Footer skeleton
@@ -837,7 +837,7 @@ class _MemoryCardSkeleton extends StatelessWidget {
                   height: 16,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                    color: context.colors.textSecondary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -846,7 +846,7 @@ class _MemoryCardSkeleton extends StatelessWidget {
                   height: 16,
                   width: 200,
                   decoration: BoxDecoration(
-                    color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                    color: context.colors.textSecondary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),

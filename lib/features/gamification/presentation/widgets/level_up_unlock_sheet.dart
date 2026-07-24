@@ -47,7 +47,7 @@ class _LevelUpUnlockSheet extends ConsumerWidget {
     final currentSp = ref.watch(currentXpProvider);
     final requiredSp = ProgressionPlan.spRequiredForFeature(feature);
     final featureName = _featureDisplayName(feature);
-    final c = AppTheme.colors;
+    final c = context.colors;
 
     return Container(
       decoration: BoxDecoration(

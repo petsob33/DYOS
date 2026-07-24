@@ -34,13 +34,13 @@ class MemoriesMapScreen extends ConsumerWidget {
     final memoriesAsync = ref.watch(memoriesStreamProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: AppTheme.colors.background,
+        backgroundColor: context.colors.background,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(PhosphorIconsBold.arrowLeft, color: AppTheme.colors.text),
+          icon: Icon(PhosphorIconsBold.arrowLeft, color: context.colors.text),
           onPressed: () => context.pop(),
           tooltip: 'Back',
         ),
@@ -48,7 +48,7 @@ class MemoriesMapScreen extends ConsumerWidget {
           'Memories map',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
       ),
@@ -70,13 +70,13 @@ class MemoriesMapScreen extends ConsumerWidget {
                   Icon(
                     PhosphorIconsBold.mapPin,
                     size: 64,
-                    color: AppTheme.colors.textSecondary.withValues(alpha: 0.4),
+                    color: context.colors.textSecondary.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     'No memories with a place yet',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                   ),
                 ],
@@ -329,7 +329,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
       children: [
         // 1. MAPA
         Container(
-          color: AppTheme.colors.textSecondary.withValues(alpha: 0.12),
+          color: context.colors.textSecondary.withValues(alpha: 0.12),
           child: !_mapsConfigResolved
               ? const Center(child: CircularProgressIndicator())
               : _mapsSdkAvailable
@@ -378,14 +378,14 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                     Expanded(
                       child: Material(
                         elevation: 4,
-                        shadowColor: AppTheme.colors.shadow.withValues(alpha: 0.2),
-                        color: AppTheme.colors.card,
+                        shadowColor: context.colors.shadow.withValues(alpha: 0.2),
+                        color: context.colors.card,
                         borderRadius: BorderRadius.circular(12),
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
                             hintText: 'Search place or address...',
-                            hintStyle: TextStyle(color: AppTheme.colors.textSecondary),
+                            hintStyle: TextStyle(color: context.colors.textSecondary),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -403,7 +403,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                                 : IconButton(
                                     icon: Icon(
                                       PhosphorIconsBold.magnifyingGlass,
-                                      color: AppTheme.colors.primary,
+                                      color: context.colors.primary,
                                     ),
                                     onPressed: _isSearching ? null : _searchAddress,
                                   ),
@@ -419,7 +419,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                               : null,
                           onSubmitted: (_) => _searchAddress(),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                       ),
@@ -427,8 +427,8 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                     const SizedBox(width: 8),
                     Material(
                       elevation: 4,
-                      shadowColor: AppTheme.colors.shadow.withValues(alpha: 0.2),
-                      color: AppTheme.colors.card,
+                      shadowColor: context.colors.shadow.withValues(alpha: 0.2),
+                      color: context.colors.card,
                       borderRadius: BorderRadius.circular(12),
                       child: IconButton(
                         onPressed: _isGettingLocation ? null : _goToMyLocation,
@@ -440,7 +440,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                               )
                             : Icon(
                                 PhosphorIconsBold.navigationArrow,
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                               ),
                         tooltip: 'My location',
                       ),
@@ -452,7 +452,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                   Material(
                     elevation: 4,
                     borderRadius: BorderRadius.circular(12),
-                    color: AppTheme.colors.card,
+                    color: context.colors.card,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 240),
                       child: ListView.separated(
@@ -461,7 +461,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                         itemCount: _predictions.length,
                         separatorBuilder: (_, __) => Divider(
                           height: 1,
-                          color: AppTheme.colors.textSecondary.withValues(alpha: 0.2),
+                          color: context.colors.textSecondary.withValues(alpha: 0.2),
                         ),
                         itemBuilder: (context, index) {
                           final p = _predictions[index];
@@ -469,13 +469,13 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                             leading: Icon(
                               PhosphorIconsBold.mapPin,
                               size: 20,
-                              color: AppTheme.colors.primary,
+                              color: context.colors.primary,
                             ),
                             title: Text(
                               p.title ?? p.structuredFormatting?.mainText ?? '',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
-                                    color: AppTheme.colors.text,
+                                    color: context.colors.text,
                                   ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -531,7 +531,7 @@ class _MapKeyMissingFallback extends StatelessWidget {
             'Map preview needs a Google Maps API key (see docs/ANDROID_GOOGLE_API_KEY.md). Memories with a place are listed below.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
           ),
         ),
@@ -552,7 +552,7 @@ class _MapKeyMissingFallback extends StatelessWidget {
                       ? '${lat.toStringAsFixed(3)}, ${lng.toStringAsFixed(3)}'
                       : 'Place';
               return Material(
-                color: AppTheme.colors.card,
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(12),
                 child: ListTile(
                   title: Text(
@@ -608,9 +608,9 @@ class _MemoryInfoCard extends StatelessWidget {
       child: SafeArea(
         child: Material(
           elevation: 8,
-          shadowColor: AppTheme.colors.shadow.withValues(alpha: 0.3),
+          shadowColor: context.colors.shadow.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(24),
-          color: AppTheme.colors.card,
+          color: context.colors.card,
           child: InkWell(
             onTap: onTap, // Otevírá detail
             borderRadius: BorderRadius.circular(24),
@@ -627,7 +627,7 @@ class _MemoryInfoCard extends StatelessWidget {
                         height: 40,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                          color: context.colors.primary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Text(
@@ -644,7 +644,7 @@ class _MemoryInfoCard extends StatelessWidget {
                               caption,
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w700,
-                                    color: AppTheme.colors.text,
+                                    color: context.colors.text,
                                   ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -652,7 +652,7 @@ class _MemoryInfoCard extends StatelessWidget {
                             Text(
                               _formatDate(memory.date),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                             ),
                           ],
@@ -662,7 +662,7 @@ class _MemoryInfoCard extends StatelessWidget {
                         onPressed: onClose,
                         icon: Icon(
                           PhosphorIconsBold.x,
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                           size: 20,
                         ),
                         padding: EdgeInsets.zero,
@@ -682,7 +682,7 @@ class _MemoryInfoCard extends StatelessWidget {
                         vertical: 6
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.colors.background,
+                        color: context.colors.background,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -691,14 +691,14 @@ class _MemoryInfoCard extends StatelessWidget {
                           Icon(
                             PhosphorIconsBold.mapPin,
                             size: 14,
-                            color: AppTheme.colors.primary,
+                            color: context.colors.primary,
                           ),
                           const SizedBox(width: 6),
                           Flexible(
                             child: Text(
                               locationName,
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.colors.textSecondary,
+                                    color: context.colors.textSecondary,
                                     fontWeight: FontWeight.w500,
                                   ),
                               maxLines: 1,

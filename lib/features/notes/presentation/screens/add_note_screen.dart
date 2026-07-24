@@ -55,7 +55,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Content cannot be empty'),
-          backgroundColor: AppTheme.colors.love,
+          backgroundColor: context.colors.love,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -105,7 +105,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Note saved successfully!'),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -120,7 +120,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error saving note: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -141,7 +141,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Add Note'),
         actions: [
@@ -165,7 +165,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
               child: Text(
                 'Save',
                 style: TextStyle(
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -189,28 +189,28 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.2),
+                        color: context.colors.textSecondary.withOpacity(0.2),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.2),
+                        color: context.colors.textSecondary.withOpacity(0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.primary,
+                        color: context.colors.primary,
                         width: 2,
                       ),
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     contentPadding: const EdgeInsets.all(AppSpacing.md),
                   ),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
@@ -224,29 +224,29 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.2),
+                        color: context.colors.textSecondary.withOpacity(0.2),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.2),
+                        color: context.colors.textSecondary.withOpacity(0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.primary,
+                        color: context.colors.primary,
                         width: 2,
                       ),
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     contentPadding: const EdgeInsets.all(AppSpacing.md),
                   ),
                   maxLines: 8,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -262,7 +262,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                   'Type',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -281,20 +281,20 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                           });
                         }
                       },
-                      selectedColor: AppTheme.colors.primary.withOpacity(0.2),
-                      backgroundColor: AppTheme.colors.background,
+                      selectedColor: context.colors.primary.withOpacity(0.2),
+                      backgroundColor: context.colors.background,
                       labelStyle: TextStyle(
                         color: isSelected
-                            ? AppTheme.colors.primary
-                            : AppTheme.colors.text,
+                            ? context.colors.primary
+                            : context.colors.text,
                         fontWeight: isSelected
                             ? FontWeight.w700
                             : FontWeight.w400,
                       ),
                       side: BorderSide(
                         color: isSelected
-                            ? AppTheme.colors.primary
-                            : AppTheme.colors.textSecondary.withOpacity(0.3),
+                            ? context.colors.primary
+                            : context.colors.textSecondary.withOpacity(0.3),
                         width: isSelected ? 2 : 1,
                       ),
                     );
@@ -306,7 +306,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                 ElevatedButton(
                   onPressed: _isSaving ? null : _saveNote,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.colors.primary,
+                    backgroundColor: context.colors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.md,

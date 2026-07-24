@@ -31,16 +31,16 @@ class QuickNoteCard extends StatelessWidget {
     return content;
   }
 
-  Color _getTextColor() {
+  Color _getTextColor(BuildContext context) {
     return content.isEmpty
-        ? AppTheme.colors.textSecondary
-        : AppTheme.colors.text;
+        ? context.colors.textSecondary
+        : context.colors.text;
   }
 
   @override
   Widget build(BuildContext context) {
     final displayText = _getDisplayText();
-    final textColor = _getTextColor();
+    final textColor = _getTextColor(context);
 
     return GestureDetector(
       onTap: onTap,
@@ -49,11 +49,11 @@ class QuickNoteCard extends StatelessWidget {
           minHeight: 150,
         ),
         decoration: BoxDecoration(
-          color: AppTheme.colors.card,
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.colors.shadow,
+              color: context.colors.shadow,
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -73,14 +73,14 @@ class QuickNoteCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                     letterSpacing: 0.5,
                   ),
                 ),
                 Icon(
                   PhosphorIconsBold.pushPin,
                   size: 16,
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                 ),
               ],
             ),

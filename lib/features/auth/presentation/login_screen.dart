@@ -72,7 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           'Reset Password',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppTheme.colors.text,
+                color: context.colors.text,
               ),
         ),
         content: Column(
@@ -82,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Text(
               'Enter your email address and we\'ll send you a link to reset your password.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -94,10 +94,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 hintText: 'your@email.com',
                 prefixIcon: Icon(
                   PhosphorIconsBold.envelope,
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 filled: true,
-                fillColor: AppTheme.colors.card,
+                fillColor: context.colors.card,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -111,7 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'Cancel',
-              style: TextStyle(color: AppTheme.colors.textSecondary),
+              style: TextStyle(color: context.colors.textSecondary),
             ),
           ),
           TextButton(
@@ -124,7 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Text(
               'Send',
               style: TextStyle(
-                color: AppTheme.colors.primary,
+                color: context.colors.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -142,7 +142,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('Password reset email sent! Check your inbox.'),
-              backgroundColor: AppTheme.colors.success,
+              backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -155,7 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${e.toString()}'),
-              backgroundColor: AppTheme.colors.love,
+              backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -226,7 +226,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: GestureDetector(
@@ -247,7 +247,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Icon(
                   PhosphorIconsBold.heart,
                   size: 80,
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 
@@ -255,7 +255,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   'Welcome back',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -264,7 +264,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Sign in to continue',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -296,10 +296,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     labelText: 'Email',
                     prefixIcon: Icon(
                       PhosphorIconsBold.envelope,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -307,7 +307,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.love,
+                        color: context.colors.love,
                         width: 1,
                       ),
                     ),
@@ -348,14 +348,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     labelText: 'Password',
                     prefixIcon: Icon(
                       PhosphorIconsBold.lock,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
                             ? PhosphorIconsBold.eyeSlash
                             : PhosphorIconsBold.eye,
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                       onPressed: () {
                         setState(() {
@@ -364,7 +364,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       },
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -372,7 +372,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.love,
+                        color: context.colors.love,
                         width: 1,
                       ),
                     ),
@@ -403,7 +403,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Text(
                       'Forgot password?',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.colors.primary,
+                            color: context.colors.primary,
                             fontWeight: FontWeight.w600,
                           ),
                     ),
@@ -415,14 +415,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: AppTheme.colors.love.withOpacity(0.1),
+                      color: context.colors.love.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           PhosphorIconsBold.warning,
-                          color: AppTheme.colors.love,
+                          color: context.colors.love,
                           size: 20,
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -433,7 +433,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
-                                  color: AppTheme.colors.love,
+                                  color: context.colors.love,
                                 ),
                           ),
                         ),
@@ -445,7 +445,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.colors.primary,
+                    backgroundColor: context.colors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.md,
@@ -481,7 +481,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     Expanded(
                       child: Divider(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                        color: context.colors.textSecondary.withOpacity(0.3),
                       ),
                     ),
                     Padding(
@@ -489,13 +489,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Text(
                         'OR',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppTheme.colors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                       ),
                     ),
                     Expanded(
                       child: Divider(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                        color: context.colors.textSecondary.withOpacity(0.3),
                       ),
                     ),
                   ],
@@ -505,9 +505,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 OutlinedButton.icon(
                   onPressed: _isLoading ? null : _handleGoogleSignIn,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.colors.text,
+                    foregroundColor: context.colors.text,
                     side: BorderSide(
-                      color: AppTheme.colors.textSecondary.withOpacity(0.3),
+                      color: context.colors.textSecondary.withOpacity(0.3),
                     ),
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.md,
@@ -519,12 +519,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   icon: Icon(
                     PhosphorIconsBold.googleLogo,
                     size: 20,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
                   label: Text(
                     'Continue with Google',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                           fontWeight: FontWeight.w600,
                         ),
                   ),
@@ -537,7 +537,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Text(
                       "Don't have an account? ",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                     ),
                     TextButton(
@@ -552,7 +552,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Text(
                         'Sign up',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.colors.primary,
+                              color: context.colors.primary,
                               fontWeight: FontWeight.w600,
                             ),
                       ),

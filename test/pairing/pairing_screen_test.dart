@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:ouros_app/core/theme/app_theme.dart';
 import 'package:ouros_app/features/auth/presentation/pairing_screen.dart';
 
 void main() {
@@ -11,9 +12,10 @@ void main() {
       // mock the FirebaseService and providers properly.
       
       await tester.pumpWidget(
-        const ProviderScope(
+        ProviderScope(
           child: MaterialApp(
-            home: PairingScreen(),
+            theme: AppTheme.light,
+            home: const PairingScreen(),
           ),
         ),
       );

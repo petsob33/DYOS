@@ -39,7 +39,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(rewarded ? 'Reward received: +30 SP' : 'No reward granted this time'),
-        backgroundColor: rewarded ? AppTheme.colors.success : AppTheme.colors.warning,
+        backgroundColor: rewarded ? context.colors.success : context.colors.warning,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -47,7 +47,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final currentSp = ref.watch(currentXpProvider); // SP stored as xp in Firestore
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
     final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
@@ -338,7 +338,7 @@ class _TierStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final tiers = LevelManager.tiers;
     return Column(
       children: [
@@ -434,7 +434,7 @@ class _MilestoneRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     final isLevelUp = milestone.type == MilestoneType.levelUp;
 
     return IntrinsicHeight(
@@ -592,7 +592,7 @@ class _QuestRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppTheme.colors;
+    final c = context.colors;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),

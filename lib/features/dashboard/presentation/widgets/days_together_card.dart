@@ -24,7 +24,7 @@ class DaysTogetherCard extends ConsumerWidget {
                 Text(
                   'Days Together',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -33,7 +33,7 @@ class DaysTogetherCard extends ConsumerWidget {
                     '0',
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.colors.text,
+                      color: context.colors.text,
                     ),
                   ),
                 ),
@@ -41,7 +41,7 @@ class DaysTogetherCard extends ConsumerWidget {
                 Text(
                   'Set your anniversary date',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -62,7 +62,7 @@ class DaysTogetherCard extends ConsumerWidget {
               Text(
                 'Days Together',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -71,7 +71,7 @@ class DaysTogetherCard extends ConsumerWidget {
                   '$daysTogether',
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
                 ),
               ),
@@ -89,7 +89,7 @@ class DaysTogetherCard extends ConsumerWidget {
             Text(
               'Days Together',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -98,7 +98,7 @@ class DaysTogetherCard extends ConsumerWidget {
                 '0',
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                 ),
               ),
             ),

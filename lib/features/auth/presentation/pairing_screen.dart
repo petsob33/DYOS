@@ -42,7 +42,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppTheme.colors.love),
+            style: TextButton.styleFrom(foregroundColor: context.colors.love),
             child: const Text('Sign Out'),
           ),
         ],
@@ -77,7 +77,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Paired with $name!'),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             duration: const Duration(seconds: 2),
@@ -94,7 +94,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.message),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             duration: const Duration(seconds: 3),
@@ -110,7 +110,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(_errorMessage!),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             duration: const Duration(seconds: 3),
@@ -123,7 +123,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Connect with Partner'),
         actions: [
@@ -146,14 +146,14 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 Icon(
                   PhosphorIconsBold.heart,
                   size: 80,
-                  color: AppTheme.colors.primary,
+                  color: context.colors.primary,
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
                   'Enter your partner\'s email',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.colors.text,
+                        color: context.colors.text,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -161,7 +161,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 Text(
                   'Both of you must already have an account',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -173,36 +173,36 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.2),
+                        color: context.colors.textSecondary.withOpacity(0.2),
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
-                        color: AppTheme.colors.textSecondary.withOpacity(0.2),
+                        color: context.colors.textSecondary.withOpacity(0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: AppTheme.colors.primary, width: 2),
+                      borderSide: BorderSide(color: context.colors.primary, width: 2),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: AppTheme.colors.love, width: 2),
+                      borderSide: BorderSide(color: context.colors.love, width: 2),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: AppTheme.colors.love, width: 2),
+                      borderSide: BorderSide(color: context.colors.love, width: 2),
                     ),
                     filled: true,
-                    fillColor: AppTheme.colors.card,
+                    fillColor: context.colors.card,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,
                       vertical: AppSpacing.md,
                     ),
                     prefixIcon: Icon(
                       PhosphorIconsBold.envelope,
-                      color: AppTheme.colors.primary,
+                      color: context.colors.primary,
                     ),
                   ),
                   keyboardType: TextInputType.emailAddress,
@@ -230,7 +230,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 ElevatedButton(
                   onPressed: _isSubmitting ? null : _submitEmail,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.colors.primary,
+                    backgroundColor: context.colors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                     shape: RoundedRectangleBorder(

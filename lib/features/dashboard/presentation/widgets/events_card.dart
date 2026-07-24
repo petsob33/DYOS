@@ -16,7 +16,7 @@ class EventsCard extends ConsumerWidget {
 
     return eventsAsync.when(
       data: (events) {
-        final c = AppTheme.colors;
+        final c = context.colors;
 
         return BentoCard(
           onTap: () {
@@ -29,7 +29,7 @@ class EventsCard extends ConsumerWidget {
         );
       },
       loading: () {
-        final c = AppTheme.colors;
+        final c = context.colors;
         return BentoCard(
           onTap: () {
             context.push('/events');
@@ -41,7 +41,7 @@ class EventsCard extends ConsumerWidget {
         );
       },
       error: (error, stackTrace) {
-        final c = AppTheme.colors;
+        final c = context.colors;
         return BentoCard(
           onTap: () {
             context.push('/events');

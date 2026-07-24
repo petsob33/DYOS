@@ -86,11 +86,11 @@ class _HapticNotificationOverlayState extends State<HapticNotificationOverlay>
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: AppTheme.colors.love.withValues(alpha: 0.2),
+                      color: context.colors.love.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.colors.love.withValues(alpha: 0.3),
+                          color: context.colors.love.withValues(alpha: 0.3),
                           blurRadius: 20,
                           spreadRadius: 10,
                         ),
@@ -98,7 +98,7 @@ class _HapticNotificationOverlayState extends State<HapticNotificationOverlay>
                     ),
                     child: Icon(
                       PhosphorIconsBold.heart,
-                      color: AppTheme.colors.love,
+                      color: context.colors.love,
                       size: 64,
                     ),
                   ),

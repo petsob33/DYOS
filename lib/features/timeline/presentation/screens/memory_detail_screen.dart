@@ -41,11 +41,11 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('Cancel', style: TextStyle(color: AppTheme.colors.textSecondary)),
+            child: Text('Cancel', style: TextStyle(color: context.colors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Delete', style: TextStyle(color: AppTheme.colors.love, fontWeight: FontWeight.w600)),
+            child: Text('Delete', style: TextStyle(color: context.colors.love, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -60,7 +60,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Memory deleted'),
-            backgroundColor: AppTheme.colors.success,
+            backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -72,7 +72,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to delete: ${e.toString()}'),
-            backgroundColor: AppTheme.colors.love,
+            backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -103,12 +103,12 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         : locationName ?? '';
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.colors.card,
+        backgroundColor: context.colors.card,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(PhosphorIconsBold.arrowLeft, color: AppTheme.colors.text),
+          icon: Icon(PhosphorIconsBold.arrowLeft, color: context.colors.text),
           onPressed: () => context.pop(),
           tooltip: 'Back',
         ),
@@ -118,7 +118,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
             Text(
               _formatFullDate(widget.memory.date),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                     fontWeight: FontWeight.w700,
                   ),
             ),
@@ -130,13 +130,13 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                       ? PhosphorIconsBold.airplane
                       : PhosphorIconsBold.circle,
                   size: 14,
-                  color: AppTheme.colors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   widget.memory.category.displayName,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.colors.textSecondary,
+                        color: context.colors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                 ),
@@ -146,7 +146,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(PhosphorIconsBold.x, color: AppTheme.colors.text),
+            icon: Icon(PhosphorIconsBold.x, color: context.colors.text),
             onPressed: () => context.pop(),
             tooltip: 'Close',
           ),
@@ -159,11 +159,11 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
               margin: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 0),
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: AppTheme.colors.card,
+                color: context.colors.card,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.colors.shadow.withValues(alpha: 0.08),
+                    color: context.colors.shadow.withValues(alpha: 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -178,7 +178,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                     Text(
                       captionOrLocation,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            color: AppTheme.colors.text,
+                            color: context.colors.text,
                             fontWeight: FontWeight.w700,
                           ),
                     ),
@@ -192,7 +192,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                         vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.colors.primary.withValues(alpha: 0.1),
+                        color: context.colors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -201,7 +201,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                           Icon(
                             PhosphorIconsBold.mapPin,
                             size: 16,
-                            color: AppTheme.colors.primary,
+                            color: context.colors.primary,
                           ),
                           const SizedBox(width: AppSpacing.xs),
                           Flexible(
@@ -211,7 +211,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                                   .textTheme
                                   .bodySmall
                                   ?.copyWith(
-                                    color: AppTheme.colors.primary,
+                                    color: context.colors.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
                               overflow: TextOverflow.ellipsis,
@@ -228,14 +228,14 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                       Icon(
                         PhosphorIconsBold.calendarBlank,
                         size: 14,
-                        color: AppTheme.colors.textSecondary.withValues(alpha: 0.9),
+                        color: context.colors.textSecondary.withValues(alpha: 0.9),
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
                           _formatDateTime(widget.memory.date),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                         ),
                       ),
@@ -246,7 +246,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                               .textTheme
                               .bodySmall
                               ?.copyWith(
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -264,8 +264,8 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                           icon: const Icon(PhosphorIconsBold.pencilSimple, size: 18),
                           label: const Text('Edit'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppTheme.colors.primary,
-                            side: BorderSide(color: AppTheme.colors.primary.withValues(alpha: 0.5)),
+                            foregroundColor: context.colors.primary,
+                            side: BorderSide(color: context.colors.primary.withValues(alpha: 0.5)),
                             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -286,8 +286,8 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                               : const Icon(PhosphorIconsBold.trash, size: 18),
                           label: Text(_isDeleting ? 'Deleting…' : 'Delete'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppTheme.colors.love,
-                            side: BorderSide(color: AppTheme.colors.love.withValues(alpha: 0.5)),
+                            foregroundColor: context.colors.love,
+                            side: BorderSide(color: context.colors.love.withValues(alpha: 0.5)),
                             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -304,11 +304,11 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
               child: Container(
                 margin: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  color: AppTheme.colors.card,
+                  color: context.colors.card,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.colors.shadow,
+                      color: context.colors.shadow,
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -334,16 +334,16 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                                   imageUrl: widget.memory.mediaUrls[index],
                                   fit: BoxFit.contain,
                                   placeholder: (context, url) => Container(
-                                    color: AppTheme.colors.background,
+                                    color: context.colors.background,
                                     child: Center(
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: AppTheme.colors.primary,
+                                        color: context.colors.primary,
                                       ),
                                     ),
                                   ),
                                   errorWidget: (context, url, error) => Container(
-                                    color: AppTheme.colors.background,
+                                    color: context.colors.background,
                                     child: Center(
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
@@ -351,7 +351,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                                           Icon(
                                             PhosphorIconsBold.image,
                                             size: 48,
-                                            color: AppTheme.colors.textSecondary
+                                            color: context.colors.textSecondary
                                                 .withValues(alpha: 0.4),
                                           ),
                                           const SizedBox(height: AppSpacing.sm),
@@ -361,7 +361,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                                                 .textTheme
                                                 .bodyMedium
                                                 ?.copyWith(
-                                                  color: AppTheme.colors.textSecondary,
+                                                  color: context.colors.textSecondary,
                                                 ),
                                           ),
                                         ],
@@ -378,7 +378,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                           child: Icon(
                             PhosphorIconsBold.image,
                             size: 64,
-                            color: AppTheme.colors.textSecondary
+                            color: context.colors.textSecondary
                                 .withValues(alpha: 0.4),
                           ),
                         ),
@@ -442,8 +442,8 @@ class _PageIndicator extends StatelessWidget {
       height: 8,
       decoration: BoxDecoration(
         color: isActive
-            ? AppTheme.colors.primary
-            : AppTheme.colors.textSecondary.withValues(alpha: 0.5),
+            ? context.colors.primary
+            : context.colors.textSecondary.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(

@@ -18,7 +18,7 @@ class ProfileScreen extends ConsumerWidget {
     final partnerAsync = ref.watch(partnerProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.colors.background,
+      backgroundColor: context.colors.background,
       appBar: AppBar(
         title: const Text('Profile'),
       ),
@@ -50,7 +50,7 @@ class ProfileScreen extends ConsumerWidget {
                                 },
                                 child: CircleAvatar(
                                   radius: 40,
-                                  backgroundColor: AppTheme.colors.primary.withValues(alpha: 0.1),
+                                  backgroundColor: context.colors.primary.withValues(alpha: 0.1),
                                       backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
                                           ? CachedNetworkImageProvider(user.photoUrl!)
                                           : null,
@@ -58,7 +58,7 @@ class ProfileScreen extends ConsumerWidget {
                                       ? Icon(
                                           PhosphorIconsBold.user,
                                           size: 40,
-                                          color: AppTheme.colors.primary,
+                                          color: context.colors.primary,
                                         )
                                       : null,
                                 ),
@@ -76,7 +76,7 @@ class ProfileScreen extends ConsumerWidget {
                                           .titleLarge
                                           ?.copyWith(
                                             fontWeight: FontWeight.w700,
-                                            color: AppTheme.colors.text,
+                                            color: context.colors.text,
                                           ),
                                     ),
                                     const SizedBox(height: AppSpacing.xs),
@@ -86,7 +86,7 @@ class ProfileScreen extends ConsumerWidget {
                                           .textTheme
                                           .bodyMedium
                                           ?.copyWith(
-                                            color: AppTheme.colors.textSecondary,
+                                            color: context.colors.textSecondary,
                                           ),
                                     ),
                                   ],
@@ -102,7 +102,7 @@ class ProfileScreen extends ConsumerWidget {
                           'Partner',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -114,7 +114,7 @@ class ProfileScreen extends ConsumerWidget {
                                   children: [
                                     Icon(
                                       PhosphorIconsBold.userPlus,
-                                      color: AppTheme.colors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                                     const SizedBox(width: AppSpacing.md),
                                     Expanded(
@@ -124,7 +124,7 @@ class ProfileScreen extends ConsumerWidget {
                                             .textTheme
                                             .bodyMedium
                                             ?.copyWith(
-                                              color: AppTheme.colors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                       ),
                                     ),
@@ -139,7 +139,7 @@ class ProfileScreen extends ConsumerWidget {
                                   CircleAvatar(
                                     radius: 24,
                                     backgroundColor:
-                                        AppTheme.colors.primary.withOpacity(0.1),
+                                        context.colors.primary.withOpacity(0.1),
                                     backgroundImage: partner.photoUrl != null && partner.photoUrl!.isNotEmpty
                                         ? CachedNetworkImageProvider(partner.photoUrl!)
                                         : null,
@@ -147,7 +147,7 @@ class ProfileScreen extends ConsumerWidget {
                                         ? Icon(
                                             PhosphorIconsBold.user,
                                             size: 24,
-                                            color: AppTheme.colors.primary,
+                                            color: context.colors.primary,
                                           )
                                         : null,
                                   ),
@@ -163,7 +163,7 @@ class ProfileScreen extends ConsumerWidget {
                                               .titleMedium
                                               ?.copyWith(
                                                 fontWeight: FontWeight.w700,
-                                                color: AppTheme.colors.text,
+                                                color: context.colors.text,
                                               ),
                                         ),
                                         const SizedBox(height: AppSpacing.xs),
@@ -173,7 +173,7 @@ class ProfileScreen extends ConsumerWidget {
                                               .textTheme
                                               .bodySmall
                                               ?.copyWith(
-                                                color: AppTheme.colors.textSecondary,
+                                                color: context.colors.textSecondary,
                                               ),
                                         ),
                                       ],
@@ -195,7 +195,7 @@ class ProfileScreen extends ConsumerWidget {
                                   .textTheme
                                   .bodyMedium
                                   ?.copyWith(
-                                    color: AppTheme.colors.love,
+                                    color: context.colors.love,
                                   ),
                             ),
                           ),
@@ -207,7 +207,7 @@ class ProfileScreen extends ConsumerWidget {
                           'Actions',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.colors.text,
+                                color: context.colors.text,
                               ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -219,7 +219,7 @@ class ProfileScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 PhosphorIconsBold.crown,
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                               ),
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
@@ -230,13 +230,13 @@ class ProfileScreen extends ConsumerWidget {
                                       .bodyLarge
                                       ?.copyWith(
                                         fontWeight: FontWeight.w600,
-                                        color: AppTheme.colors.text,
+                                        color: context.colors.text,
                                       ),
                                 ),
                               ),
                               Icon(
                                 PhosphorIconsBold.caretRight,
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                                 size: 20,
                               ),
                             ],
@@ -251,7 +251,7 @@ class ProfileScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 PhosphorIconsBold.lock,
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                               ),
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
@@ -262,13 +262,13 @@ class ProfileScreen extends ConsumerWidget {
                                       .bodyLarge
                                       ?.copyWith(
                                         fontWeight: FontWeight.w600,
-                                        color: AppTheme.colors.text,
+                                        color: context.colors.text,
                                       ),
                                 ),
                               ),
                               Icon(
                                 PhosphorIconsBold.caretRight,
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                                 size: 20,
                               ),
                             ],
@@ -283,7 +283,7 @@ class ProfileScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 PhosphorIconsBold.gear,
-                                color: AppTheme.colors.primary,
+                                color: context.colors.primary,
                               ),
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
@@ -294,13 +294,13 @@ class ProfileScreen extends ConsumerWidget {
                                       .bodyLarge
                                       ?.copyWith(
                                         fontWeight: FontWeight.w600,
-                                        color: AppTheme.colors.text,
+                                        color: context.colors.text,
                                       ),
                                 ),
                               ),
                               Icon(
                                 PhosphorIconsBold.caretRight,
-                                color: AppTheme.colors.textSecondary,
+                                color: context.colors.textSecondary,
                                 size: 20,
                               ),
                             ],
@@ -315,7 +315,7 @@ class ProfileScreen extends ConsumerWidget {
                   error: (error, stackTrace) => Center(
                     child: Text(
                       'Error loading profile: ${error.toString()}',
-                      style: TextStyle(color: AppTheme.colors.love),
+                      style: TextStyle(color: context.colors.love),
                     ),
                   ),
                 ),

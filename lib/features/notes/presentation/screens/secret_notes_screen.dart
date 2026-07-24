@@ -23,13 +23,13 @@ class SecretNotesScreen extends ConsumerWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: AppTheme.colors.background,
+        backgroundColor: context.colors.background,
         appBar: AppBar(
           title: const Text('Secret Notes'),
           bottom: TabBar(
-            labelColor: AppTheme.colors.primary,
-            unselectedLabelColor: AppTheme.colors.textSecondary,
-            indicatorColor: AppTheme.colors.primary,
+            labelColor: context.colors.primary,
+            unselectedLabelColor: context.colors.textSecondary,
+            indicatorColor: context.colors.primary,
             tabs: const [
               Tab(text: 'Secret Gift'),
               Tab(text: 'Private'),
@@ -79,20 +79,20 @@ class SecretNotesScreen extends ConsumerWidget {
                     Icon(
                       emptyIcon,
                       size: 48,
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       emptyMessage,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       emptyDescription,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.colors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -135,20 +135,20 @@ class SecretNotesScreen extends ConsumerWidget {
                   Icon(
                     PhosphorIconsBold.warning,
                     size: 48,
-                    color: AppTheme.colors.warning,
+                    color: context.colors.warning,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     'Error loading notes',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppTheme.colors.text,
+                          color: context.colors.text,
                         ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     error.toString(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.colors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                     textAlign: TextAlign.center,
                   ),
@@ -178,7 +178,7 @@ class _NoteItemCard extends StatelessWidget {
               note.title!,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppTheme.colors.text,
+                    color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -186,7 +186,7 @@ class _NoteItemCard extends StatelessWidget {
           Text(
             note.content,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.colors.text,
+                  color: context.colors.text,
                   height: 1.5,
                 ),
           ),
@@ -196,13 +196,13 @@ class _NoteItemCard extends StatelessWidget {
               Icon(
                 PhosphorIconsBold.calendar,
                 size: 14,
-                color: AppTheme.colors.textSecondary,
+                color: context.colors.textSecondary,
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
                 _formatDate(note.createdAt),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.colors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
               ),
             ],

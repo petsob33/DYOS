@@ -21,7 +21,7 @@ class QuickMessageCard extends ConsumerWidget {
     return coupleAsync.when(
       data: (couple) {
         if (couple == null) {
-          final c = AppTheme.colors;
+          final c = context.colors;
           return BentoCard(
             background: c.card,
             child: Center(
@@ -42,7 +42,7 @@ class QuickMessageCard extends ConsumerWidget {
           isPremium,
         );
 
-        final c = AppTheme.colors;
+        final c = context.colors;
 
         return BentoCard(
           onTap: () {
@@ -63,7 +63,7 @@ class QuickMessageCard extends ConsumerWidget {
         );
       },
       loading: () {
-        final c = AppTheme.colors;
+        final c = context.colors;
         return BentoCard(
           background: c.card,
           child: Center(
@@ -76,7 +76,7 @@ class QuickMessageCard extends ConsumerWidget {
         );
       },
       error: (_, __) {
-        final c = AppTheme.colors;
+        final c = context.colors;
         return BentoCard(
           background: c.card,
           child: Center(
