@@ -10,6 +10,7 @@ import '../../../core/widgets/bento_card.dart';
 import '../../auth/presentation/auth_providers.dart';
 import 'intimacy_provider.dart';
 import '../domain/intimacy_log_model.dart';
+import '../domain/intimacy_stats.dart';
 import 'widgets/intimacy_history_list.dart';
 
 class DataScreen extends ConsumerWidget {
@@ -58,6 +59,12 @@ class DataScreen extends ConsumerWidget {
                     child: _StatsRow(logs: logs),
                   ),
                   const SizedBox(height: AppSpacing.lg),
+                  // Current Month Stats
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    child: _CurrentMonthStats(logs: logs),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
                   // Frequency Chart
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -71,6 +78,12 @@ class DataScreen extends ConsumerWidget {
                       logs: logs,
                       currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
                     ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  // Orgasm Comparison Chart
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    child: _OrgasmComparisonChart(logs: logs),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   // Tags Radar Chart
@@ -179,6 +192,92 @@ class _StatsRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Current Month Stats: 4 cards summarizing this calendar month
+class _CurrentMonthStats extends StatelessWidget {
+  const _CurrentMonthStats({required this.logs});
+
+  final List<IntimacyLog> logs;
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = currentMonthStats(logs, DateTime.now());
+
+    return BentoCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                PhosphorIconsBold.calendarCheck,
+                color: context.colors.primary,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'This Month',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: context.colors.text,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            children: [
+              Expanded(
+                child: _StatCard(
+                  icon: PhosphorIconsBold.heart,
+                  title: 'Total',
+                  value: stats.count.toString(),
+                  subtitle: 'This month',
+                  color: context.colors.love,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _StatCard(
+                  icon: PhosphorIconsBold.clock,
+                  title: 'Longest Sex',
+                  value: stats.longestDurationMinutes == null
+                      ? '–'
+                      : '${stats.longestDurationMinutes}m',
+                  subtitle: 'This month',
+                  color: context.colors.primary,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _StatCard(
+                  icon: PhosphorIconsBold.timer,
+                  title: 'Avg Duration',
+                  value: stats.avgDurationMinutes == null
+                      ? '–'
+                      : '${stats.avgDurationMinutes!.toStringAsFixed(1)}m',
+                  subtitle: 'This month',
+                  color: context.colors.warning,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _StatCard(
+                  icon: PhosphorIconsBold.fire,
+                  title: 'Avg Orgasms',
+                  value: stats.avgOrgasms.toStringAsFixed(1),
+                  subtitle: 'This month',
+                  color: context.colors.love,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -443,6 +542,141 @@ class _InitiatorChart extends StatelessWidget {
                       color: context.colors.love,
                       label: 'Partner',
                       count: partnerCount,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Orgasm Comparison Chart: PieChart/DonutChart showing orgasm totals for both partners
+class _OrgasmComparisonChart extends StatelessWidget {
+  const _OrgasmComparisonChart({required this.logs});
+
+  final List<IntimacyLog> logs;
+
+  @override
+  Widget build(BuildContext context) {
+    final totals = totalOrgasms(logs);
+    final total = totals.user + totals.partner;
+
+    if (total == 0) {
+      return BentoCard(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  PhosphorIconsBold.chartPieSlice,
+                  color: context.colors.primary,
+                  size: 24,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  'Orgasm Comparison',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.text,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Center(
+              child: Text(
+                'No data yet',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final userPercent = (totals.user / total * 100).round();
+    final partnerPercent = (totals.partner / total * 100).round();
+
+    return BentoCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                PhosphorIconsBold.chartPieSlice,
+                color: context.colors.primary,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Orgasm Comparison',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: context.colors.text,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          SizedBox(
+            height: 200,
+            child: Row(
+              children: [
+                Expanded(
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 60,
+                      sections: [
+                        PieChartSectionData(
+                          value: totals.user.toDouble(),
+                          title: '$userPercent%',
+                          color: context.colors.primary,
+                          radius: 60,
+                          titleStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        PieChartSectionData(
+                          value: totals.partner.toDouble(),
+                          title: '$partnerPercent%',
+                          color: context.colors.love,
+                          radius: 60,
+                          titleStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.lg),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _LegendItem(
+                      color: context.colors.primary,
+                      label: 'You',
+                      count: totals.user,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _LegendItem(
+                      color: context.colors.love,
+                      label: 'Partner',
+                      count: totals.partner,
                     ),
                   ],
                 ),
