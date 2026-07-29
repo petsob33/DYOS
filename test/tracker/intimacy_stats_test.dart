@@ -42,6 +42,27 @@ void main() {
     });
   });
 
+  group('longestDuration', () {
+    test('returns null when logs is empty', () {
+      expect(longestDuration([]), isNull);
+    });
+
+    test('returns null when every log has a null duration', () {
+      final logs = [buildLog(duration: null), buildLog(duration: null)];
+      expect(longestDuration(logs), isNull);
+    });
+
+    test('returns the max duration across all logs, ignoring nulls', () {
+      final logs = [
+        buildLog(duration: 15),
+        buildLog(duration: null),
+        buildLog(duration: 45),
+        buildLog(duration: 30),
+      ];
+      expect(longestDuration(logs), 45);
+    });
+  });
+
   group('currentMonthStats', () {
     final now = DateTime(2026, 7, 15);
 

@@ -21,6 +21,12 @@ OrgasmTotals totalOrgasms(List<IntimacyLog> logs) {
   return (user: user, partner: partner);
 }
 
+/// The longest logged duration in minutes, or null if none of [logs] has one.
+int? longestDuration(List<IntimacyLog> logs) {
+  final durations = logs.map((log) => log.duration).whereType<int>().toList();
+  return durations.isEmpty ? null : durations.reduce((a, b) => a > b ? a : b);
+}
+
 MonthStats currentMonthStats(List<IntimacyLog> logs, DateTime now) {
   final monthLogs = logs
       .where((log) => log.date.year == now.year && log.date.month == now.month)
@@ -38,7 +44,7 @@ MonthStats currentMonthStats(List<IntimacyLog> logs, DateTime now) {
 
   return (
     count: monthLogs.length,
-    longestDurationMinutes: durations.isEmpty ? null : durations.reduce((a, b) => a > b ? a : b),
+    longestDurationMinutes: longestDuration(monthLogs),
     avgDurationMinutes: durations.isEmpty ? null : durations.reduce((a, b) => a + b) / durations.length,
     avgOrgasms: monthLogs.isEmpty ? 0 : totalOrgasmsThisMonth / monthLogs.length,
   );
