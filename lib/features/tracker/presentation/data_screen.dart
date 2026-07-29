@@ -8,6 +8,8 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../auth/presentation/auth_providers.dart';
+import '../../dashboard/domain/haptic_signal_stats.dart';
+import '../../dashboard/presentation/hearts_streak_provider.dart';
 import 'intimacy_provider.dart';
 import '../domain/intimacy_log_model.dart';
 import '../domain/intimacy_stats.dart';
@@ -58,6 +60,9 @@ class DataScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                     child: _StatsRow(logs: logs),
                   ),
+                  const SizedBox(height: AppSpacing.lg),
+                  // Best Of (swipeable highlights)
+                  _BestOfCarousel(logs: logs),
                   const SizedBox(height: AppSpacing.lg),
                   // Current Month Stats
                   Padding(
@@ -196,6 +201,87 @@ class _StatsRow extends StatelessWidget {
   }
 }
 
+/// Best Of: swipeable highlight cards (all-time/monthly records, streaks)
+class _BestOfCarousel extends ConsumerWidget {
+  const _BestOfCarousel({required this.logs});
+
+  final List<IntimacyLog> logs;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final couple = ref.watch(currentCoupleProvider).valueOrNull;
+    final signals = ref.watch(hapticSignalsHistoryProvider).valueOrNull ?? [];
+    final now = DateTime.now();
+
+    final allTimeLongest = longestDuration(logs);
+    final monthLongest = currentMonthStats(logs, now).longestDurationMinutes;
+    final streak = couple == null
+        ? 0
+        : heartsStreak(signals, memberIds: couple.members, now: now);
+
+    final cards = [
+      _StatCard(
+        icon: PhosphorIconsBold.trophy,
+        title: 'Longest Sex',
+        value: allTimeLongest == null ? '–' : '${allTimeLongest}m',
+        subtitle: 'All time',
+        color: context.colors.primary,
+      ),
+      _StatCard(
+        icon: PhosphorIconsBold.clock,
+        title: 'Longest Sex',
+        value: monthLongest == null ? '–' : '${monthLongest}m',
+        subtitle: 'This month',
+        color: context.colors.warning,
+      ),
+      _StatCard(
+        icon: PhosphorIconsBold.fire,
+        title: 'Hearts Streak',
+        value: streak.toString(),
+        subtitle: streak == 1 ? 'day in a row' : 'days in a row',
+        color: context.colors.love,
+      ),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Row(
+            children: [
+              Icon(
+                PhosphorIconsBold.sparkle,
+                color: context.colors.primary,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Best Of',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: context.colors.text,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        SizedBox(
+          height: 140,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            itemCount: cards.length,
+            separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+            itemBuilder: (context, index) => SizedBox(width: 160, child: cards[index]),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Current Month Stats: 4 cards summarizing this calendar month
 class _CurrentMonthStats extends StatelessWidget {
   const _CurrentMonthStats({required this.logs});
@@ -238,18 +324,6 @@ class _CurrentMonthStats extends StatelessWidget {
                   value: stats.count.toString(),
                   subtitle: 'This month',
                   color: context.colors.love,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _StatCard(
-                  icon: PhosphorIconsBold.clock,
-                  title: 'Longest Sex',
-                  value: stats.longestDurationMinutes == null
-                      ? '–'
-                      : '${stats.longestDurationMinutes}m',
-                  subtitle: 'This month',
-                  color: context.colors.primary,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
