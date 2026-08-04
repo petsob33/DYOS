@@ -4,8 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_provider.dart';
+import 'core/l10n/locale_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/notification_service.dart';
+import 'l10n/generated/app_localizations.dart';
 
 class OurOSRoot extends ConsumerStatefulWidget {
   const OurOSRoot({super.key});
@@ -29,12 +31,16 @@ class _OurOSRootState extends ConsumerState<OurOSRoot> {
     final router = ref.watch(appRouterProvider);
     final themeMode =
         ref.watch(themeModeControllerProvider).valueOrNull ?? ThemeMode.system;
+    final locale = ref.watch(localeControllerProvider).valueOrNull;
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'OurOS',
       themeMode: themeMode,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
       builder: (context, child) {
         final textTheme = Theme.of(
