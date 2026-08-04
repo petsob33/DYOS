@@ -315,40 +315,41 @@ class _CurrentMonthStats extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          Row(
-            children: [
-              Expanded(
-                child: _StatCard(
-                  icon: PhosphorIconsBold.heart,
-                  title: 'Total',
-                  value: stats.count.toString(),
-                  subtitle: 'This month',
-                  color: context.colors.love,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _StatCard(
-                  icon: PhosphorIconsBold.timer,
-                  title: 'Avg Duration',
-                  value: stats.avgDurationMinutes == null
-                      ? '–'
-                      : '${stats.avgDurationMinutes!.toStringAsFixed(1)}m',
-                  subtitle: 'This month',
-                  color: context.colors.warning,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _StatCard(
-                  icon: PhosphorIconsBold.fire,
-                  title: 'Avg Orgasms',
-                  value: stats.avgOrgasms.toStringAsFixed(1),
-                  subtitle: 'This month',
-                  color: context.colors.love,
-                ),
-              ),
-            ],
+          SizedBox(
+            height: 140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: 3,
+              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
+              itemBuilder: (context, index) {
+                final cards = [
+                  _StatCard(
+                    icon: PhosphorIconsBold.heart,
+                    title: 'Total',
+                    value: stats.count.toString(),
+                    subtitle: 'This month',
+                    color: context.colors.love,
+                  ),
+                  _StatCard(
+                    icon: PhosphorIconsBold.timer,
+                    title: 'Avg Duration',
+                    value: stats.avgDurationMinutes == null
+                        ? '–'
+                        : '${stats.avgDurationMinutes!.toStringAsFixed(1)}m',
+                    subtitle: 'This month',
+                    color: context.colors.warning,
+                  ),
+                  _StatCard(
+                    icon: PhosphorIconsBold.fire,
+                    title: 'Avg Orgasms',
+                    value: stats.avgOrgasms.toStringAsFixed(1),
+                    subtitle: 'This month',
+                    color: context.colors.love,
+                  ),
+                ];
+                return SizedBox(width: 160, child: cards[index]);
+              },
+            ),
           ),
         ],
       ),
