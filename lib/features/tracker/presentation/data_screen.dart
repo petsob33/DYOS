@@ -268,7 +268,7 @@ class _BestOfCarousel extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         SizedBox(
-          height: 140,
+          height: MediaQuery.textScalerOf(context).scale(152).clamp(152.0, 260.0),
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -316,7 +316,7 @@ class _CurrentMonthStats extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           SizedBox(
-            height: 140,
+            height: MediaQuery.textScalerOf(context).scale(152).clamp(152.0, 260.0),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: 3,
