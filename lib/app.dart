@@ -41,6 +41,16 @@ class _OurOSRootState extends ConsumerState<OurOSRoot> {
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: (deviceLocale, supportedLocales) {
+        if (deviceLocale != null) {
+          for (final supported in supportedLocales) {
+            if (supported.languageCode == deviceLocale.languageCode) {
+              return supported;
+            }
+          }
+        }
+        return const Locale('en');
+      },
       routerConfig: router,
       builder: (context, child) {
         final textTheme = Theme.of(
