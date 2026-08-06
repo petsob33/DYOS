@@ -542,15 +542,17 @@ class _LoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.md),
-          child: _LogCardSkeleton(),
-        );
-      },
+      child: Column(
+        children: List.generate(
+          5,
+          (index) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: _LogCardSkeleton(),
+          ),
+        ),
+      ),
     );
   }
 }
