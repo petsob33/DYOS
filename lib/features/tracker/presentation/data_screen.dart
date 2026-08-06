@@ -260,11 +260,15 @@ class _BestOfCarousel extends ConsumerWidget {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                context.l10n.dataScreenBestOfHeading,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.colors.text,
+              Expanded(
+                child: Text(
+                  context.l10n.dataScreenBestOfHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.text,
+                  ),
                 ),
               ),
             ],
@@ -309,11 +313,15 @@ class _CurrentMonthStats extends StatelessWidget {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                context.l10n.dataScreenCurrentMonthHeading,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.colors.text,
+              Expanded(
+                child: Text(
+                  context.l10n.dataScreenCurrentMonthHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.text,
+                  ),
                 ),
               ),
             ],
@@ -428,11 +436,15 @@ class _FrequencyChart extends StatelessWidget {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                context.l10n.dataScreenFrequencyChartHeading,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.colors.text,
+              Expanded(
+                child: Text(
+                  context.l10n.dataScreenFrequencyChartHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.text,
+                  ),
                 ),
               ),
             ],
@@ -560,11 +572,15 @@ class _InitiatorChart extends StatelessWidget {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                context.l10n.dataScreenInitiatorChartHeading,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.colors.text,
+              Expanded(
+                child: Text(
+                  context.l10n.dataScreenInitiatorChartHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.text,
+                  ),
                 ),
               ),
             ],
@@ -656,11 +672,15 @@ class _OrgasmComparisonChart extends StatelessWidget {
                   size: 24,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text(
-                  context.l10n.dataScreenOrgasmComparisonHeading,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: context.colors.text,
+                Expanded(
+                  child: Text(
+                    context.l10n.dataScreenOrgasmComparisonHeading,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.text,
+                    ),
                   ),
                 ),
               ],
@@ -695,11 +715,15 @@ class _OrgasmComparisonChart extends StatelessWidget {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                context.l10n.dataScreenOrgasmComparisonHeading,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.colors.text,
+              Expanded(
+                child: Text(
+                  context.l10n.dataScreenOrgasmComparisonHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.text,
+                  ),
                 ),
               ),
             ],
@@ -837,11 +861,15 @@ class _TagsRadarChart extends StatelessWidget {
                   size: 24,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text(
-                  context.l10n.dataScreenTagsRadarHeading,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: context.colors.text,
+                Expanded(
+                  child: Text(
+                    context.l10n.dataScreenTagsRadarHeading,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.text,
+                    ),
                   ),
                 ),
               ],
@@ -878,11 +906,15 @@ class _TagsRadarChart extends StatelessWidget {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                context.l10n.dataScreenTagsRadarHeading,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: context.colors.text,
+              Expanded(
+                child: Text(
+                  context.l10n.dataScreenTagsRadarHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.text,
+                  ),
                 ),
               ),
             ],
@@ -960,6 +992,8 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(
             title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: context.colors.textSecondary,
               fontSize: 11,
@@ -968,6 +1002,8 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w800,
               color: context.colors.text,
@@ -976,6 +1012,8 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: context.colors.textSecondary,
               fontSize: 10,
