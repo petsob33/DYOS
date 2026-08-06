@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../tracker/presentation/intimacy_provider.dart';
 import '../../../tracker/domain/intimacy_log_model.dart';
@@ -30,7 +31,7 @@ class IntimacySparkCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'No activity yet',
+                  context.l10n.intimacySparkCardNoActivity,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -48,22 +49,17 @@ class IntimacySparkCard extends ConsumerWidget {
         final lastLog = sortedLogs.first;
         final daysSince = DateTime.now().difference(lastLog.date).inDays;
 
-        String sparkText;
+        final sparkText = context.l10n.intimacySparkCardDaysAgo(daysSince);
         String sparkEmoji;
         if (daysSince == 0) {
-          sparkText = 'Today';
           sparkEmoji = '🔥';
         } else if (daysSince == 1) {
-          sparkText = '1 day ago';
           sparkEmoji = '🔥';
         } else if (daysSince < 7) {
-          sparkText = '$daysSince days ago';
           sparkEmoji = '🔥';
         } else if (daysSince < 14) {
-          sparkText = '$daysSince days ago';
           sparkEmoji = '💫';
         } else {
-          sparkText = '$daysSince days ago';
           sparkEmoji = '💭';
         }
 
@@ -142,7 +138,7 @@ class IntimacySparkCard extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Error loading data',
+              context.l10n.intimacySparkCardError,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.colors.textSecondary,
               ),

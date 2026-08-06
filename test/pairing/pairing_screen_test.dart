@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ouros_app/core/theme/app_theme.dart';
 import 'package:ouros_app/features/auth/presentation/pairing_screen.dart';
+import 'package:ouros_app/l10n/generated/app_localizations.dart';
 
 void main() {
   group('PairingScreen Widget Tests', () {
@@ -15,6 +16,8 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             theme: AppTheme.light,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: const PairingScreen(),
           ),
         ),

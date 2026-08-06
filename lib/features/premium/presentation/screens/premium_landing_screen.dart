@@ -7,6 +7,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../domain/premium_copy.dart';
@@ -123,7 +124,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
       return Scaffold(
         backgroundColor: c.background,
         appBar: AppBar(
-          title: const Text('DYOS+'),
+          title: Text(context.l10n.premiumLandingScreenTitle),
           leading: IconButton(
             icon: const Icon(PhosphorIconsBold.arrowLeft),
             onPressed: () => context.pop(),
@@ -145,7 +146,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      'You have DYOS+',
+                      context.l10n.premiumLandingScreenYouHavePremium,
                       style: GoogleFonts.inter(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
@@ -154,7 +155,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'One subscription for both of you.',
+                      context.l10n.premiumLandingScreenOneSubscriptionBoth,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         color: c.textSecondary,
@@ -173,7 +174,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
     return Scaffold(
       backgroundColor: c.background,
       appBar: AppBar(
-        title: const Text('DYOS+'),
+        title: Text(context.l10n.premiumLandingScreenTitle),
         leading: IconButton(
           icon: const Icon(PhosphorIconsBold.arrowLeft),
           onPressed: () => context.pop(),
@@ -197,7 +198,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                     _buildBenefitsCard(context, c),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      'Choose your plan',
+                      context.l10n.premiumLandingScreenChooseYourPlan,
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -220,7 +221,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(AppSpacing.lg),
                             child: Text(
-                              'Could not load plans: $_offeringsError. Pull down to retry.',
+                              context.l10n.premiumLandingScreenLoadPlansError(_offeringsError.toString()),
                               style: GoogleFonts.inter(
                                 color: c.textSecondary,
                               ),
@@ -244,7 +245,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                     ],
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      'Cancel anytime. One subscription for both of you.',
+                      context.l10n.premiumLandingScreenCancelAnytimeNote,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: c.textSecondary,
@@ -294,7 +295,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'DYOS+',
+                context.l10n.premiumLandingScreenTitle,
                 style: GoogleFonts.inter(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
@@ -306,7 +307,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'More for the two of you',
+            context.l10n.premiumLandingScreenHeroSubtitle,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -315,7 +316,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Unlimited memories, insights, and no limits. One plan, both of you.',
+            context.l10n.premiumLandingScreenHeroDescription,
             style: GoogleFonts.inter(
               fontSize: 15,
               color: c.textSecondary,
@@ -334,7 +335,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Instant benefits',
+            context.l10n.premiumLandingScreenInstantBenefits,
             style: GoogleFonts.inter(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -404,7 +405,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Text(
-            'No plans available right now. Pull down to retry.',
+            context.l10n.premiumLandingScreenNoPlansAvailable,
             style: GoogleFonts.inter(color: c.textSecondary),
             textAlign: TextAlign.center,
           ),
@@ -421,7 +422,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Text(
-            'No plans configured. Pull down to retry.',
+            context.l10n.premiumLandingScreenNoPlansConfigured,
             style: GoogleFonts.inter(color: c.textSecondary),
             textAlign: TextAlign.center,
           ),
@@ -469,7 +470,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       Row(
                         children: [
                           Text(
-                            isYearly ? 'Yearly' : 'Monthly',
+                            isYearly ? context.l10n.premiumLandingScreenYearly : context.l10n.premiumLandingScreenMonthly,
                             style: GoogleFonts.inter(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -501,8 +502,8 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       ),
                       Text(
                         isYearly
-                            ? 'Yearly billing'
-                            : 'Monthly billing',
+                            ? context.l10n.premiumLandingScreenYearlyBilling
+                            : context.l10n.premiumLandingScreenMonthlyBilling,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: c.textSecondary,
@@ -575,7 +576,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       ),
                     )
                   : Text(
-                      'Get DYOS+ now',
+                      context.l10n.premiumLandingScreenGetPremiumNow,
                       style: GoogleFonts.inter(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -587,7 +588,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _footerLink('Restore', _restoring ? null : _restore, c),
+              _footerLink(context.l10n.premiumLandingScreenRestore, _restoring ? null : _restore, c),
               Text(
                 ' · ',
                 style: GoogleFonts.inter(
@@ -596,7 +597,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                 ),
               ),
               _footerLink(
-                'Privacy',
+                context.l10n.premiumLandingScreenPrivacy,
                 () => _openLegalUrl('privacy-policy.html'),
                 c,
               ),
@@ -608,7 +609,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                 ),
               ),
               _footerLink(
-                'Terms',
+                context.l10n.premiumLandingScreenTerms,
                 () => _openLegalUrl('terms-of-service.html'),
                 c,
               ),

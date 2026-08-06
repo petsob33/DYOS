@@ -8,6 +8,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/theme_mode_provider.dart';
 import '../../../core/l10n/locale_provider.dart';
+import '../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/firebase_service.dart';
 import '../../../features/auth/presentation/auth_providers.dart';
@@ -24,7 +25,7 @@ class SettingsScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(24),
         ),
         title: Text(
-          'Delete Account',
+          context.l10n.settingsScreenDeleteAccountTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.love,
@@ -35,25 +36,21 @@ class SettingsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'This action cannot be undone. This will permanently delete:',
+              context.l10n.settingsScreenDeleteAccountWarning,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.text,
                   ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              '• Your account and profile\n'
-              '• All your memories and photos\n'
-              '• All intimacy logs and data\n'
-              '• Your pairing (partner will be unpaired)\n'
-              '• All notes and lists',
+              context.l10n.settingsScreenDeleteAccountBulletList,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.colors.textSecondary,
                   ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'Are you absolutely sure?',
+              context.l10n.settingsScreenDeleteAccountConfirmQuestion,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.love,
                     fontWeight: FontWeight.w700,
@@ -65,7 +62,7 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              'Cancel',
+              context.l10n.commonCancel,
               style: TextStyle(color: context.colors.textSecondary),
             ),
           ),
@@ -74,9 +71,9 @@ class SettingsScreen extends ConsumerWidget {
             style: TextButton.styleFrom(
               foregroundColor: context.colors.love,
             ),
-            child: const Text(
-              'Delete Forever',
-              style: TextStyle(fontWeight: FontWeight.w700),
+            child: Text(
+              context.l10n.settingsScreenDeleteForever,
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -95,12 +92,12 @@ class SettingsScreen extends ConsumerWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
-            content: const Column(
+            content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: AppSpacing.md),
-                Text('Deleting account...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: AppSpacing.md),
+                Text(context.l10n.settingsScreenDeletingAccount),
               ],
             ),
           ),
@@ -130,7 +127,7 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error deleting account: ${e.toString()}'),
+            content: Text(context.l10n.settingsScreenDeleteAccountError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -154,7 +151,7 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('You must be paired to set anniversary date'),
+            content: Text(context.l10n.settingsScreenMustBePairedForAnniversary),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -184,9 +181,9 @@ class SettingsScreen extends ConsumerWidget {
       initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
-      helpText: 'Select anniversary date',
-      cancelText: 'Cancel',
-      confirmText: 'Set',
+      helpText: context.l10n.settingsScreenSelectAnniversaryDateHelp,
+      cancelText: context.l10n.commonCancel,
+      confirmText: context.l10n.settingsScreenSetAnniversaryConfirm,
     );
 
     if (pickedDate == null || !context.mounted) return;
@@ -201,7 +198,7 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Anniversary date updated'),
+            content: Text(context.l10n.settingsScreenAnniversaryUpdated),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -214,7 +211,7 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error updating anniversary date: ${e.toString()}'),
+            content: Text(context.l10n.settingsScreenAnniversaryUpdateError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -231,8 +228,8 @@ class SettingsScreen extends ConsumerWidget {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Log out'),
-        content: const Text('Are you sure you want to log out?'),
+        title: Text(context.l10n.settingsScreenLogOut),
+        content: Text(context.l10n.settingsScreenLogoutConfirmQuestion),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -240,7 +237,7 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              'Cancel',
+              context.l10n.commonCancel,
               style: TextStyle(color: context.colors.textSecondary),
             ),
           ),
@@ -249,7 +246,7 @@ class SettingsScreen extends ConsumerWidget {
             style: TextButton.styleFrom(
               foregroundColor: context.colors.love,
             ),
-            child: const Text('Log out'),
+            child: Text(context.l10n.settingsScreenLogOut),
           ),
         ],
       ),
@@ -295,7 +292,7 @@ class SettingsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error logging out: ${e.toString()}'),
+            content: Text(context.l10n.settingsScreenLogoutError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -312,7 +309,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(context.l10n.settingsScreenTitle),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
       ),
@@ -323,7 +320,7 @@ class SettingsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Settings',
+                context.l10n.settingsScreenTitle,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: context.colors.text,
@@ -362,7 +359,7 @@ class SettingsScreen extends ConsumerWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Anniversary Date',
+                                        context.l10n.settingsScreenAnniversaryDateLabel,
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium
@@ -374,8 +371,8 @@ class SettingsScreen extends ConsumerWidget {
                                       const SizedBox(height: 2),
                                       Text(
                                         anniversaryDate != null
-                                            ? '${anniversaryDate.year}-${anniversaryDate.month.toString().padLeft(2, '0')}-${anniversaryDate.day.toString().padLeft(2, '0')}${daysTogether != null ? ' • $daysTogether days together' : ''}'
-                                            : 'Set your anniversary date',
+                                            ? '${anniversaryDate.year}-${anniversaryDate.month.toString().padLeft(2, '0')}-${anniversaryDate.day.toString().padLeft(2, '0')}${daysTogether != null ? ' • ${context.l10n.settingsScreenDaysTogether(daysTogether)}' : ''}'
+                                            : context.l10n.settingsScreenSetAnniversaryDatePrompt,
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodySmall
@@ -415,7 +412,7 @@ class SettingsScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Anniversary Date',
+                                    context.l10n.settingsScreenAnniversaryDateLabel,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
@@ -426,7 +423,7 @@ class SettingsScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Loading...',
+                                    context.l10n.settingsScreenLoading,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
@@ -464,7 +461,7 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: AppSpacing.md),
                           Text(
-                            'Appearance',
+                            context.l10n.settingsScreenAppearanceLabel,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: context.colors.text,
@@ -480,18 +477,18 @@ class SettingsScreen extends ConsumerWidget {
                                   .valueOrNull ??
                               ThemeMode.system;
                           return SegmentedButton<ThemeMode>(
-                            segments: const [
+                            segments: [
                               ButtonSegment(
                                 value: ThemeMode.light,
-                                label: Text('Light'),
+                                label: Text(context.l10n.settingsScreenThemeLight),
                               ),
                               ButtonSegment(
                                 value: ThemeMode.dark,
-                                label: Text('Dark'),
+                                label: Text(context.l10n.settingsScreenThemeDark),
                               ),
                               ButtonSegment(
                                 value: ThemeMode.system,
-                                label: Text('System'),
+                                label: Text(context.l10n.settingsScreenThemeSystem),
                               ),
                             ],
                             selected: {currentMode},
@@ -610,7 +607,7 @@ class SettingsScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Pairing',
+                                context.l10n.settingsScreenPairingLabel,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -621,7 +618,7 @@ class SettingsScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Manage your pairing',
+                                context.l10n.settingsScreenPairingSubtitle,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall
@@ -665,7 +662,7 @@ class SettingsScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Delete Account',
+                                context.l10n.settingsScreenDeleteAccountTitle,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -676,7 +673,7 @@ class SettingsScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Permanently delete your account',
+                                context.l10n.settingsScreenDeleteAccountSubtitle,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall
@@ -720,7 +717,7 @@ class SettingsScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Log out',
+                                context.l10n.settingsScreenLogOut,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -731,7 +728,7 @@ class SettingsScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Sign out and clear session',
+                                context.l10n.settingsScreenLogoutSubtitle,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall

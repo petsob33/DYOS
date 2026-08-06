@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/memory_repository.dart';
 import '../../domain/memory_model.dart';
@@ -34,18 +36,16 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('Delete memory?'),
-        content: const Text(
-          'This memory will be removed. This cannot be undone.',
-        ),
+        title: Text(context.l10n.memoryDetailScreenDeleteMemoryTitle),
+        content: Text(context.l10n.memoryDetailScreenDeleteMemoryContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('Cancel', style: TextStyle(color: context.colors.textSecondary)),
+            child: Text(context.l10n.commonCancel, style: TextStyle(color: context.colors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Delete', style: TextStyle(color: context.colors.love, fontWeight: FontWeight.w600)),
+            child: Text(context.l10n.commonDelete, style: TextStyle(color: context.colors.love, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -59,7 +59,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Memory deleted'),
+            content: Text(context.l10n.memoryDetailScreenMemoryDeleted),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -71,7 +71,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         setState(() => _isDeleting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to delete: ${e.toString()}'),
+            content: Text(context.l10n.memoryDetailScreenFailedToDelete(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -110,13 +110,13 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
         leading: IconButton(
           icon: Icon(PhosphorIconsBold.arrowLeft, color: context.colors.text),
           onPressed: () => context.pop(),
-          tooltip: 'Back',
+          tooltip: context.l10n.memoryDetailScreenBackTooltip,
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _formatFullDate(widget.memory.date),
+              _formatFullDate(context, widget.memory.date),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: context.colors.text,
                     fontWeight: FontWeight.w700,
@@ -148,7 +148,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
           IconButton(
             icon: Icon(PhosphorIconsBold.x, color: context.colors.text),
             onPressed: () => context.pop(),
-            tooltip: 'Close',
+            tooltip: context.l10n.memoryDetailScreenCloseTooltip,
           ),
         ],
       ),
@@ -233,7 +233,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
-                          _formatDateTime(widget.memory.date),
+                          _formatDateTime(context, widget.memory.date),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: context.colors.textSecondary,
                               ),
@@ -241,7 +241,10 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                       ),
                       if (widget.memory.mediaUrls.length > 1)
                         Text(
-                          '${_currentPage + 1} / ${widget.memory.mediaUrls.length}',
+                          context.l10n.memoryDetailScreenPageCounter(
+                            _currentPage + 1,
+                            widget.memory.mediaUrls.length,
+                          ),
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall
@@ -262,7 +265,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                               ? null
                               : () => context.push('/memory/edit', extra: widget.memory),
                           icon: const Icon(PhosphorIconsBold.pencilSimple, size: 18),
-                          label: const Text('Edit'),
+                          label: Text(context.l10n.commonEdit),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: context.colors.primary,
                             side: BorderSide(color: context.colors.primary.withValues(alpha: 0.5)),
@@ -284,7 +287,11 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Icon(PhosphorIconsBold.trash, size: 18),
-                          label: Text(_isDeleting ? 'Deleting…' : 'Delete'),
+                          label: Text(
+                            _isDeleting
+                                ? context.l10n.memoryDetailScreenDeletingLabel
+                                : context.l10n.commonDelete,
+                          ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: context.colors.love,
                             side: BorderSide(color: context.colors.love.withValues(alpha: 0.5)),
@@ -356,7 +363,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                                           ),
                                           const SizedBox(height: AppSpacing.sm),
                                           Text(
-                                            'Failed to load image',
+                                            context.l10n.memoryDetailScreenFailedToLoadImage,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyMedium
@@ -408,23 +415,16 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
     );
   }
 
-  String _formatFullDate(DateTime date) {
-    final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    final weekdays = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-    ];
-    return '${weekdays[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}, ${date.year}';
+  String _formatFullDate(BuildContext context, DateTime date) {
+    final localeName = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMMEEEEd(localeName).format(date);
   }
 
-  String _formatDateTime(DateTime date) {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${date.day} ${months[date.month - 1]} ${date.year} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  String _formatDateTime(BuildContext context, DateTime date) {
+    final localeName = Localizations.localeOf(context).toString();
+    final datePart = DateFormat('d MMM y', localeName).format(date);
+    final timePart = DateFormat.Hm(localeName).format(date);
+    return context.l10n.memoryDetailScreenDateAtTime(datePart, timePart);
   }
 }
 

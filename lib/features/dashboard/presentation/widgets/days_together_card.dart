@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import 'package:flutter/services.dart';
@@ -22,7 +23,7 @@ class DaysTogetherCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Days Together',
+                  context.l10n.daysTogetherCardTitle,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -39,7 +40,7 @@ class DaysTogetherCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Set your anniversary date',
+                  context.l10n.daysTogetherCardSetDate,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -60,7 +61,7 @@ class DaysTogetherCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Days Together',
+                context.l10n.daysTogetherCardTitle,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -87,7 +88,7 @@ class DaysTogetherCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Days Together',
+              context.l10n.daysTogetherCardTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: context.colors.textSecondary,
               ),

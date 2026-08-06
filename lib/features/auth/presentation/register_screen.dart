@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/services/auth_service.dart';
 import 'auth_providers.dart';
 
@@ -79,7 +80,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   /// Handle registration form submission
-  /// 
+  ///
   /// Process:
   /// 1. Validate all form fields
   ///    - Name: required, minimum 2 characters
@@ -94,12 +95,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   /// 5. On success: Router sends user to pairing or home based on profile
   /// 6. On error: Display error message to user
   /// 7. Always: Reset loading state
-  /// 
+  ///
   /// Error handling:
   /// - AuthService throws user-friendly error strings
   /// - Common errors: email already in use, weak password, etc.
   /// - Errors are displayed in the error message container
-  /// 
+  ///
   /// Navigation:
   /// - Uses go_router's context.go() for navigation
   /// - Router will handle redirect if user is already authenticated
@@ -157,7 +158,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
@@ -169,17 +170,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 Icon(
                   PhosphorIconsBold.heart,
                   size: 80,
                   color: context.colors.primary,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Title
                 Text(
-                  'Create account',
+                  context.l10n.registerScreenCreateAccount,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: context.colors.text,
@@ -187,16 +188,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                
+
                 Text(
-                  'Sign up to get started',
+                  context.l10n.registerScreenSignUpToGetStarted,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: context.colors.textSecondary,
                       ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.xxl),
-                
+
                 GestureDetector(
                   onTap: () {
                     _nameFocusNode.requestFocus();
@@ -219,7 +220,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       _emailFocusNode.requestFocus();
                     },
                   decoration: InputDecoration(
-                    labelText: 'Full name',
+                    labelText: context.l10n.registerScreenFullNameLabel,
                     prefixIcon: Icon(
                       PhosphorIconsBold.user,
                       color: context.colors.textSecondary,
@@ -241,18 +242,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: (value) {
                     // Check if field is empty
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
+                      return context.l10n.registerScreenNameRequired;
                     }
                     // Ensure name is at least 2 characters (reasonable minimum)
                     if (value.length < 2) {
-                      return 'Name must be at least 2 characters';
+                      return context.l10n.registerScreenNameTooShort;
                     }
                     return null;
                   },
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 GestureDetector(
                   onTap: () {
                     _emailFocusNode.requestFocus();
@@ -275,7 +276,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       _passwordFocusNode.requestFocus();
                     },
                   decoration: InputDecoration(
-                    labelText: 'Email',
+                    labelText: context.l10n.loginScreenEmailLabel,
                     prefixIcon: Icon(
                       PhosphorIconsBold.envelope,
                       color: context.colors.textSecondary,
@@ -296,17 +297,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return context.l10n.loginScreenEmailRequired;
                     }
                     if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return context.l10n.loginScreenEmailInvalid;
                     }
                     return null;
                   },
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 GestureDetector(
                   onTap: () {
                     _passwordFocusNode.requestFocus();
@@ -329,7 +330,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       _confirmPasswordFocusNode.requestFocus();
                     },
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: context.l10n.loginScreenPasswordLabel,
                     prefixIcon: Icon(
                       PhosphorIconsBold.lock,
                       color: context.colors.textSecondary,
@@ -363,17 +364,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
+                      return context.l10n.registerScreenPasswordRequired;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return context.l10n.loginScreenPasswordTooShort;
                     }
                     return null;
                   },
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 GestureDetector(
                   onTap: () {
                     _confirmPasswordFocusNode.requestFocus();
@@ -394,7 +395,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     },
                     onFieldSubmitted: (_) => _handleRegister(),
                   decoration: InputDecoration(
-                    labelText: 'Confirm password',
+                    labelText: context.l10n.registerScreenConfirmPasswordLabel,
                     prefixIcon: Icon(
                       PhosphorIconsBold.lock,
                       color: context.colors.textSecondary,
@@ -428,17 +429,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
+                      return context.l10n.registerScreenConfirmPasswordRequired;
                     }
                     if (value != _passwordController.text) {
-                      return 'Passwords do not match';
+                      return context.l10n.registerScreenPasswordsDoNotMatch;
                     }
                     return null;
                   },
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 if (_errorMessage != null)
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -469,7 +470,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // Sign Up Button
                 // Primary action button - triggers registration
                 ElevatedButton(
@@ -495,7 +496,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         )
                       : Text(
-                          'Sign up',
+                          context.l10n.registerScreenSignUpButton,
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium
@@ -506,7 +507,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -517,7 +518,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                       child: Text(
-                        'OR',
+                        context.l10n.loginScreenOrDivider,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: context.colors.textSecondary,
                             ),
@@ -531,7 +532,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 OutlinedButton.icon(
                   onPressed: _isLoading ? null : _handleGoogleSignIn,
                   style: OutlinedButton.styleFrom(
@@ -552,7 +553,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     color: context.colors.text,
                   ),
                   label: Text(
-                    'Continue with Google',
+                    context.l10n.loginScreenContinueWithGoogle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: context.colors.text,
                           fontWeight: FontWeight.w600,
@@ -560,12 +561,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account? ',
+                      context.l10n.registerScreenAlreadyHaveAccountPrompt,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -580,7 +581,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                       ),
                       child: Text(
-                        'Sign in',
+                        context.l10n.registerScreenSignInButton,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: context.colors.primary,
                               fontWeight: FontWeight.w600,

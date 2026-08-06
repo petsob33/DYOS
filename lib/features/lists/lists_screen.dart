@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/bento_card.dart';
+import '../../core/l10n/build_context_l10n_extension.dart';
 import '../notes/domain/note_item.dart';
 import '../notes/presentation/notes_provider.dart';
 
@@ -21,7 +22,7 @@ class ListsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Lists'),
+        title: Text(context.l10n.listsScreenTitle),
         actions: [
           IconButton(
             icon: Icon(
@@ -29,7 +30,7 @@ class ListsScreen extends ConsumerWidget {
               color: context.colors.text,
             ),
             onPressed: () => context.push('/add-note?type=bucketList'),
-            tooltip: 'Add note',
+            tooltip: context.l10n.listsScreenAddNoteTooltip,
           ),
         ],
       ),
@@ -46,7 +47,7 @@ class ListsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Bucket List',
+                      context.l10n.listsScreenBucketListHeading,
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: context.colors.text,
@@ -54,7 +55,7 @@ class ListsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Things you want to do together',
+                      context.l10n.listsScreenBucketListSubheading,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -79,7 +80,7 @@ class ListsScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
-                              'No bucket list items yet',
+                              context.l10n.listsScreenEmptyTitle,
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -89,7 +90,7 @@ class ListsScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
-                              'Tap the + button to add your first item',
+                              context.l10n.listsScreenEmptySubtitle,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
@@ -146,7 +147,7 @@ class ListsScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: AppSpacing.md),
                           Text(
-                            'Error loading bucket list',
+                            context.l10n.listsScreenErrorTitle,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -217,7 +218,7 @@ class _BucketListItem extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
-                _formatDate(note.createdAt),
+                _formatDate(context, note.createdAt),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
                     ),
@@ -229,12 +230,12 @@ class _BucketListItem extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    if (difference.inDays == 0) return 'Today';
-    if (difference.inDays == 1) return 'Yesterday';
-    if (difference.inDays < 7) return '${difference.inDays} days ago';
+    if (difference.inDays == 0) return context.l10n.listsScreenToday;
+    if (difference.inDays == 1) return context.l10n.listsScreenYesterday;
+    if (difference.inDays < 7) return context.l10n.listsScreenDaysAgo(difference.inDays);
     return '${date.day}/${date.month}/${date.year}';
   }
 }

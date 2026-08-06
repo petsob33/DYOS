@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/services/auth_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -56,12 +57,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   /// Show forgot password dialog
-  /// 
+  ///
   /// Displays a dialog where user can enter their email to receive
   /// a password reset link.
   Future<void> _showForgotPasswordDialog(BuildContext context) async {
     final emailController = TextEditingController(text: _emailController.text);
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -69,7 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           borderRadius: BorderRadius.circular(24),
         ),
         title: Text(
-          'Reset Password',
+          context.l10n.loginScreenResetPasswordTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -80,7 +81,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Enter your email address and we\'ll send you a link to reset your password.',
+              context.l10n.loginScreenResetPasswordBody,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -90,8 +91,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                labelText: 'Email',
-                hintText: 'your@email.com',
+                labelText: context.l10n.loginScreenEmailLabel,
+                hintText: context.l10n.loginScreenEmailHint,
                 prefixIcon: Icon(
                   PhosphorIconsBold.envelope,
                   color: context.colors.textSecondary,
@@ -110,7 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              'Cancel',
+              context.l10n.commonCancel,
               style: TextStyle(color: context.colors.textSecondary),
             ),
           ),
@@ -122,7 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               }
             },
             child: Text(
-              'Send',
+              context.l10n.loginScreenSendButton,
               style: TextStyle(
                 color: context.colors.primary,
                 fontWeight: FontWeight.w700,
@@ -137,11 +138,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       try {
         final authService = ref.read(authServiceProvider);
         await authService.sendPasswordResetEmail(emailController.text.trim());
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Password reset email sent! Check your inbox.'),
+              content: Text(context.l10n.loginScreenResetEmailSent),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -154,7 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${e.toString()}'),
+              content: Text(context.l10n.loginScreenGenericError(e.toString())),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -186,17 +187,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final result = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Account not found'),
-            content: const Text(
-                'No account was found for this email. Would you like to create a new account?'),
+            title: Text(context.l10n.loginScreenAccountNotFoundTitle),
+            content: Text(context.l10n.loginScreenAccountNotFoundBody),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(context.l10n.commonCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Register'),
+                child: Text(context.l10n.loginScreenRegisterAction),
               ),
             ],
           ),
@@ -218,8 +218,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     }
   }
-  
-  
+
 
 
 
@@ -243,16 +242,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSpacing.xxl),
-                
+
                 Icon(
                   PhosphorIconsBold.heart,
                   size: 80,
                   color: context.colors.primary,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 Text(
-                  'Welcome back',
+                  context.l10n.loginScreenWelcomeBack,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: context.colors.text,
@@ -260,16 +259,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                
+
                 Text(
-                  'Sign in to continue',
+                  context.l10n.loginScreenSignInToContinue,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: context.colors.textSecondary,
                       ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.xxl),
-                
+
                 GestureDetector(
                   onTap: () {
                     _emailFocusNode.requestFocus();
@@ -293,7 +292,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _passwordFocusNode.requestFocus();
                     },
                   decoration: InputDecoration(
-                    labelText: 'Email',
+                    labelText: context.l10n.loginScreenEmailLabel,
                     prefixIcon: Icon(
                       PhosphorIconsBold.envelope,
                       color: context.colors.textSecondary,
@@ -314,17 +313,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return context.l10n.loginScreenEmailRequired;
                     }
                     if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return context.l10n.loginScreenEmailInvalid;
                     }
                     return null;
                   },
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 GestureDetector(
                   onTap: () {
                     _passwordFocusNode.requestFocus();
@@ -345,7 +344,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     },
                     onFieldSubmitted: (_) => _handleLogin(),
                   decoration: InputDecoration(
-                    labelText: 'Password',
+                    labelText: context.l10n.loginScreenPasswordLabel,
                     prefixIcon: Icon(
                       PhosphorIconsBold.lock,
                       color: context.colors.textSecondary,
@@ -379,17 +378,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return context.l10n.loginScreenPasswordRequired;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return context.l10n.loginScreenPasswordTooShort;
                     }
                     return null;
                   },
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                
+
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -401,7 +400,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     child: Text(
-                      'Forgot password?',
+                      context.l10n.loginScreenForgotPassword,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: context.colors.primary,
                             fontWeight: FontWeight.w600,
@@ -410,7 +409,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 if (_errorMessage != null)
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -441,7 +440,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
@@ -465,7 +464,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         )
                       : Text(
-                          'Sign in',
+                          context.l10n.loginScreenSignInButton,
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium
@@ -476,7 +475,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -487,7 +486,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                       child: Text(
-                        'OR',
+                        context.l10n.loginScreenOrDivider,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: context.colors.textSecondary,
                             ),
@@ -501,7 +500,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 OutlinedButton.icon(
                   onPressed: _isLoading ? null : _handleGoogleSignIn,
                   style: OutlinedButton.styleFrom(
@@ -522,7 +521,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: context.colors.text,
                   ),
                   label: Text(
-                    'Continue with Google',
+                    context.l10n.loginScreenContinueWithGoogle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: context.colors.text,
                           fontWeight: FontWeight.w600,
@@ -530,12 +529,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account? ",
+                      context.l10n.loginScreenNoAccountPrompt,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -550,7 +549,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       child: Text(
-                        'Sign up',
+                        context.l10n.loginScreenSignUpButton,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: context.colors.primary,
                               fontWeight: FontWeight.w600,

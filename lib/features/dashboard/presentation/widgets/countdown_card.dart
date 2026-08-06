@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../events/presentation/event_provider.dart';
 import 'package:flutter/services.dart';
@@ -22,14 +23,14 @@ class CountdownCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Countdown',
+                  context.l10n.countdownCardTitle,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'No upcoming events',
+                  context.l10n.countdownCardNoEvents,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -55,7 +56,7 @@ class CountdownCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Countdown',
+                context.l10n.countdownCardTitle,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -70,7 +71,7 @@ class CountdownCard extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'days until: ${event.title}',
+                context.l10n.countdownCardDaysUntil(daysUntil, event.title),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -86,7 +87,7 @@ class CountdownCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Countdown',
+              context.l10n.countdownCardTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: context.colors.textSecondary,
               ),
@@ -101,14 +102,14 @@ class CountdownCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Countdown',
+              context.l10n.countdownCardTitle,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: context.colors.textSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Error loading events',
+              context.l10n.countdownCardError,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.colors.textSecondary,
               ),

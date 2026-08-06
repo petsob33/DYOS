@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../widgets/intimacy_history_list.dart';
 
@@ -12,7 +13,7 @@ class IntimacyHistoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Intimacy History'),
+        title: Text(context.l10n.intimacyHistoryScreenTitle),
       ),
       body: const SafeArea(
         child: IntimacyHistoryList(),

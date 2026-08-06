@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/note_item.dart';
 import '../../data/notes_repository.dart';
@@ -54,7 +55,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
     if (content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Content cannot be empty'),
+          content: Text(context.l10n.addNoteScreenContentEmptyError),
           backgroundColor: context.colors.love,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -77,11 +78,11 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
       final couple = coupleAsync.valueOrNull;
       
       if (currentUser == null) {
-        throw Exception('User not authenticated. Please log in again.');
+        throw Exception(context.l10n.addNoteScreenNotAuthenticatedError);
       }
-      
+
       if (couple == null || couple.id.isEmpty) {
-        throw Exception('You are not paired with a partner. Please pair first.');
+        throw Exception(context.l10n.addNoteScreenNotPairedError);
       }
 
       final note = NoteItem(
@@ -104,7 +105,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Note saved successfully!'),
+            content: Text(context.l10n.addNoteScreenSaveSuccess),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -119,7 +120,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error saving note: ${e.toString()}'),
+            content: Text(context.l10n.addNoteScreenSaveError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -143,7 +144,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Add Note'),
+        title: Text(context.l10n.addNoteScreenTitle),
         actions: [
           if (_isSaving)
             const Padding(
@@ -163,7 +164,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
             TextButton(
               onPressed: _saveNote,
               child: Text(
-                'Save',
+                context.l10n.commonSave,
                 style: TextStyle(
                   color: context.colors.primary,
                   fontWeight: FontWeight.w700,
@@ -184,8 +185,8 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                 TextFormField(
                   controller: _titleController,
                   decoration: InputDecoration(
-                    labelText: 'Title (optional)',
-                    hintText: 'Add a title...',
+                    labelText: context.l10n.addNoteScreenTitleLabel,
+                    hintText: context.l10n.addNoteScreenTitleHint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
@@ -219,8 +220,8 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                 TextFormField(
                   controller: _contentController,
                   decoration: InputDecoration(
-                    labelText: 'Content',
-                    hintText: 'Write your note here...',
+                    labelText: context.l10n.addNoteScreenContentLabel,
+                    hintText: context.l10n.addNoteScreenContentHint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
@@ -250,7 +251,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                       ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Content is required';
+                      return context.l10n.addNoteScreenContentRequired;
                     }
                     return null;
                   },
@@ -259,7 +260,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
 
                 // Type selection
                 Text(
-                  'Type',
+                  context.l10n.addNoteScreenTypeLabel,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: context.colors.text,
@@ -325,9 +326,9 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Save Note',
-                          style: TextStyle(
+                      : Text(
+                          context.l10n.addNoteScreenSaveNoteButton,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
                           ),
@@ -344,13 +345,13 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
   String _getTypeLabel(NoteType type) {
     switch (type) {
       case NoteType.shared:
-        return 'Shared';
+        return context.l10n.addNoteScreenTypeShared;
       case NoteType.private:
-        return 'Private';
+        return context.l10n.addNoteScreenTypePrivate;
       case NoteType.bucketList:
-        return 'Bucket List';
+        return context.l10n.addNoteScreenTypeBucketList;
       case NoteType.secretGift:
-        return 'Secret Gift';
+        return context.l10n.addNoteScreenTypeSecretGift;
     }
   }
 }

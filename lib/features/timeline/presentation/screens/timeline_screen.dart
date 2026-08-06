@@ -3,9 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../gamification/domain/progression_plan.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
@@ -50,7 +52,7 @@ class TimelineScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Timeline'),
+        title: Text(context.l10n.timelineScreenTitle),
         actions: [
           IconButton(
             icon: const Icon(PhosphorIconsBold.mapTrifold),
@@ -61,7 +63,7 @@ class TimelineScreen extends ConsumerWidget {
                 showLevelUpUnlockSheet(context, ref, FeatureID.mapView);
               }
             },
-            tooltip: 'Memories map',
+            tooltip: context.l10n.timelineScreenMemoriesMapTooltip,
           ),
         ],
       ),
@@ -82,7 +84,7 @@ class TimelineScreen extends ConsumerWidget {
                         ? _EmptyState()
                         : _TimelineList(
                             memories: memories,
-                            formatMonthYear: _formatMonthYear,
+                            formatMonthYear: (date) => _formatMonthYear(context, date),
                             showLoadMore: !isFiltered && feedState.hasMore,
                             isLoadingMore: feedState.isLoadingMore,
                             onLoadMore: () =>
@@ -102,9 +104,7 @@ class TimelineScreen extends ConsumerWidget {
           if (!isPremium && memoriesCount >= freeLimit) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text(
-                  'You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.',
-                ),
+                content: Text(context.l10n.timelineScreenFreeLimitMessage),
                 backgroundColor: context.colors.warning,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -124,22 +124,9 @@ class TimelineScreen extends ConsumerWidget {
     );
   }
 
-  static String _formatMonthYear(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return '${months[date.month - 1]} ${date.year}';
+  static String _formatMonthYear(BuildContext context, DateTime date) {
+    final localeName = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMM(localeName).format(date);
   }
 }
 
@@ -181,7 +168,7 @@ class _TimelineList extends StatelessWidget {
                   ? const CircularProgressIndicator()
                   : OutlinedButton(
                       onPressed: onLoadMore,
-                      child: const Text('Load older memories'),
+                      child: Text(context.l10n.timelineScreenLoadOlderMemories),
                     ),
             ),
           );
@@ -214,7 +201,7 @@ class _CategoryFilter extends ConsumerWidget {
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: ChoiceChip(
-              label: Text(category?.displayName ?? 'All'),
+              label: Text(category?.displayName ?? context.l10n.timelineScreenAllCategoriesLabel),
               selected: isSelected,
               onSelected: (selected) {
                 if (selected) {
@@ -258,7 +245,7 @@ class _MemoriesLimitBar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Memories limit (Free)',
+              context.l10n.timelineScreenMemoriesLimitFreeLabel,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: c.text,
                     fontWeight: FontWeight.w600,
@@ -273,7 +260,7 @@ class _MemoriesLimitBar extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              '$currentCount / $limit memories on the free plan',
+              context.l10n.timelineScreenMemoriesLimitSubtitle(currentCount, limit),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: c.textSecondary,
                   ),
@@ -325,7 +312,7 @@ class _ErrorState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'Error loading memories',
+              context.l10n.timelineScreenErrorLoadingMemories,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: context.colors.text,
@@ -363,7 +350,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'No memories yet',
+              context.l10n.timelineScreenNoMemoriesYet,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: context.colors.text,
@@ -371,7 +358,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Start creating memories with your partner!',
+              context.l10n.timelineScreenStartCreatingMemories,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -524,7 +511,7 @@ class _MemoryCardState extends State<MemoryCard> {
                     bottom: AppSpacing.md,
                   ),
                   child: Text(
-                    _formatDate(widget.memory.date),
+                    _formatDate(context, widget.memory.date),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: context.colors.textSecondary,
                           fontWeight: FontWeight.w500,
@@ -686,22 +673,9 @@ class _MemoryCardState extends State<MemoryCard> {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return '${date.day}. ${months[date.month - 1]}';
+  String _formatDate(BuildContext context, DateTime date) {
+    final localeName = Localizations.localeOf(context).toString();
+    return DateFormat('d. MMM', localeName).format(date);
   }
 }
 
@@ -738,7 +712,7 @@ class _MemoryImage extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Failed to load',
+                context.l10n.timelineScreenFailedToLoad,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: context.colors.textSecondary,
                     ),

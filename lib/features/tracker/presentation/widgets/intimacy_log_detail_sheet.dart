@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
@@ -89,7 +91,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
               child: Row(
                 children: [
                   Text(
-                    'Intimacy Log Details',
+                    context.l10n.intimacyLogDetailSheetTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -114,9 +116,9 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     // Date & Time
                     _DetailSection(
                       icon: PhosphorIconsBold.calendar,
-                      title: 'Date & Time',
+                      title: context.l10n.intimacyLogDetailSheetDateTimeLabel,
                       child: Text(
-                        _formatDateTime(log.date),
+                        _formatDateTime(context, log.date),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: context.colors.text,
                             ),
@@ -127,7 +129,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     // Rating
                     _DetailSection(
                       icon: PhosphorIconsBold.fire,
-                      title: 'Rating',
+                      title: context.l10n.intimacyLogDetailSheetRatingLabel,
                       child: Row(
                         children: List.generate(5, (index) {
                           final value = index + 1;
@@ -153,15 +155,15 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                         data: (partnerData) {
                           final isCurrentUser = log.initiatorId == currentUserAsync.valueOrNull?.uid;
                           final initiatorName = isCurrentUser
-                              ? (currentUserData?.displayName ?? 'Me')
-                              : (partnerData?.displayName ?? 'Partner');
+                              ? (currentUserData?.displayName ?? context.l10n.intimacyLogDetailSheetMeFallback)
+                              : (partnerData?.displayName ?? context.l10n.dataScreenPartnerLabel);
                           final initiatorPhotoUrl = isCurrentUser
                               ? currentUserPhotoUrl
                               : partnerPhotoUrl;
 
                           return _DetailSection(
                             icon: PhosphorIconsBold.user,
-                            title: 'Initiator',
+                            title: context.l10n.intimacyLogDetailSheetInitiatorLabel,
                             child: Row(
                               children: [
                                 CircleAvatar(
@@ -201,7 +203,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     if (log.tags.isNotEmpty)
                       _DetailSection(
                         icon: PhosphorIconsBold.tag,
-                        title: 'Tags',
+                        title: context.l10n.intimacyLogDetailSheetTagsLabel,
                         child: Wrap(
                           spacing: AppSpacing.sm,
                           runSpacing: AppSpacing.sm,
@@ -231,7 +233,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     // Protection
                     _DetailSection(
                       icon: PhosphorIconsBold.shieldCheck,
-                      title: 'Protection',
+                      title: context.l10n.intimacyLogDetailSheetProtectionLabel,
                       child: Row(
                         children: [
                           Icon(
@@ -245,7 +247,9 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
-                            log.protectionUsed ? 'Used' : 'Not used',
+                            log.protectionUsed
+                                ? context.l10n.intimacyLogDetailSheetProtectionUsed
+                                : context.l10n.intimacyLogDetailSheetProtectionNotUsed,
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: context.colors.text,
                                 ),
@@ -260,12 +264,12 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                       currentUserDataAsync.when(
                         data: (currentUserData) => partnerAsync.when(
                           data: (partnerData) {
-                            final meName = currentUserData?.displayName ?? 'Me';
-                            final partnerName = partnerData?.displayName ?? 'Partner';
+                            final meName = currentUserData?.displayName ?? context.l10n.intimacyLogDetailSheetMeFallback;
+                            final partnerName = partnerData?.displayName ?? context.l10n.dataScreenPartnerLabel;
 
                             return _DetailSection(
                               icon: PhosphorIconsBold.sparkle,
-                              title: 'Orgasms',
+                              title: context.l10n.intimacyLogDetailSheetOrgasmsLabel,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -321,9 +325,9 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     if (log.duration != null)
                       _DetailSection(
                         icon: PhosphorIconsBold.clock,
-                        title: 'Duration',
+                        title: context.l10n.intimacyLogDetailSheetDurationLabel,
                         child: Text(
-                          '${log.duration} minutes',
+                          context.l10n.intimacyLogDetailSheetDurationValue(log.duration!),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: context.colors.text,
                               ),
@@ -335,7 +339,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     if (log.location != null && log.location!.isNotEmpty)
                       _DetailSection(
                         icon: PhosphorIconsBold.mapPin,
-                        title: 'Location',
+                        title: context.l10n.intimacyLogDetailSheetLocationLabel,
                         child: Text(
                           log.location!,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -350,7 +354,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                     if (log.note != null && log.note!.isNotEmpty)
                       _DetailSection(
                         icon: PhosphorIconsBold.note,
-                        title: 'Note',
+                        title: context.l10n.intimacyLogDetailSheetNoteLabel,
                         child: Text(
                           log.note!,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -368,7 +372,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                           child: OutlinedButton.icon(
                             onPressed: () => _confirmAndDelete(context, ref),
                             icon: const Icon(PhosphorIconsBold.trash),
-                            label: const Text('Delete'),
+                            label: Text(context.l10n.commonDelete),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: context.colors.love,
                               side: BorderSide(color: context.colors.love),
@@ -389,7 +393,7 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
                               AddIntimacySheet.show(context, logToEdit: log);
                             },
                             icon: const Icon(PhosphorIconsBold.pencil),
-                            label: const Text('Edit'),
+                            label: Text(context.l10n.commonEdit),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: context.colors.primary,
                               foregroundColor: Colors.white,
@@ -416,56 +420,31 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
     );
   }
 
-  String _formatDateTime(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    final weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
-
-    final weekday = weekdays[date.weekday - 1];
-    final month = months[date.month - 1];
-    final day = date.day;
-    final year = date.year;
+  String _formatDateTime(BuildContext context, DateTime date) {
+    final locale = Localizations.localeOf(context).toString();
+    final datePart = DateFormat.yMMMMEEEEd(locale).format(date);
     final hour = date.hour.toString().padLeft(2, '0');
     final minute = date.minute.toString().padLeft(2, '0');
+    final timePart = '$hour:$minute';
 
-    return '$weekday, $month $day, $year at $hour:$minute';
+    return context.l10n.intimacyLogDetailSheetDateTimeValue(datePart, timePart);
   }
 
   Future<void> _confirmAndDelete(BuildContext context, WidgetRef ref) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete intimacy log?'),
-        content: const Text('This action cannot be undone.'),
+        title: Text(context.l10n.intimacyLogDetailSheetDeleteConfirmTitle),
+        content: Text(context.l10n.intimacyLogDetailSheetDeleteConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             child: Text(
-              'Delete',
+              context.l10n.commonDelete,
               style: TextStyle(color: context.colors.love),
             ),
           ),
@@ -486,12 +465,12 @@ class IntimacyLogDetailSheet extends ConsumerWidget {
       if (!context.mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Intimacy log deleted')),
+        SnackBar(content: Text(context.l10n.intimacyLogDetailSheetDeletedSnackbar)),
       );
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete log: ${e.toString()}')),
+        SnackBar(content: Text(context.l10n.intimacyLogDetailSheetDeleteFailedSnackbar(e.toString()))),
       );
     }
   }

@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../auth/domain/couple_model.dart';
@@ -34,7 +35,7 @@ class StatusHeader extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Center(
               child: Text(
-                'Pair with your partner to view status',
+                context.l10n.statusHeaderPairPrompt,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -71,9 +72,9 @@ class StatusHeader extends StatelessWidget {
                     children: [
                       Expanded(
                         child: AvatarStatus(
-                          name: currentUser?.displayName ?? 'You',
+                          name: currentUser?.displayName ?? context.l10n.statusHeaderYouFallback,
                           emoji: currentUserStatus?.emoji ?? '😊',
-                          status: currentUserStatus?.text ?? 'Ready',
+                          status: currentUserStatus?.text ?? context.l10n.statusHeaderReadyStatus,
                           photoUrl: currentUser?.photoUrl,
                           userId: currentUserId,
                           coupleId: couple.id,
@@ -91,9 +92,9 @@ class StatusHeader extends StatelessWidget {
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: AvatarStatus(
-                          name: partner?.displayName ?? 'Partner',
+                          name: partner?.displayName ?? context.l10n.statusHeaderPartnerFallback,
                           emoji: partnerStatus?.emoji ?? '😊',
-                          status: partnerStatus?.text ?? 'Ready',
+                          status: partnerStatus?.text ?? context.l10n.statusHeaderReadyStatus,
                           photoUrl: partner?.photoUrl,
                         ),
                       ),
@@ -107,9 +108,9 @@ class StatusHeader extends StatelessWidget {
                   children: [
                     Expanded(
                       child: AvatarStatus(
-                        name: currentUser?.displayName ?? 'You',
+                        name: currentUser?.displayName ?? context.l10n.statusHeaderYouFallback,
                         emoji: currentUserStatus?.emoji ?? '😊',
-                        status: currentUserStatus?.text ?? 'Ready',
+                        status: currentUserStatus?.text ?? context.l10n.statusHeaderReadyStatus,
                         userId: currentUserId,
                         coupleId: couple.id,
                         isEditable: true,
@@ -124,11 +125,11 @@ class StatusHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
-                    const Expanded(
+                    Expanded(
                       child: AvatarStatus(
-                        name: 'Partner',
+                        name: context.l10n.statusHeaderPartnerFallback,
                         emoji: '😊',
-                        status: 'Loading...',
+                        status: context.l10n.statusHeaderLoadingStatus,
                       ),
                     ),
                   ],
@@ -141,9 +142,9 @@ class StatusHeader extends StatelessWidget {
                     children: [
                       Expanded(
                         child: AvatarStatus(
-                          name: currentUser?.displayName ?? 'You',
+                          name: currentUser?.displayName ?? context.l10n.statusHeaderYouFallback,
                           emoji: currentUserStatus?.emoji ?? '😊',
-                          status: currentUserStatus?.text ?? 'Ready',
+                          status: currentUserStatus?.text ?? context.l10n.statusHeaderReadyStatus,
                           userId: currentUserId,
                           coupleId: couple.id,
                           isEditable: true,
@@ -158,11 +159,11 @@ class StatusHeader extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      const Expanded(
+                      Expanded(
                         child: AvatarStatus(
-                          name: 'Partner',
+                          name: context.l10n.statusHeaderPartnerFallback,
                           emoji: '😊',
-                          status: 'Error',
+                          status: context.l10n.statusHeaderErrorStatus,
                         ),
                       ),
                     ],
@@ -177,10 +178,10 @@ class StatusHeader extends StatelessWidget {
           ),
           error: (_, __) => BentoCard(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: const AvatarStatus(
-              name: 'You',
+            child: AvatarStatus(
+              name: context.l10n.statusHeaderYouFallback,
               emoji: '😊',
-              status: 'Error',
+              status: context.l10n.statusHeaderErrorStatus,
             ),
           ),
         );
@@ -191,7 +192,11 @@ class StatusHeader extends StatelessWidget {
       ),
       error: (_, __) => BentoCard(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        child: const AvatarStatus(name: 'You', emoji: '😊', status: 'Ready'),
+        child: AvatarStatus(
+          name: context.l10n.statusHeaderYouFallback,
+          emoji: '😊',
+          status: context.l10n.statusHeaderReadyStatus,
+        ),
       ),
     );
   }
@@ -323,7 +328,7 @@ class AvatarStatus extends ConsumerWidget {
               borderRadius: BorderRadius.circular(24),
             ),
             title: Text(
-              'Update Status',
+              context.l10n.statusHeaderUpdateStatusTitle,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -335,7 +340,7 @@ class AvatarStatus extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Choose emoji',
+                    context.l10n.statusHeaderChooseEmojiLabel,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: context.colors.textSecondary,
                       fontWeight: FontWeight.w600,
@@ -378,8 +383,8 @@ class AvatarStatus extends ConsumerWidget {
                   TextField(
                     controller: textController,
                     decoration: InputDecoration(
-                      labelText: 'Status',
-                      hintText: 'Ready',
+                      labelText: context.l10n.statusHeaderStatusLabel,
+                      hintText: context.l10n.statusHeaderReadyStatus,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -393,7 +398,7 @@ class AvatarStatus extends ConsumerWidget {
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
-                  'Cancel',
+                  context.l10n.commonCancel,
                   style: TextStyle(color: context.colors.textSecondary),
                 ),
               ),
@@ -403,11 +408,11 @@ class AvatarStatus extends ConsumerWidget {
                     'emoji': selectedEmoji,
                     'text': textController.text.trim().isNotEmpty
                         ? textController.text.trim()
-                        : 'Ready',
+                        : context.l10n.statusHeaderReadyStatus,
                   });
                 },
                 child: Text(
-                  'Save',
+                  context.l10n.commonSave,
                   style: TextStyle(
                     color: context.colors.primary,
                     fontWeight: FontWeight.w700,
@@ -435,7 +440,7 @@ class AvatarStatus extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Status updated'),
+              content: Text(context.l10n.statusHeaderStatusUpdatedMessage),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -448,7 +453,7 @@ class AvatarStatus extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error updating status: $e'),
+              content: Text(context.l10n.statusHeaderUpdateErrorMessage(e.toString())),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(

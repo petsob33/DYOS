@@ -4,5 +4,993 @@
   "commonDelete": "Delete",
   "commonEdit": "Edit",
   "commonConfirm": "Confirm",
-  "commonSave": "Save"
+  "commonSave": "Save",
+  "dataScreenTitle": "Data & Analytics",
+  "dataScreenError": "Error: {error}",
+  "@dataScreenError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dataScreenHeading": "Relationship Insights",
+  "dataScreenSubheading": "Track patterns and trends in your relationship",
+  "dataScreenTotalCountTitle": "Total Count",
+  "dataScreenAllTime": "All time",
+  "dataScreenAvgPerWeekTitle": "Avg/Week",
+  "dataScreenAverage": "Average",
+  "dataScreenFavoriteDayTitle": "Favorite Day",
+  "dataScreenMostActive": "Most active",
+  "dataScreenBestOfHeading": "Best Of",
+  "dataScreenLongestSexTitle": "Longest Sex",
+  "dataScreenThisMonthSubtitle": "This month",
+  "dataScreenHeartsStreakTitle": "Hearts Streak",
+  "dataScreenStreakDaySubtitle": "{count, plural, one{day in a row} other{days in a row}}",
+  "@dataScreenStreakDaySubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataScreenCurrentMonthHeading": "This Month",
+  "dataScreenTotalTitle": "Total",
+  "dataScreenAvgDurationTitle": "Avg Duration",
+  "dataScreenAvgOrgasmsTitle": "Avg Orgasms",
+  "dataScreenFrequencyChartHeading": "Frequency Chart",
+  "dataScreenInitiatorChartHeading": "Initiator Chart",
+  "dataScreenYouLabel": "You",
+  "dataScreenPartnerLabel": "Partner",
+  "dataScreenOrgasmComparisonHeading": "Orgasm Comparison",
+  "dataScreenNoDataYet": "No data yet",
+  "dataScreenTagsRadarHeading": "Tags Radar",
+  "dataScreenNoTagsYet": "No tags yet",
+  "dataScreenHistoryHeading": "History",
+  "loginScreenResetPasswordTitle": "Reset Password",
+  "loginScreenResetPasswordBody": "Enter your email address and we'll send you a link to reset your password.",
+  "loginScreenEmailLabel": "Email",
+  "loginScreenEmailHint": "your@email.com",
+  "loginScreenSendButton": "Send",
+  "loginScreenResetEmailSent": "Password reset email sent! Check your inbox.",
+  "loginScreenGenericError": "Error: {error}",
+  "@loginScreenGenericError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "loginScreenAccountNotFoundTitle": "Account not found",
+  "loginScreenAccountNotFoundBody": "No account was found for this email. Would you like to create a new account?",
+  "loginScreenRegisterAction": "Register",
+  "loginScreenWelcomeBack": "Welcome back",
+  "loginScreenSignInToContinue": "Sign in to continue",
+  "loginScreenEmailRequired": "Please enter your email",
+  "loginScreenEmailInvalid": "Please enter a valid email",
+  "loginScreenPasswordLabel": "Password",
+  "loginScreenPasswordRequired": "Please enter your password",
+  "loginScreenPasswordTooShort": "Password must be at least 6 characters",
+  "loginScreenForgotPassword": "Forgot password?",
+  "loginScreenSignInButton": "Sign in",
+  "loginScreenOrDivider": "OR",
+  "loginScreenContinueWithGoogle": "Continue with Google",
+  "loginScreenNoAccountPrompt": "Don't have an account? ",
+  "loginScreenSignUpButton": "Sign up",
+  "registerScreenCreateAccount": "Create account",
+  "registerScreenSignUpToGetStarted": "Sign up to get started",
+  "registerScreenFullNameLabel": "Full name",
+  "registerScreenNameRequired": "Please enter your name",
+  "registerScreenNameTooShort": "Name must be at least 2 characters",
+  "registerScreenPasswordRequired": "Please enter a password",
+  "registerScreenConfirmPasswordLabel": "Confirm password",
+  "registerScreenConfirmPasswordRequired": "Please confirm your password",
+  "registerScreenPasswordsDoNotMatch": "Passwords do not match",
+  "registerScreenSignUpButton": "Sign up",
+  "registerScreenAlreadyHaveAccountPrompt": "Already have an account? ",
+  "registerScreenSignInButton": "Sign in",
+  "pairingScreenAppBarTitle": "Connect with Partner",
+  "pairingScreenSignOut": "Sign Out",
+  "pairingScreenSignOutConfirm": "Are you sure you want to sign out?",
+  "pairingScreenHeading": "Enter your partner's email",
+  "pairingScreenSubheading": "Both of you must already have an account",
+  "pairingScreenEmailHint": "partner@email.com",
+  "pairingScreenEmailRequired": "Please enter an email address",
+  "pairingScreenEmailInvalid": "Enter a valid email address",
+  "pairingScreenCannotPairSelf": "You cannot pair with yourself",
+  "pairingScreenPairedWith": "Paired with {name}!",
+  "@pairingScreenPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pairingScreenGenericError": "Unable to pair right now. Check your connection.",
+  "pairingScreenPairButton": "Pair",
+  "profileScreenTitle": "Profile",
+  "profileScreenUserNotFound": "User not found",
+  "profileScreenNoName": "No name",
+  "profileScreenPartnerHeading": "Partner",
+  "profileScreenNoPartnerPaired": "No partner paired",
+  "profileScreenErrorLoadingPartner": "Error loading partner: {error}",
+  "@profileScreenErrorLoadingPartner": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileScreenActionsHeading": "Actions",
+  "profileScreenUpgradeAction": "DYOS+ / Upgrade",
+  "profileScreenSecretGiftAction": "Secret gift / Private",
+  "profileScreenSettingsAction": "Settings",
+  "profileScreenErrorLoadingProfile": "Error loading profile: {error}",
+  "@profileScreenErrorLoadingProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editProfilePictureScreenTitle": "Edit Profile Picture",
+  "editProfilePictureScreenPickError": "Error picking image: {error}",
+  "@editProfilePictureScreenPickError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editProfilePictureScreenSelectImageFirst": "Please select an image first",
+  "editProfilePictureScreenUserNotFound": "User not found",
+  "editProfilePictureScreenUpdateSuccess": "Profile picture updated successfully!",
+  "editProfilePictureScreenGenericError": "Error: {error}",
+  "@editProfilePictureScreenGenericError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editProfilePictureScreenChooseImage": "Choose Image",
+  "editProfilePictureScreenSaveButton": "Save Profile Picture",
+  "firebaseTestScreenTitle": "Firebase Connection Test",
+  "firebaseTestScreenRerunTooltip": "Run tests again",
+  "firebaseTestScreenRunning": "Running tests...",
+  "firebaseTestScreenAllPassed": "All tests passed! ✅",
+  "firebaseTestScreenSomeFailed": "Some tests failed ⚠️",
+  "firebaseTestScreenPassedCount": "Passed: {passed} / {total}",
+  "@firebaseTestScreenPassedCount": {
+    "placeholders": {
+      "passed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "firebaseTestScreenNoResults": "No test results yet",
+  "firebaseTestScreenWhatToCheckHeading": "What to check:",
+  "firebaseTestScreenInstructionAllGreen": "✅ All green = Firebase is properly connected!",
+  "firebaseTestScreenInstructionCoreFailed": "❌ Firebase Core failed = Check configuration files",
+  "firebaseTestScreenInstructionFirestoreFailed": "❌ Firestore failed = Enable Firestore in Firebase Console",
+  "firebaseTestScreenInstructionWriteReadFailed": "❌ Write/Read failed = Check Firestore security rules",
+  "blueprintDetailScreenXpGranted": "System Updated: +100 XP acquired! 🚀",
+  "blueprintDetailScreenAlreadyEarned": "Section saved. (XP already earned today.)",
+  "blueprintDetailScreenSectionComplete": "Section complete!",
+  "blueprintDetailScreenLoadError": "Could not load this Blueprint section.",
+  "blueprintDetailScreenNotFound": "Blueprint section not found.",
+  "blueprintDetailScreenCompleteButton": "Complete Section",
+  "blueprintsListScreenTitle": "Daily Questions",
+  "blueprintsListScreenLoadError": "Could not load Blueprints.",
+  "blueprintsListScreenIntro": "Save your preferences as a couple. Complete a section to earn +100 XP.",
+  "blueprintsListScreenQuestionsCount": "{count, plural, one{1 question} other{{count} questions}}",
+  "@blueprintsListScreenQuestionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "blueprintQuestionCardPartnerValue": "Partner: {value}",
+  "@blueprintQuestionCardPartnerValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "blueprintQuestionCardYes": "Yes",
+  "blueprintQuestionCardNo": "No",
+  "cycleSettingsSheetPairFirst": "Please pair with a partner first",
+  "cycleSettingsSheetSaved": "Settings saved successfully!",
+  "cycleSettingsSheetError": "Error: {error}",
+  "@cycleSettingsSheetError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cycleSettingsSheetTitle": "Cycle Settings",
+  "cycleSettingsSheetDayInCycleLabel": "Day in Cycle",
+  "cycleSettingsSheetDayInCycleValue": "Day {day}",
+  "@cycleSettingsSheetDayInCycleValue": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "cycleSettingsSheetLastPeriodDateLabel": "Last Period Date",
+  "cycleSettingsSheetNotSet": "Not set",
+  "cycleSettingsSheetTapToChange": "Tap to change",
+  "cycleSettingsSheetAvgCycleLengthLabel": "Average Cycle Length",
+  "cycleSettingsSheetDaysValue": "{count, plural, one{1 day} other{{count} days}}",
+  "@cycleSettingsSheetDaysValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cycleSettingsSheetPeriodLengthLabel": "Period Length",
+  "cycleSettingsSheetHideMenstruationLabel": "Hide Menstruation",
+  "cycleSettingsSheetHideMenstruationDescription": "Hide menstruation tracking and display in calendar",
+  "cycleSettingsSheetLoadError": "Error loading settings",
+  "cycleTrackingScreenTitle": "Calendar",
+  "cycleTrackingScreenSettingsTooltip": "Cycle Settings",
+  "cycleTrackingScreenToday": "Today",
+  "cycleTrackingScreenYesterday": "Yesterday",
+  "cycleTrackingScreenTomorrow": "Tomorrow",
+  "cycleTrackingScreenMemoriesHeading": "Memories",
+  "cycleTrackingScreenIntimacyHeading": "Intimacy",
+  "cycleTrackingScreenRating": "Rating: {rating}/5",
+  "@cycleTrackingScreenRating": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "cycleTrackingScreenEventsHeading": "Events",
+  "cycleTrackingScreenAddMemoryButton": "Add Memory",
+  "cycleTrackingScreenAddIntimacyButton": "Add Intimacy",
+  "cycleTrackingScreenAddEventButton": "Add Event",
+  "cycleTrackingScreenAddPeriodLogButton": "Add Period Log",
+  "cycleTrackingScreenLegendHeading": "Legend",
+  "cycleTrackingScreenMenstruationLabel": "Menstruation",
+  "cycleTrackingScreenFollicularLabel": "Follicular",
+  "cycleTrackingScreenOvulationFertileLabel": "Ovulation/Fertile",
+  "cycleTrackingScreenLutealPmsLabel": "Luteal/PMS",
+  "cycleTrackingScreenPairFirst": "Please pair with a partner first",
+  "cycleTrackingScreenLogUpdated": "Cycle log updated successfully!",
+  "cycleTrackingScreenLogAdded": "Cycle log added successfully!",
+  "cycleTrackingScreenError": "Error: {error}",
+  "@cycleTrackingScreenError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cycleTrackingScreenEditLogTitle": "Edit Cycle Log",
+  "cycleTrackingScreenAddLogTitle": "Add Cycle Log",
+  "cycleTrackingScreenFlowIntensityLabel": "Flow Intensity",
+  "cycleTrackingScreenMoodLabel": "Mood",
+  "cycleTrackingScreenUpdateLogButton": "Update Log",
+  "cycleTrackingScreenAddLogButton": "Add Log",
+  "addEventSheetTitleRequired": "Please enter a title",
+  "addEventSheetPairFirst": "Please pair with a partner first",
+  "addEventSheetAddedWithXp": "Event added! +15 XP",
+  "addEventSheetAddedXpAlreadyEarned": "Event added! XP for this activity is granted once per day.",
+  "addEventSheetUpdated": "Event updated successfully!",
+  "addEventSheetAdded": "Event added successfully!",
+  "addEventSheetError": "Error: {error}",
+  "@addEventSheetError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addEventSheetEditTitle": "Edit Event",
+  "addEventSheetAddTitle": "Add Event",
+  "addEventSheetTitleLabel": "Title",
+  "addEventSheetTitleHint": "Enter event title",
+  "addEventSheetUpdateButton": "Update Event",
+  "addEventSheetAddButton": "Add Event",
+  "addEventSheetDateTimeLabel": "Date & Time",
+  "addEventSheetToday": "Today",
+  "addEventSheetYesterday": "Yesterday",
+  "addEventSheetTomorrow": "Tomorrow",
+  "eventsScreenBackTooltip": "Back",
+  "eventsScreenTitle": "Events",
+  "eventsScreenAddEventTooltip": "Add event",
+  "eventsScreenDebugEventsLoaded": "{count, plural, one{Debug: 1 event loaded} other{Debug: {count} events loaded}}",
+  "@eventsScreenDebugEventsLoaded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsScreenNoEventsOnDay": "No events on this day",
+  "eventsScreenNoEventsYet": "No events yet",
+  "eventsScreenAddEventButton": "Add event",
+  "eventsScreenLoadError": "Error loading events: {error}",
+  "@eventsScreenLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsScreenDeleteDialogTitle": "Delete Event",
+  "eventsScreenDeleteConfirmMessage": "Are you sure you want to delete \"{title}\"?",
+  "@eventsScreenDeleteConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsScreenPairFirst": "Please pair with a partner first",
+  "eventsScreenDeleted": "Event deleted successfully",
+  "eventsScreenError": "Error: {error}",
+  "@eventsScreenError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsScreenDeleteEventTooltip": "Delete event",
+  "intimacyHistoryScreenTitle": "Intimacy History",
+  "addIntimacySheetPairFirst": "Please pair with a partner first",
+  "addIntimacySheetSelectInitiator": "Please select an initiator",
+  "addIntimacySheetAddedWithXp": "Intimacy log added! +20 XP",
+  "addIntimacySheetAddedXpAlreadyGranted": "Intimacy log added! XP for this activity is granted once per day.",
+  "addIntimacySheetUpdatedSuccess": "Intimacy log updated successfully!",
+  "addIntimacySheetAddedSuccess": "Intimacy log added successfully!",
+  "addIntimacySheetError": "Error: {error}",
+  "@addIntimacySheetError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addIntimacySheetEditTitle": "Edit Intimacy Log",
+  "addIntimacySheetAddTitle": "Add Intimacy Log",
+  "addIntimacySheetMeFallback": "Me",
+  "addIntimacySheetUpdateButton": "Update Log",
+  "addIntimacySheetAddButton": "Add Log",
+  "addIntimacySheetNoteFieldLabel": "Note (optional)",
+  "addIntimacySheetNoteHint": "Add any notes...",
+  "addIntimacySheetDateTimeLabel": "Date & Time",
+  "addIntimacySheetToday": "Today",
+  "addIntimacySheetYesterday": "Yesterday",
+  "addIntimacySheetRatingLabel": "Rating",
+  "addIntimacySheetInitiatorLabel": "Initiator",
+  "addIntimacySheetTagsLabel": "Tags",
+  "addIntimacySheetProtectionUsedLabel": "Protection Used",
+  "addIntimacySheetProtectionSubtitle": "Was protection used during intimacy?",
+  "addIntimacySheetOrgasmsLabel": "Orgasms",
+  "addIntimacySheetDurationLabel": "Duration",
+  "addIntimacySheetDurationFieldLabel": "Duration (minutes)",
+  "addIntimacySheetDurationHint": "e.g., 30",
+  "addIntimacySheetLocationLabel": "Location",
+  "addIntimacySheetLocationFieldLabel": "Location (optional)",
+  "addIntimacySheetLocationHint": "e.g., Home, Hotel, Beach...",
+  "intimacyHistoryListViewAllButton": "View All",
+  "intimacyHistoryListLoadOlderButton": "Load older logs",
+  "intimacyHistoryListErrorTitle": "Error loading logs",
+  "intimacyHistoryListEmptyTitle": "No memories yet",
+  "intimacyHistoryListEmptySubtitle": "Time to change that? 😉",
+  "intimacyHistoryListDurationMinutes": "{minutes} min",
+  "@intimacyHistoryListDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "intimacyLogDetailSheetTitle": "Intimacy Log Details",
+  "intimacyLogDetailSheetDateTimeLabel": "Date & Time",
+  "intimacyLogDetailSheetDateTimeValue": "{date} at {time}",
+  "@intimacyLogDetailSheetDateTimeValue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "intimacyLogDetailSheetRatingLabel": "Rating",
+  "intimacyLogDetailSheetInitiatorLabel": "Initiator",
+  "intimacyLogDetailSheetMeFallback": "Me",
+  "intimacyLogDetailSheetTagsLabel": "Tags",
+  "intimacyLogDetailSheetProtectionLabel": "Protection",
+  "intimacyLogDetailSheetProtectionUsed": "Used",
+  "intimacyLogDetailSheetProtectionNotUsed": "Not used",
+  "intimacyLogDetailSheetOrgasmsLabel": "Orgasms",
+  "intimacyLogDetailSheetDurationLabel": "Duration",
+  "intimacyLogDetailSheetDurationValue": "{minutes, plural, one{{minutes} minute} other{{minutes} minutes}}",
+  "@intimacyLogDetailSheetDurationValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "intimacyLogDetailSheetLocationLabel": "Location",
+  "intimacyLogDetailSheetNoteLabel": "Note",
+  "intimacyLogDetailSheetDeleteConfirmTitle": "Delete intimacy log?",
+  "intimacyLogDetailSheetDeleteConfirmBody": "This action cannot be undone.",
+  "intimacyLogDetailSheetDeletedSnackbar": "Intimacy log deleted",
+  "intimacyLogDetailSheetDeleteFailedSnackbar": "Failed to delete log: {error}",
+  "@intimacyLogDetailSheetDeleteFailedSnackbar": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "appRouterMemoryNotFound": "Memory not found",
+  "appRouterNavHome": "Home",
+  "appRouterNavMemory": "Memory",
+  "appRouterNavData": "Data",
+  "appRouterNavCalendar": "Calendar",
+  "appRouterQuickActionsHeading": "Quick actions",
+  "appRouterQuickActionAddNote": "Add note",
+  "appRouterQuickActionAddMemory": "Add memory",
+  "appRouterQuickActionLogIntimacy": "Log intimacy",
+  "appRouterQuickActionAddEvent": "Add event",
+  "chatScreenShortcutThinkingOfYou": "Thinking of you 💭",
+  "chatScreenShortcutMissYou": "Miss you ❤️",
+  "chatScreenShortcutLoveYou": "Love you 😘",
+  "chatScreenShortcutSeeYouSoon": "See you soon 👋",
+  "chatScreenShortcutGoodMorning": "Good morning ☀️",
+  "chatScreenShortcutGoodNight": "Good night 🌙",
+  "chatScreenShortcutHowAreYou": "How are you? 😊",
+  "chatScreenSendMessageError": "Could not send message: {error}",
+  "@chatScreenSendMessageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatScreenSendTouchError": "Could not send touch: {error}",
+  "@chatScreenSendTouchError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chatScreenPartnerFallback": "Partner",
+  "chatScreenPairPrompt": "Pair with your partner to start chatting.",
+  "chatScreenEmptyState": "No messages or touches yet.\nSay hi 👋",
+  "chatScreenLoadHistoryError": "Could not load chat history.",
+  "chatScreenTouchLabel": "Touch",
+  "chatScreenSendTouchTooltip": "Send a touch",
+  "chatScreenMessageHint": "Type a message...",
+  "chatScreenSendTooltip": "Send",
+  "homeScreenUserNotFound": "User not found",
+  "homeScreenNotPaired": "Not paired. Please pair first.",
+  "homeScreenTestNotificationsTitle": "Test Notifications",
+  "homeScreenHapticSentMessage": "Haptic signal sent! Check console/logs for details.",
+  "homeScreenGenericError": "Error: {error}",
+  "@homeScreenGenericError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "homeScreenTestHapticSignalButton": "Test Haptic Signal",
+  "homeScreenQuickMessageSentMessage": "Quick message sent! Check console/logs for details.",
+  "homeScreenTestQuickMessageButton": "Test Quick Message",
+  "homeScreenSettingsTooltip": "Settings",
+  "homeScreenTitle": "Home",
+  "homeScreenSubtitle": "Widgets for your life",
+  "appBarLevelStripXpLabel": "{xp} SP",
+  "@appBarLevelStripXpLabel": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "countdownCardTitle": "Countdown",
+  "countdownCardNoEvents": "No upcoming events",
+  "countdownCardDaysUntil": "{count, plural, one{day} other{days}} until {title}",
+  "@countdownCardDaysUntil": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "countdownCardError": "Error loading events",
+  "daysTogetherCardTitle": "Days Together",
+  "daysTogetherCardSetDate": "Set your anniversary date",
+  "intimacySparkCardNoActivity": "No activity yet",
+  "intimacySparkCardDaysAgo": "{count, plural, =0{Today} one{{count} day ago} other{{count} days ago}}",
+  "@intimacySparkCardDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "intimacySparkCardError": "Error loading data",
+  "quickMessageNotificationOverlayLabel": "Quick Message",
+  "quickNoteCardPromptWriteSomethingNice": "Write me something nice...",
+  "quickNoteCardPromptDontForget": "Don't forget...",
+  "quickNoteCardPromptDoorCode": "The door code is...",
+  "quickNoteCardPromptSecretPhrase": "Today's secret phrase?",
+  "quickNoteCardHeaderLabel": "STICKY NOTE",
+  "statusHeaderPairPrompt": "Pair with your partner to view status",
+  "statusHeaderYouFallback": "You",
+  "statusHeaderPartnerFallback": "Partner",
+  "statusHeaderReadyStatus": "Ready",
+  "statusHeaderLoadingStatus": "Loading...",
+  "statusHeaderErrorStatus": "Error",
+  "statusHeaderUpdateStatusTitle": "Update Status",
+  "statusHeaderChooseEmojiLabel": "Choose emoji",
+  "statusHeaderStatusLabel": "Status",
+  "statusHeaderStatusUpdatedMessage": "Status updated",
+  "statusHeaderUpdateErrorMessage": "Error updating status: {error}",
+  "@statusHeaderUpdateErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "tapticTouchCardUnlockPrompt": "Unlock with DYOS+ or via the Roadmap",
+  "tapticTouchCardSentLabel": "Sent",
+  "tapticTouchCardSentToPartnerMessage": "Sent to partner",
+  "tapticTouchCardSendErrorMessage": "Error sending: {error}",
+  "@tapticTouchCardSendErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addMemoryScreenErrorPickingImages": "Error picking images: {error}",
+  "@addMemoryScreenErrorPickingImages": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addMemoryScreenErrorPickingImage": "Error picking image: {error}",
+  "@addMemoryScreenErrorPickingImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addMemoryScreenMemoryUpdated": "Memory updated",
+  "addMemoryScreenFreeLimitMessage": "You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.",
+  "addMemoryScreenAddImageOrCaption": "Please add at least one image or a caption",
+  "addMemoryScreenMemorySavedXp": "Memory saved! +25 XP",
+  "addMemoryScreenMemorySavedXpOncePerDay": "Memory saved! XP for this activity is granted once per day.",
+  "addMemoryScreenMemoryUpdatedWithCaption": "Memory \"{caption}\" updated.",
+  "@addMemoryScreenMemoryUpdatedWithCaption": {
+    "placeholders": {
+      "caption": {
+        "type": "String"
+      }
+    }
+  },
+  "addMemoryScreenUntitledCaption": "Untitled",
+  "addMemoryScreenEditMemoryTitle": "Edit Memory",
+  "addMemoryScreenAddMemoryTitle": "Add Memory",
+  "addMemoryScreenCaptionLabel": "Caption",
+  "addMemoryScreenCaptionHint": "What's this memory about?",
+  "addMemoryScreenPhotosVideosLabel": "Photos & Videos",
+  "addMemoryScreenAddPhotos": "Add Photos",
+  "addMemoryScreenAddMorePhotos": "Add More Photos",
+  "addMemoryScreenDateLabel": "Date",
+  "addMemoryScreenCategoryLabel": "Category",
+  "addMemoryScreenPlaceLabel": "Place",
+  "addMemoryScreenAddPlace": "Add place",
+  "addMemoryScreenLocationSet": "Location set",
+  "addMemoryScreenChangePlaceTooltip": "Change place",
+  "addMemoryScreenRemovePlaceTooltip": "Remove place",
+  "addMemoryScreenUpdateMemoryButton": "Update Memory",
+  "addMemoryScreenSaveMemoryButton": "Save Memory",
+  "memoriesMapScreenBackTooltip": "Back",
+  "memoriesMapScreenTitle": "Memories map",
+  "memoriesMapScreenNoMemoriesYet": "No memories with a place yet",
+  "memoriesMapScreenError": "Error: {error}",
+  "@memoriesMapScreenError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoriesMapScreenSearchHint": "Search place or address...",
+  "memoriesMapScreenMyLocationTooltip": "My location",
+  "memoriesMapScreenMapKeyMissingMessage": "Map preview needs a Google Maps API key (see docs/ANDROID_GOOGLE_API_KEY.md). Memories with a place are listed below.",
+  "memoriesMapScreenPlaceFallback": "Place",
+  "memoriesMapScreenMemoryFallback": "Memory",
+  "memoriesMapScreenUntitledCaption": "Untitled",
+  "memoryDetailScreenDeleteMemoryTitle": "Delete memory?",
+  "memoryDetailScreenDeleteMemoryContent": "This memory will be removed. This cannot be undone.",
+  "memoryDetailScreenMemoryDeleted": "Memory deleted",
+  "memoryDetailScreenFailedToDelete": "Failed to delete: {error}",
+  "@memoryDetailScreenFailedToDelete": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryDetailScreenBackTooltip": "Back",
+  "memoryDetailScreenCloseTooltip": "Close",
+  "memoryDetailScreenPageCounter": "{current} / {total}",
+  "@memoryDetailScreenPageCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryDetailScreenDeletingLabel": "Deleting…",
+  "memoryDetailScreenFailedToLoadImage": "Failed to load image",
+  "memoryDetailScreenDateAtTime": "{date} at {time}",
+  "@memoryDetailScreenDateAtTime": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timelineScreenTitle": "Timeline",
+  "timelineScreenMemoriesMapTooltip": "Memories map",
+  "timelineScreenFreeLimitMessage": "You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.",
+  "timelineScreenLoadOlderMemories": "Load older memories",
+  "timelineScreenAllCategoriesLabel": "All",
+  "timelineScreenMemoriesLimitFreeLabel": "Memories limit (Free)",
+  "timelineScreenMemoriesLimitSubtitle": "{count} / {limit} memories on the free plan",
+  "@timelineScreenMemoriesLimitSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "timelineScreenErrorLoadingMemories": "Error loading memories",
+  "timelineScreenNoMemoriesYet": "No memories yet",
+  "timelineScreenStartCreatingMemories": "Start creating memories with your partner!",
+  "timelineScreenFailedToLoad": "Failed to load",
+  "memoryDetailDialogDeleteMemoryTitle": "Delete memory?",
+  "memoryDetailDialogDeleteMemoryContent": "This memory will be removed. This cannot be undone.",
+  "memoryDetailDialogMemoryDeleted": "Memory deleted",
+  "memoryDetailDialogFailedToDelete": "Failed to delete: {error}",
+  "@memoryDetailDialogFailedToDelete": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryDetailDialogNoPhotos": "No Photos",
+  "memoryDetailDialogMemoryFallback": "Memory",
+  "memoryDetailDialogDateAtTime": "{date} at {time}",
+  "@memoryDetailDialogDateAtTime": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "pickPlaceScreenApiKeyMissingMessage": "Add GOOGLE_MAPS_API_KEY to android/local.properties (Android) or GOOGLE_PLACES_API_KEY in ios Secrets.xcconfig, then rebuild. You can still search by address.",
+  "pickPlaceScreenPlacesError": "Places: {message}",
+  "@pickPlaceScreenPlacesError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pickPlaceScreenSearchSuggestionsUnavailable": "Search suggestions unavailable. Use the search icon to find places.",
+  "pickPlaceScreenCouldNotLoadPlaceDetails": "Could not load place details",
+  "pickPlaceScreenNoResultsFound": "No results found for this address",
+  "pickPlaceScreenSearchFailed": "Search failed: {error}",
+  "@pickPlaceScreenSearchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pickPlaceScreenLocationServicesDisabled": "Location services are disabled",
+  "pickPlaceScreenLocationPermissionDenied": "Location permission denied",
+  "pickPlaceScreenRestartAppLocation": "Restart the app to use My location.",
+  "pickPlaceScreenCouldNotGetLocation": "Could not get location: {error}",
+  "@pickPlaceScreenCouldNotGetLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pickPlaceScreenBackTooltip": "Back",
+  "pickPlaceScreenTitle": "Pick a place",
+  "pickPlaceScreenMapKeyMissingFallback": "Map preview needs a Google Maps API key in the native build (see docs/ANDROID_GOOGLE_API_KEY.md). Search by address works below.",
+  "pickPlaceScreenSearchHint": "Search place or address...",
+  "pickPlaceScreenMyLocationTooltip": "My location",
+  "pickPlaceScreenTapToSetLocation": "Tap on the map to set the memory location",
+  "pickPlaceScreenPlaceNameLabel": "Place name (optional)",
+  "pickPlaceScreenPlaceNameHint": "e.g. Restaurant, Park",
+  "levelScreenTitle": "Your Level",
+  "levelScreenRewardReceived": "Reward received: +30 SP",
+  "levelScreenNoRewardGranted": "No reward granted this time",
+  "levelScreenBootSequence": "Boot Sequence",
+  "levelScreenCollectSpToNextTier": "Collect {spToNext} SP to get to {nextTier}",
+  "@levelScreenCollectSpToNextTier": {
+    "placeholders": {
+      "spToNext": {
+        "type": "int"
+      },
+      "nextTier": {
+        "type": "String"
+      }
+    }
+  },
+  "levelScreenSpValue": "{sp} SP",
+  "@levelScreenSpValue": {
+    "placeholders": {
+      "sp": {
+        "type": "int"
+      }
+    }
+  },
+  "levelScreenProgressionRewardsHeading": "Progression & Rewards",
+  "levelScreenCompleteTasksHeading": "Complete tasks & win rewards",
+  "levelScreenQuestBlueprintTitle": "Complete a Blueprint section",
+  "levelScreenQuestMemoryTitle": "Add a memory",
+  "levelScreenQuestEventTitle": "Add an event",
+  "levelScreenQuestIntimacyTitle": "Log intimacy",
+  "levelScreenWatchAdCta": "Watch an ad and get +30 SP",
+  "levelScreenWatchButton": "Watch",
+  "levelScreenCompletedToday": "Completed today",
+  "levelScreenQuestRewardBadge": "+{sp} SP",
+  "@levelScreenQuestRewardBadge": {
+    "placeholders": {
+      "sp": {
+        "type": "int"
+      }
+    }
+  },
+  "systemStatusDemoScreenTitle": "System Status (Preview)",
+  "levelUpUnlockSheetFeatureMemories": "Memories",
+  "levelUpUnlockSheetFeatureBlueprints": "Daily Questions",
+  "levelUpUnlockSheetFeatureQuickMessages": "Quick Messages",
+  "levelUpUnlockSheetFeatureMapView": "Memory Map",
+  "levelUpUnlockSheetTitle": "Level up to unlock",
+  "levelUpUnlockSheetRequirementBody": "You need {requiredSp} SP to unlock {featureName}. You have {currentSp} SP.",
+  "@levelUpUnlockSheetRequirementBody": {
+    "placeholders": {
+      "requiredSp": {
+        "type": "int"
+      },
+      "featureName": {
+        "type": "String"
+      },
+      "currentSp": {
+        "type": "int"
+      }
+    }
+  },
+  "levelUpUnlockSheetViewRoadmap": "View roadmap",
+  "levelUpUnlockSheetGetPremium": "Get DYOS+",
+  "systemStatusCardCurrentVersion": "Current Version: {version}",
+  "@systemStatusCardCurrentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "systemStatusCardProgressToNext": "{currentXp} / {tierMax} SP to {nextLabel}",
+  "@systemStatusCardProgressToNext": {
+    "placeholders": {
+      "currentXp": {
+        "type": "int"
+      },
+      "tierMax": {
+        "type": "int"
+      },
+      "nextLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "systemStatusCardMaxLevel": "{currentXp} SP · Max level",
+  "@systemStatusCardMaxLevel": {
+    "placeholders": {
+      "currentXp": {
+        "type": "int"
+      }
+    }
+  },
+  "listsScreenTitle": "Lists",
+  "listsScreenAddNoteTooltip": "Add note",
+  "listsScreenBucketListHeading": "Bucket List",
+  "listsScreenBucketListSubheading": "Things you want to do together",
+  "listsScreenEmptyTitle": "No bucket list items yet",
+  "listsScreenEmptySubtitle": "Tap the + button to add your first item",
+  "listsScreenErrorTitle": "Error loading bucket list",
+  "listsScreenToday": "Today",
+  "listsScreenYesterday": "Yesterday",
+  "listsScreenDaysAgo": "{count, plural, one{{count} day ago} other{{count} days ago}}",
+  "@listsScreenDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsScreenTitle": "Settings",
+  "settingsScreenDeleteAccountTitle": "Delete Account",
+  "settingsScreenDeleteAccountWarning": "This action cannot be undone. This will permanently delete:",
+  "settingsScreenDeleteAccountBulletList": "• Your account and profile\n• All your memories and photos\n• All intimacy logs and data\n• Your pairing (partner will be unpaired)\n• All notes and lists",
+  "settingsScreenDeleteAccountConfirmQuestion": "Are you absolutely sure?",
+  "settingsScreenDeleteForever": "Delete Forever",
+  "settingsScreenDeletingAccount": "Deleting account...",
+  "settingsScreenDeleteAccountError": "Error deleting account: {error}",
+  "@settingsScreenDeleteAccountError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsScreenMustBePairedForAnniversary": "You must be paired to set anniversary date",
+  "settingsScreenSelectAnniversaryDateHelp": "Select anniversary date",
+  "settingsScreenSetAnniversaryConfirm": "Set",
+  "settingsScreenAnniversaryUpdated": "Anniversary date updated",
+  "settingsScreenAnniversaryUpdateError": "Error updating anniversary date: {error}",
+  "@settingsScreenAnniversaryUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsScreenAnniversaryDateLabel": "Anniversary Date",
+  "settingsScreenSetAnniversaryDatePrompt": "Set your anniversary date",
+  "settingsScreenDaysTogether": "{count, plural, one{{count} day together} other{{count} days together}}",
+  "@settingsScreenDaysTogether": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsScreenLoading": "Loading...",
+  "settingsScreenAppearanceLabel": "Appearance",
+  "settingsScreenThemeLight": "Light",
+  "settingsScreenThemeDark": "Dark",
+  "settingsScreenThemeSystem": "System",
+  "settingsScreenPairingLabel": "Pairing",
+  "settingsScreenPairingSubtitle": "Manage your pairing",
+  "settingsScreenDeleteAccountSubtitle": "Permanently delete your account",
+  "settingsScreenLogOut": "Log out",
+  "settingsScreenLogoutConfirmQuestion": "Are you sure you want to log out?",
+  "settingsScreenLogoutSubtitle": "Sign out and clear session",
+  "settingsScreenLogoutError": "Error logging out: {error}",
+  "@settingsScreenLogoutError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addNoteScreenContentEmptyError": "Content cannot be empty",
+  "addNoteScreenNotAuthenticatedError": "User not authenticated. Please log in again.",
+  "addNoteScreenNotPairedError": "You are not paired with a partner. Please pair first.",
+  "addNoteScreenSaveSuccess": "Note saved successfully!",
+  "addNoteScreenSaveError": "Error saving note: {error}",
+  "@addNoteScreenSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addNoteScreenTitle": "Add Note",
+  "addNoteScreenTitleLabel": "Title (optional)",
+  "addNoteScreenTitleHint": "Add a title...",
+  "addNoteScreenContentLabel": "Content",
+  "addNoteScreenContentHint": "Write your note here...",
+  "addNoteScreenContentRequired": "Content is required",
+  "addNoteScreenTypeLabel": "Type",
+  "addNoteScreenTypeShared": "Shared",
+  "addNoteScreenTypePrivate": "Private",
+  "addNoteScreenTypeBucketList": "Bucket List",
+  "addNoteScreenTypeSecretGift": "Secret Gift",
+  "addNoteScreenSaveNoteButton": "Save Note",
+  "secretNotesScreenTitle": "Secret Notes",
+  "secretNotesScreenTabSecretGift": "Secret Gift",
+  "secretNotesScreenTabPrivate": "Private",
+  "secretNotesScreenEmptySecretGiftTitle": "No secret gift ideas yet",
+  "secretNotesScreenEmptySecretGiftSubtitle": "Tap the + button to add your first secret gift idea",
+  "secretNotesScreenEmptyPrivateTitle": "No private notes yet",
+  "secretNotesScreenEmptyPrivateSubtitle": "Tap the + button to add your first private note",
+  "secretNotesScreenErrorTitle": "Error loading notes",
+  "secretNotesScreenToday": "Today",
+  "secretNotesScreenYesterday": "Yesterday",
+  "secretNotesScreenDaysAgo": "{count, plural, one{{count} day ago} other{{count} days ago}}",
+  "@secretNotesScreenDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumLandingScreenTitle": "DYOS+",
+  "premiumLandingScreenYouHavePremium": "You have DYOS+",
+  "premiumLandingScreenOneSubscriptionBoth": "One subscription for both of you.",
+  "premiumLandingScreenChooseYourPlan": "Choose your plan",
+  "premiumLandingScreenLoadPlansError": "Could not load plans: {error}. Pull down to retry.",
+  "@premiumLandingScreenLoadPlansError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumLandingScreenCancelAnytimeNote": "Cancel anytime. One subscription for both of you.",
+  "premiumLandingScreenHeroSubtitle": "More for the two of you",
+  "premiumLandingScreenHeroDescription": "Unlimited memories, insights, and no limits. One plan, both of you.",
+  "premiumLandingScreenInstantBenefits": "Instant benefits",
+  "premiumLandingScreenNoPlansAvailable": "No plans available right now. Pull down to retry.",
+  "premiumLandingScreenNoPlansConfigured": "No plans configured. Pull down to retry.",
+  "premiumLandingScreenYearly": "Yearly",
+  "premiumLandingScreenMonthly": "Monthly",
+  "premiumLandingScreenYearlyBilling": "Yearly billing",
+  "premiumLandingScreenMonthlyBilling": "Monthly billing",
+  "premiumLandingScreenGetPremiumNow": "Get DYOS+ now",
+  "premiumLandingScreenRestore": "Restore",
+  "premiumLandingScreenPrivacy": "Privacy",
+  "premiumLandingScreenTerms": "Terms",
+  "paywallModalTitle": "DYOS+",
+  "paywallModalLoadError": "Could not load plans. Please try again.",
+  "paywallModalNoPlansAvailable": "No plans available.",
+  "paywallModalYearly": "Yearly",
+  "paywallModalMonthly": "Monthly",
+  "paywallModalMonthlyBilling": "Monthly billing",
+  "paywallModalRestorePurchases": "Restore purchases"
 }

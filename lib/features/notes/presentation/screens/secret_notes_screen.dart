@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../domain/note_item.dart';
@@ -25,14 +26,14 @@ class SecretNotesScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: context.colors.background,
         appBar: AppBar(
-          title: const Text('Secret Notes'),
+          title: Text(context.l10n.secretNotesScreenTitle),
           bottom: TabBar(
             labelColor: context.colors.primary,
             unselectedLabelColor: context.colors.textSecondary,
             indicatorColor: context.colors.primary,
-            tabs: const [
-              Tab(text: 'Secret Gift'),
-              Tab(text: 'Private'),
+            tabs: [
+              Tab(text: context.l10n.secretNotesScreenTabSecretGift),
+              Tab(text: context.l10n.secretNotesScreenTabPrivate),
             ],
           ),
         ),
@@ -42,16 +43,16 @@ class SecretNotesScreen extends ConsumerWidget {
             _buildNotesList(
               context: context,
               notesAsync: secretGiftNotesAsync,
-              emptyMessage: 'No secret gift ideas yet',
-              emptyDescription: 'Tap the + button to add your first secret gift idea',
+              emptyMessage: context.l10n.secretNotesScreenEmptySecretGiftTitle,
+              emptyDescription: context.l10n.secretNotesScreenEmptySecretGiftSubtitle,
               emptyIcon: PhosphorIconsBold.gift,
             ),
             // Private Tab
             _buildNotesList(
               context: context,
               notesAsync: privateNotesAsync,
-              emptyMessage: 'No private notes yet',
-              emptyDescription: 'Tap the + button to add your first private note',
+              emptyMessage: context.l10n.secretNotesScreenEmptyPrivateTitle,
+              emptyDescription: context.l10n.secretNotesScreenEmptyPrivateSubtitle,
               emptyIcon: PhosphorIconsBold.lock,
             ),
           ],
@@ -139,7 +140,7 @@ class SecretNotesScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'Error loading notes',
+                    context.l10n.secretNotesScreenErrorTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: context.colors.text,
                         ),
@@ -200,7 +201,7 @@ class _NoteItemCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
-                _formatDate(note.createdAt),
+                _formatDate(context, note.createdAt),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
                     ),
@@ -212,16 +213,16 @@ class _NoteItemCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
-      return 'Today';
+      return context.l10n.secretNotesScreenToday;
     } else if (difference.inDays == 1) {
-      return 'Yesterday';
+      return context.l10n.secretNotesScreenYesterday;
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+      return context.l10n.secretNotesScreenDaysAgo(difference.inDays);
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }

@@ -7,6 +7,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/services/auth_service.dart';
 import '../data/user_repository.dart';
 
@@ -212,12 +213,12 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Firebase Connection Test'),
+        title: Text(context.l10n.firebaseTestScreenTitle),
         actions: [
           IconButton(
             icon: const Icon(PhosphorIconsBold.arrowClockwise),
             onPressed: _isRunning ? null : _runAllTests,
-            tooltip: 'Run tests again',
+            tooltip: context.l10n.firebaseTestScreenRerunTooltip,
           ),
         ],
       ),
@@ -247,10 +248,10 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       _isRunning
-                          ? 'Running tests...'
+                          ? context.l10n.firebaseTestScreenRunning
                           : _failedCount == 0
-                              ? 'All tests passed! ✅'
-                              : 'Some tests failed ⚠️',
+                              ? context.l10n.firebaseTestScreenAllPassed
+                              : context.l10n.firebaseTestScreenSomeFailed,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: _failedCount == 0
@@ -261,7 +262,7 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Passed: $_passedCount / ${_results.length}',
+                      context.l10n.firebaseTestScreenPassedCount(_passedCount, _results.length),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -281,10 +282,10 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                 ),
               )
             else if (_results.isEmpty)
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.xl),
-                  child: Text('No test results yet'),
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  child: Text(context.l10n.firebaseTestScreenNoResults),
                 ),
               )
             else
@@ -307,7 +308,7 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'What to check:',
+                          context.l10n.firebaseTestScreenWhatToCheckHeading,
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium
@@ -319,16 +320,16 @@ class _FirebaseTestScreenState extends ConsumerState<FirebaseTestScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _InstructionItem(
-                      '✅ All green = Firebase is properly connected!',
+                      context.l10n.firebaseTestScreenInstructionAllGreen,
                     ),
                     _InstructionItem(
-                      '❌ Firebase Core failed = Check configuration files',
+                      context.l10n.firebaseTestScreenInstructionCoreFailed,
                     ),
                     _InstructionItem(
-                      '❌ Firestore failed = Enable Firestore in Firebase Console',
+                      context.l10n.firebaseTestScreenInstructionFirestoreFailed,
                     ),
                     _InstructionItem(
-                      '❌ Write/Read failed = Check Firestore security rules',
+                      context.l10n.firebaseTestScreenInstructionWriteReadFailed,
                     ),
                   ],
                 ),

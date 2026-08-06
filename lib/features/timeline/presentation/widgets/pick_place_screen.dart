@@ -11,6 +11,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/config/maps_api_config.dart';
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/services/geocoding_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -88,9 +89,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
-                'Add GOOGLE_MAPS_API_KEY to android/local.properties (Android) or GOOGLE_PLACES_API_KEY in ios Secrets.xcconfig, then rebuild. You can still search by address.',
-              ),
+              content: Text(context.l10n.pickPlaceScreenApiKeyMissingMessage),
               backgroundColor: context.colors.warning,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 6),
@@ -125,7 +124,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Places: ${error.message}'),
+                content: Text(context.l10n.pickPlaceScreenPlacesError(error.message)),
                 backgroundColor: context.colors.love,
                 behavior: SnackBarBehavior.floating,
                 duration: const Duration(seconds: 5),
@@ -148,7 +147,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
           setState(() => _placesReady = false);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Search suggestions unavailable. Use the search icon to find places.'),
+              content: Text(context.l10n.pickPlaceScreenSearchSuggestionsUnavailable),
               backgroundColor: context.colors.warning,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 4),
@@ -193,7 +192,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Could not load place details'),
+            content: Text(context.l10n.pickPlaceScreenCouldNotLoadPlaceDetails),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -217,7 +216,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('No results found for this address'),
+              content: Text(context.l10n.pickPlaceScreenNoResultsFound),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -238,7 +237,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Search failed: ${e.toString()}'),
+            content: Text(context.l10n.pickPlaceScreenSearchFailed(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -257,7 +256,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
       if (!serviceEnabled && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Location services are disabled'),
+            content: Text(context.l10n.pickPlaceScreenLocationServicesDisabled),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -273,7 +272,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Location permission denied'),
+              content: Text(context.l10n.pickPlaceScreenLocationPermissionDenied),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -294,8 +293,8 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
     } catch (e) {
       if (mounted) {
         final message = e is MissingPluginException
-            ? 'Restart the app to use My location.'
-            : 'Could not get location: ${e.toString()}';
+            ? context.l10n.pickPlaceScreenRestartAppLocation
+            : context.l10n.pickPlaceScreenCouldNotGetLocation(e.toString());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message),
@@ -375,10 +374,10 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
         leading: IconButton(
           icon: Icon(PhosphorIconsBold.arrowLeft, color: context.colors.text),
           onPressed: () => Navigator.of(context).pop(),
-          tooltip: 'Back',
+          tooltip: context.l10n.pickPlaceScreenBackTooltip,
         ),
         title: Text(
-          'Pick a place',
+          context.l10n.pickPlaceScreenTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -417,7 +416,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.all(24),
                                 child: Text(
-                                  'Map preview needs a Google Maps API key in the native build (see docs/ANDROID_GOOGLE_API_KEY.md). Search by address works below.',
+                                  context.l10n.pickPlaceScreenMapKeyMissingFallback,
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                         color: context.colors.textSecondary,
@@ -442,7 +441,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                 child: TextField(
                                   controller: _searchController,
                                   decoration: InputDecoration(
-                                    hintText: 'Search place or address...',
+                                    hintText: context.l10n.pickPlaceScreenSearchHint,
                                     border: InputBorder.none,
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 12,
@@ -491,7 +490,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                         PhosphorIconsBold.navigationArrow,
                                         color: context.colors.primary,
                                       ),
-                                tooltip: 'My location',
+                                tooltip: context.l10n.pickPlaceScreenMyLocationTooltip,
                               ),
                             ),
                           ],
@@ -575,7 +574,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
               top: false,
               child: _selectedPosition == null
                   ? Text(
-                      'Tap on the map to set the memory location',
+                      context.l10n.pickPlaceScreenTapToSetLocation,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -585,7 +584,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          'Place name (optional)',
+                          context.l10n.pickPlaceScreenPlaceNameLabel,
                           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: context.colors.text,
@@ -595,7 +594,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                         TextField(
                           controller: _nameController,
                           decoration: InputDecoration(
-                            hintText: 'e.g. Restaurant, Park',
+                            hintText: context.l10n.pickPlaceScreenPlaceNameHint,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide(
@@ -644,7 +643,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                child: const Text('Cancel'),
+                                child: Text(context.l10n.commonCancel),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.md),
@@ -662,7 +661,7 @@ class _PickPlaceScreenState extends State<PickPlaceScreen> {
                                   ),
                                   elevation: 0,
                                 ),
-                                child: const Text('Confirm'),
+                                child: Text(context.l10n.commonConfirm),
                               ),
                             ),
                           ],

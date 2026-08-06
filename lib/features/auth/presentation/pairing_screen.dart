@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/services/firebase_service.dart';
 import '../../../core/services/pairing_exceptions.dart';
 import '../../../core/services/auth_service.dart';
@@ -33,17 +34,17 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: Text(context.l10n.pairingScreenSignOut),
+        content: Text(context.l10n.pairingScreenSignOutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: context.colors.love),
-            child: const Text('Sign Out'),
+            child: Text(context.l10n.pairingScreenSignOut),
           ),
         ],
       ),
@@ -76,7 +77,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
             : email;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Paired with $name!'),
+            content: Text(context.l10n.pairingScreenPairedWith(name)),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -104,7 +105,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Unable to pair right now. Check your connection.';
+          _errorMessage = context.l10n.pairingScreenGenericError;
           _isSubmitting = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,12 +126,12 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Connect with Partner'),
+        title: Text(context.l10n.pairingScreenAppBarTitle),
         actions: [
           IconButton(
             icon: const Icon(PhosphorIconsBold.signOut),
             onPressed: _signOut,
-            tooltip: 'Sign Out',
+            tooltip: context.l10n.pairingScreenSignOut,
           ),
         ],
       ),
@@ -150,7 +151,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  'Enter your partner\'s email',
+                  context.l10n.pairingScreenHeading,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: context.colors.text,
@@ -159,7 +160,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Both of you must already have an account',
+                  context.l10n.pairingScreenSubheading,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.colors.textSecondary,
                       ),
@@ -169,7 +170,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: 'partner@email.com',
+                    hintText: context.l10n.pairingScreenEmailHint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
@@ -209,11 +210,11 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                   autocorrect: false,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please enter an email address';
+                      return context.l10n.pairingScreenEmailRequired;
                     }
                     final email = value.trim().toLowerCase();
                     if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
-                      return 'Enter a valid email address';
+                      return context.l10n.pairingScreenEmailInvalid;
                     }
                     final currentEmail = ref
                         .read(firebaseServiceProvider)
@@ -221,7 +222,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                         ?.email
                         ?.toLowerCase();
                     if (currentEmail != null && email == currentEmail) {
-                      return 'You cannot pair with yourself';
+                      return context.l10n.pairingScreenCannotPairSelf;
                     }
                     return null;
                   },
@@ -248,7 +249,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                           ),
                         )
                       : Text(
-                          'Pair',
+                          context.l10n.pairingScreenPairButton,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,

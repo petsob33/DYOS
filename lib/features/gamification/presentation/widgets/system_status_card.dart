@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../domain/level_manager.dart';
@@ -99,7 +100,7 @@ class _SystemStatusCardState extends State<SystemStatusCard>
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'Current Version: $versionStr',
+                context.l10n.systemStatusCardCurrentVersion(versionStr),
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -129,8 +130,8 @@ class _SystemStatusCardState extends State<SystemStatusCard>
           Center(
             child: Text(
               nextLabel != null && xpToNext != null
-                  ? '${widget.currentXp} / $tierMax SP to $nextLabel'
-                  : '${widget.currentXp} SP · Max level',
+                  ? context.l10n.systemStatusCardProgressToNext(widget.currentXp, tierMax, nextLabel)
+                  : context.l10n.systemStatusCardMaxLevel(widget.currentXp),
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,

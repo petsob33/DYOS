@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../../core/widgets/dyos_universal_calendar.dart';
 import '../../auth/presentation/auth_providers.dart';
@@ -49,10 +51,10 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
           onPressed: () {
             context.pop();
           },
-          tooltip: 'Back',
+          tooltip: context.l10n.eventsScreenBackTooltip,
         ),
         title: Text(
-          'Events',
+          context.l10n.eventsScreenTitle,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -67,7 +69,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
             onPressed: () {
               AddEventSheet.show(context);
             },
-            tooltip: 'Add event',
+            tooltip: context.l10n.eventsScreenAddEventTooltip,
           ),
         ],
       ),
@@ -107,7 +109,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              'Debug: ${events.length} events loaded',
+                              context.l10n.eventsScreenDebugEventsLoaded(events.length),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: context.colors.primary,
                                     fontWeight: FontWeight.w600,
@@ -207,8 +209,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                             const SizedBox(height: AppSpacing.md),
                             Text(
                               _selectedDay != null
-                                  ? 'No events on this day'
-                                  : 'No events yet',
+                                  ? context.l10n.eventsScreenNoEventsOnDay
+                                  : context.l10n.eventsScreenNoEventsYet,
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     color: context.colors.textSecondary,
                                   ),
@@ -222,7 +224,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                                   initialDate: _selectedDay,
                                 );
                               },
-                              child: const Text('Add event'),
+                              child: Text(context.l10n.eventsScreenAddEventButton),
                             ),
                           ],
                         ),
@@ -253,7 +255,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) => Center(
                   child: Text(
-                    'Error loading events: $error',
+                    context.l10n.eventsScreenLoadError(error.toString()),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: context.colors.love,
                         ),
@@ -271,19 +273,19 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Event'),
-        content: Text('Are you sure you want to delete "${event.title}"?'),
+        title: Text(context.l10n.eventsScreenDeleteDialogTitle),
+        content: Text(context.l10n.eventsScreenDeleteConfirmMessage(event.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: context.colors.love,
             ),
-            child: const Text('Delete'),
+            child: Text(context.l10n.commonDelete),
           ),
         ],
       ),
@@ -297,7 +299,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Please pair with a partner first'),
+              content: Text(context.l10n.eventsScreenPairFirst),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -316,7 +318,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Event deleted successfully'),
+              content: Text(context.l10n.eventsScreenDeleted),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -330,7 +332,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${e.toString()}'),
+              content: Text(context.l10n.eventsScreenError(e.toString())),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -372,7 +374,7 @@ class _EventCard extends StatelessWidget {
                     ),
               ),
               Text(
-                _formatDate(event.date),
+                _formatDate(context, event.date),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
                     ),
@@ -398,7 +400,7 @@ class _EventCard extends StatelessWidget {
               size: 20,
             ),
             onPressed: onDelete,
-            tooltip: 'Delete event',
+            tooltip: context.l10n.eventsScreenDeleteEventTooltip,
           ),
         ],
       ),
@@ -411,21 +413,7 @@ class _EventCard extends StatelessWidget {
     return '$hour:$minute';
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return '${months[date.month - 1]} ${date.day}';
+  String _formatDate(BuildContext context, DateTime date) {
+    return DateFormat.MMMd(Localizations.localeOf(context).toString()).format(date);
   }
 }

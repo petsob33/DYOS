@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ouros_app/core/theme/app_theme.dart';
 import 'package:ouros_app/features/dashboard/presentation/widgets/haptic_notification_overlay.dart';
 import 'package:ouros_app/features/dashboard/presentation/widgets/quick_message_notification_overlay.dart';
+import 'package:ouros_app/l10n/generated/app_localizations.dart';
 
 /// Regression coverage for the notification-overlay freeze: both overlays
 /// used to be shown via showDialog(), which inserts a full-screen modal
@@ -22,6 +23,8 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Builder(
           builder: (context) {
             capturedContext = context;
@@ -204,6 +207,8 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Builder(
             builder: (context) {
               capturedContext = context;

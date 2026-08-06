@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/memory_repository.dart';
 import '../../domain/memory_model.dart';
@@ -49,19 +51,17 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('Delete memory?'),
-        content: const Text(
-          'This memory will be removed. This cannot be undone.',
-        ),
+        title: Text(context.l10n.memoryDetailDialogDeleteMemoryTitle),
+        content: Text(context.l10n.memoryDetailDialogDeleteMemoryContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('Cancel',
+            child: Text(context.l10n.commonCancel,
                 style: TextStyle(color: context.colors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Delete',
+            child: Text(context.l10n.commonDelete,
                 style: TextStyle(
                     color: context.colors.love, fontWeight: FontWeight.w600)),
           ),
@@ -77,7 +77,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Memory deleted'),
+            content: Text(context.l10n.memoryDetailDialogMemoryDeleted),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape:
@@ -90,7 +90,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
         setState(() => _isDeleting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to delete: ${e.toString()}'),
+            content: Text(context.l10n.memoryDetailDialogFailedToDelete(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape:
@@ -196,7 +196,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                         color: context.colors.background,
                         child: Center(
                           child: Text(
-                            'No Photos',
+                            context.l10n.memoryDetailDialogNoPhotos,
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
@@ -261,7 +261,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                               child: Text(
                                 widget.memory.caption.isNotEmpty
                                     ? widget.memory.caption
-                                    : locationName ?? 'Memory',
+                                    : locationName ?? context.l10n.memoryDetailDialogMemoryFallback,
                                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                       fontWeight: FontWeight.w700,
                                       // Oprava: Použití standardní černé/šedé místo textPrimary
@@ -297,7 +297,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                             PhosphorIconsBold.pencilSimple,
                                             color: context.colors.primary,
                                           ),
-                                          title: const Text('Edit'),
+                                          title: Text(context.l10n.commonEdit),
                                           onTap: () {
                                             Navigator.of(ctx).pop();
                                             Navigator.of(context).pop();
@@ -311,7 +311,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                             color: context.colors.love,
                                           ),
                                           title: Text(
-                                            'Delete',
+                                            context.l10n.commonDelete,
                                             style: TextStyle(
                                               color: context.colors.love,
                                             ),
@@ -350,7 +350,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                             ),
                             const SizedBox(width: AppSpacing.xs),
                             Text(
-                              _formatDateTime(widget.memory.date),
+                              _formatDateTime(context, widget.memory.date),
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: context.colors.textSecondary,
                                   ),
@@ -460,9 +460,11 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
     );
   }
 
-  String _formatDateTime(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${date.day} ${months[date.month - 1]} ${date.year} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  String _formatDateTime(BuildContext context, DateTime date) {
+    final localeName = Localizations.localeOf(context).toString();
+    final datePart = DateFormat('d MMM y', localeName).format(date);
+    final timePart = DateFormat.Hm(localeName).format(date);
+    return context.l10n.memoryDetailDialogDateAtTime(datePart, timePart);
   }
 }
 

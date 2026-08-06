@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../widgets/system_status_card.dart';
 
 /// Demo screen to preview [SystemStatusCard] with mock SP (750 = early v2.0 Connected).
@@ -14,7 +15,7 @@ class SystemStatusDemoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('System Status (Preview)'),
+        title: Text(context.l10n.systemStatusDemoScreenTitle),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

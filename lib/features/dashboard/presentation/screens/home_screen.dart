@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../../core/services/firebase_service.dart';
 import '../../../../core/services/app_logger.dart';
@@ -193,7 +194,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('User not found'),
+            content: Text(context.l10n.homeScreenUserNotFound),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
@@ -206,7 +207,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Not paired. Please pair first.'),
+            content: Text(context.l10n.homeScreenNotPaired),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
@@ -224,7 +225,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Test Notifications'),
+        title: Text(context.l10n.homeScreenTestNotificationsTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -244,8 +245,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text(
-                          'Haptic signal sent! Check console/logs for details.',
+                        content: Text(
+                          context.l10n.homeScreenHapticSentMessage,
                         ),
                         backgroundColor: context.colors.success,
                         behavior: SnackBarBehavior.floating,
@@ -259,7 +260,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Error: $e'),
+                        content: Text(context.l10n.homeScreenGenericError(e.toString())),
                         backgroundColor: context.colors.love,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 5),
@@ -269,7 +270,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 }
               },
               icon: const Icon(PhosphorIconsBold.handTap),
-              label: const Text('Test Haptic Signal'),
+              label: Text(context.l10n.homeScreenTestHapticSignalButton),
               style: ElevatedButton.styleFrom(
                 backgroundColor: context.colors.primary,
                 foregroundColor: Colors.white,
@@ -294,8 +295,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text(
-                          'Quick message sent! Check console/logs for details.',
+                        content: Text(
+                          context.l10n.homeScreenQuickMessageSentMessage,
                         ),
                         backgroundColor: context.colors.success,
                         behavior: SnackBarBehavior.floating,
@@ -309,7 +310,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Error: $e'),
+                        content: Text(context.l10n.homeScreenGenericError(e.toString())),
                         backgroundColor: context.colors.love,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 5),
@@ -319,7 +320,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 }
               },
               icon: const Icon(PhosphorIconsBold.chatCircle),
-              label: const Text('Test Quick Message'),
+              label: Text(context.l10n.homeScreenTestQuickMessageButton),
               style: ElevatedButton.styleFrom(
                 backgroundColor: context.colors.primary,
                 foregroundColor: Colors.white,
@@ -330,7 +331,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
         ],
       ),
@@ -458,14 +459,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           IconButton(
             icon: Icon(PhosphorIconsBold.bell, color: context.colors.primary),
             onPressed: () => _testNotifications(context, ref),
-            tooltip: 'Test Notifications',
+            tooltip: context.l10n.homeScreenTestNotificationsTitle,
           ),
           IconButton(
             icon: Icon(PhosphorIconsBold.gear, color: context.colors.text),
             onPressed: () {
               context.push('/settings');
             },
-            tooltip: 'Settings',
+            tooltip: context.l10n.homeScreenSettingsTooltip,
           ),
         ],
       ),
@@ -482,7 +483,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Home',
+                      context.l10n.homeScreenTitle,
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -491,7 +492,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Widgets for your life',
+                      context.l10n.homeScreenSubtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.colors.textSecondary,
                       ),

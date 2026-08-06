@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../domain/premium_copy.dart';
 import '../premium_provider.dart';
 
@@ -194,7 +195,7 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
 
   Widget _buildHeader() {
     return Text(
-      'DYOS+',
+      context.l10n.paywallModalTitle,
       style: GoogleFonts.inter(
         fontSize: 28,
         fontWeight: FontWeight.bold,
@@ -261,7 +262,7 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Text(
-        'Could not load plans. Please try again.',
+        context.l10n.paywallModalLoadError,
         style: GoogleFonts.inter(color: _PaywallColors.textSecondary),
       ),
     );
@@ -273,7 +274,7 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Text(
-          'No plans available.',
+          context.l10n.paywallModalNoPlansAvailable,
           style: GoogleFonts.inter(color: _PaywallColors.textSecondary),
         ),
       );
@@ -288,7 +289,7 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Text(
-          'No plans available.',
+          context.l10n.paywallModalNoPlansAvailable,
           style: GoogleFonts.inter(color: _PaywallColors.textSecondary),
         ),
       );
@@ -297,8 +298,8 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
     return Column(
       children: packages.map((package) {
         final isYearly = package.packageType == PackageType.annual;
-        final title = isYearly ? 'Yearly' : 'Monthly';
-        final subtitle = isYearly ? PremiumCopy.yearlySavings : 'Monthly billing';
+        final title = isYearly ? context.l10n.paywallModalYearly : context.l10n.paywallModalMonthly;
+        final subtitle = isYearly ? PremiumCopy.yearlySavings : context.l10n.paywallModalMonthlyBilling;
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: Material(
@@ -372,7 +373,7 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           : Text(
-              'Restore purchases',
+              context.l10n.paywallModalRestorePurchases,
               style: GoogleFonts.inter(color: _PaywallColors.textSecondary),
             ),
     );
