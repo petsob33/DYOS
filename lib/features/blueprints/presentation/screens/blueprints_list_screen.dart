@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../blueprint_provider.dart';
 
@@ -25,7 +26,7 @@ class BlueprintsListScreen extends ConsumerWidget {
         foregroundColor: c.text,
         elevation: 0,
         title: Text(
-          'Daily Questions',
+          context.l10n.blueprintsListScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -38,7 +39,7 @@ class BlueprintsListScreen extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, _) => Center(
             child: Text(
-              'Could not load Blueprints.',
+              context.l10n.blueprintsListScreenLoadError,
               style: GoogleFonts.inter(color: c.textSecondary),
             ),
           ),
@@ -48,7 +49,7 @@ class BlueprintsListScreen extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Text(
-                    'Save your preferences as a couple. Complete a section to earn +100 XP.',
+                    context.l10n.blueprintsListScreenIntro,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       color: c.textSecondary,
@@ -100,7 +101,9 @@ class BlueprintsListScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    '${section.questions.length} questions',
+                                    context.l10n.blueprintsListScreenQuestionsCount(
+                                      section.questions.length,
+                                    ),
                                     style: GoogleFonts.inter(
                                       fontSize: 13,
                                       color: c.textSecondary,

@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../../core/widgets/dyos_universal_calendar.dart';
 import '../../auth/presentation/auth_providers.dart';
@@ -79,7 +81,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
               child: Row(
                 children: [
                   Text(
-                    'Calendar',
+                    context.l10n.cycleTrackingScreenTitle,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -90,7 +92,7 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                     icon: const Icon(Icons.settings),
                     color: context.colors.textSecondary,
                     onPressed: () => _showSettingsSheet(context),
-                    tooltip: 'Cycle Settings',
+                    tooltip: context.l10n.cycleTrackingScreenSettingsTooltip,
                   ),
                 ],
               ),
@@ -627,33 +629,19 @@ class _DayOptionsWidget extends ConsumerWidget {
   final VoidCallback onClose;
   final void Function(DateTime) onShowCycleLogSheet;
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final selectedDay = DateTime(date.year, date.month, date.day);
 
     if (selectedDay == today) {
-      return 'Today';
+      return context.l10n.cycleTrackingScreenToday;
     } else if (selectedDay == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday';
+      return context.l10n.cycleTrackingScreenYesterday;
     } else if (selectedDay == today.add(const Duration(days: 1))) {
-      return 'Tomorrow';
+      return context.l10n.cycleTrackingScreenTomorrow;
     } else {
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
-      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+      return DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(date);
     }
   }
 
@@ -685,7 +673,7 @@ class _DayOptionsWidget extends ConsumerWidget {
             child: Row(
               children: [
                 Text(
-                  _formatDate(selectedDate),
+                  _formatDate(context, selectedDate),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: context.colors.text,
@@ -704,7 +692,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                 // Memories section
                 if (dayMemories.isNotEmpty) ...[
                   Text(
-                    'Memories',
+                    context.l10n.cycleTrackingScreenMemoriesHeading,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -772,7 +760,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                 // Intimacy logs section
                 if (dayIntimacyLogs.isNotEmpty) ...[
                   Text(
-                    'Intimacy',
+                    context.l10n.cycleTrackingScreenIntimacyHeading,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -806,7 +794,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Intimacy',
+                                      context.l10n.cycleTrackingScreenIntimacyHeading,
                                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                             fontWeight: FontWeight.w600,
                                             color: context.colors.text,
@@ -814,7 +802,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      'Rating: ${log.rating}/5',
+                                      context.l10n.cycleTrackingScreenRating(log.rating),
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                             color: context.colors.textSecondary,
                                           ),
@@ -839,7 +827,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                 // Events section
                 if (dayEvents.isNotEmpty) ...[
                   Text(
-                    'Events',
+                    context.l10n.cycleTrackingScreenEventsHeading,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -917,7 +905,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                           color: context.colors.success,
                           size: 18,
                         ),
-                        label: const Text('Add Memory'),
+                        label: Text(context.l10n.cycleTrackingScreenAddMemoryButton),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: context.colors.success,
                           side: BorderSide(color: context.colors.success),
@@ -940,7 +928,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                           color: context.colors.love,
                           size: 18,
                         ),
-                        label: const Text('Add Intimacy'),
+                        label: Text(context.l10n.cycleTrackingScreenAddIntimacyButton),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: context.colors.love,
                           side: BorderSide(color: context.colors.love),
@@ -966,7 +954,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                           color: context.colors.primary,
                           size: 18,
                         ),
-                        label: const Text('Add Event'),
+                        label: Text(context.l10n.cycleTrackingScreenAddEventButton),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: context.colors.primary,
                           side: BorderSide(color: context.colors.primary),
@@ -985,7 +973,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                           onShowCycleLogSheet(selectedDate);
                         },
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text('Add Period Log'),
+                        label: Text(context.l10n.cycleTrackingScreenAddPeriodLogButton),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: context.colors.warning,
                           side: BorderSide(color: context.colors.warning),
@@ -1024,7 +1012,7 @@ class _CycleLegend extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Legend',
+            context.l10n.cycleTrackingScreenLegendHeading,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: context.colors.text,
@@ -1037,19 +1025,19 @@ class _CycleLegend extends StatelessWidget {
             children: [
               _LegendItem(
                 color: const Color(0xFFFF375F),
-                label: 'Menstruation',
+                label: context.l10n.cycleTrackingScreenMenstruationLabel,
               ),
               _LegendItem(
                 color: const Color(0xFF5E5CE6),
-                label: 'Follicular',
+                label: context.l10n.cycleTrackingScreenFollicularLabel,
               ),
               _LegendItem(
                 color: const Color(0xFF34C759),
-                label: 'Ovulation/Fertile',
+                label: context.l10n.cycleTrackingScreenOvulationFertileLabel,
               ),
               _LegendItem(
                 color: const Color(0xFFFF9F0A),
-                label: 'Luteal/PMS',
+                label: context.l10n.cycleTrackingScreenLutealPmsLabel,
               ),
             ],
           ),
@@ -1131,7 +1119,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Please pair with a partner first'),
+            content: Text(context.l10n.cycleTrackingScreenPairFirst),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1168,8 +1156,8 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
           SnackBar(
             content: Text(
               widget.existingLog != null
-                  ? 'Cycle log updated successfully!'
-                  : 'Cycle log added successfully!',
+                  ? context.l10n.cycleTrackingScreenLogUpdated
+                  : context.l10n.cycleTrackingScreenLogAdded,
             ),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
@@ -1188,7 +1176,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(context.l10n.cycleTrackingScreenError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1234,8 +1222,8 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                 children: [
                   Text(
                     widget.existingLog != null
-                        ? 'Edit Cycle Log'
-                        : 'Add Cycle Log',
+                        ? context.l10n.cycleTrackingScreenEditLogTitle
+                        : context.l10n.cycleTrackingScreenAddLogTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -1259,7 +1247,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                   children: [
                     // Date display
                     Text(
-                      _formatDate(widget.date),
+                      _formatDate(context, widget.date),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: context.colors.textSecondary,
@@ -1269,7 +1257,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
 
                     // Flow Intensity
                     Text(
-                      'Flow Intensity',
+                      context.l10n.cycleTrackingScreenFlowIntensityLabel,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: context.colors.text,
@@ -1315,7 +1303,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
 
                     // Mood
                     Text(
-                      'Mood',
+                      context.l10n.cycleTrackingScreenMoodLabel,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: context.colors.text,
@@ -1384,8 +1372,8 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
                               )
                             : Text(
                                 widget.existingLog != null
-                                    ? 'Update Log'
-                                    : 'Add Log',
+                                    ? context.l10n.cycleTrackingScreenUpdateLogButton
+                                    : context.l10n.cycleTrackingScreenAddLogButton,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
@@ -1405,21 +1393,7 @@ class _CycleLogSheetState extends ConsumerState<_CycleLogSheet> {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  String _formatDate(BuildContext context, DateTime date) {
+    return DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(date);
   }
 }

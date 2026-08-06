@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/services/ad_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../gamification/presentation/user_stats_provider.dart';
 import '../../premium/presentation/premium_provider.dart';
@@ -139,7 +141,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Please enter a title'),
+            content: Text(context.l10n.addEventSheetTitleRequired),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -158,7 +160,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Please pair with a partner first'),
+              content: Text(context.l10n.addEventSheetPairFirst),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -198,8 +200,8 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
               SnackBar(
                 content: Text(
                   xpGranted
-                      ? 'Event added! +15 XP'
-                      : 'Event added! XP for this activity is granted once per day.',
+                      ? context.l10n.addEventSheetAddedWithXp
+                      : context.l10n.addEventSheetAddedXpAlreadyEarned,
                 ),
                 backgroundColor: context.colors.success,
                 behavior: SnackBarBehavior.floating,
@@ -218,7 +220,9 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                isEditing ? 'Event updated successfully!' : 'Event added successfully!',
+                isEditing
+                    ? context.l10n.addEventSheetUpdated
+                    : context.l10n.addEventSheetAdded,
               ),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
@@ -237,7 +241,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${e.toString()}'),
+              content: Text(context.l10n.addEventSheetError(e.toString())),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -283,7 +287,9 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
               child: Row(
                 children: [
                   Text(
-                    widget.eventToEdit != null ? 'Edit Event' : 'Add Event',
+                    widget.eventToEdit != null
+                        ? context.l10n.addEventSheetEditTitle
+                        : context.l10n.addEventSheetAddTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -316,8 +322,8 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
                     TextField(
                       controller: _titleController,
                       decoration: InputDecoration(
-                        labelText: 'Title',
-                        hintText: 'Enter event title',
+                        labelText: context.l10n.addEventSheetTitleLabel,
+                        hintText: context.l10n.addEventSheetTitleHint,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
@@ -378,7 +384,9 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
                                 ),
                               )
                             : Text(
-                                widget.eventToEdit != null ? 'Update Event' : 'Add Event',
+                                widget.eventToEdit != null
+                                    ? context.l10n.addEventSheetUpdateButton
+                                    : context.l10n.addEventSheetAddButton,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
@@ -414,7 +422,7 @@ class _DatePickerSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Date & Time',
+          context.l10n.addEventSheetDateTimeLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -442,7 +450,7 @@ class _DatePickerSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _formatDate(selectedDate),
+                          _formatDate(context, selectedDate),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: context.colors.text,
@@ -472,33 +480,19 @@ class _DatePickerSection extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final selectedDay = DateTime(date.year, date.month, date.day);
 
     if (selectedDay == today) {
-      return 'Today';
+      return context.l10n.addEventSheetToday;
     } else if (selectedDay == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday';
+      return context.l10n.addEventSheetYesterday;
     } else if (selectedDay == today.add(const Duration(days: 1))) {
-      return 'Tomorrow';
+      return context.l10n.addEventSheetTomorrow;
     } else {
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
-      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+      return DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(date);
     }
   }
 

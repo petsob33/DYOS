@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
@@ -60,21 +62,17 @@ class IntimacyHistoryList extends ConsumerWidget {
           : logs;
       final hasMoreLogs = limit != null && logs.length > limit!;
 
-      // Group logs by month
-      final groupedLogs = <String, List<IntimacyLog>>{};
+      // Group logs by month (keyed by the month's first day so sorting stays
+      // locale-independent; the display label is formatted separately below)
+      final groupedLogs = <DateTime, List<IntimacyLog>>{};
       for (final log in limitedLogs) {
-        final monthKey = _formatMonthYear(log.date);
+        final monthKey = DateTime(log.date.year, log.date.month);
         groupedLogs.putIfAbsent(monthKey, () => []).add(log);
       }
 
       // Sort months descending (newest first)
       final sortedMonths = groupedLogs.keys.toList()
-        ..sort((a, b) {
-          // Parse month strings to compare dates
-          final aDate = _parseMonthYear(a);
-          final bDate = _parseMonthYear(b);
-          return bDate.compareTo(aDate);
-        });
+        ..sort((a, b) => b.compareTo(a));
 
       // Helper widget to build the list with optional "View All"/"Load more" button
       Widget buildListView({
@@ -87,10 +85,13 @@ class IntimacyHistoryList extends ConsumerWidget {
           children: [
             ...sortedMonths.map((monthKey) {
               final monthLogs = groupedLogs[monthKey]!;
+              final monthLabel = DateFormat.yMMMM(
+                Localizations.localeOf(context).toString(),
+              ).format(monthKey);
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: _IntimacyMonthSection(
-                  month: monthKey,
+                  month: monthLabel,
                   logs: monthLogs,
                   currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
                   currentUserPhotoUrl: currentUserPhotoUrl,
@@ -108,7 +109,7 @@ class IntimacyHistoryList extends ConsumerWidget {
                       context.push('/intimacy-history');
                     },
                     icon: const Icon(PhosphorIconsBold.arrowRight),
-                    label: const Text('View All'),
+                    label: Text(context.l10n.intimacyHistoryListViewAllButton),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: context.colors.primary,
                       side: BorderSide(
@@ -134,7 +135,7 @@ class IntimacyHistoryList extends ConsumerWidget {
                       : OutlinedButton(
                           onPressed: () =>
                               ref.read(intimacyFeedControllerProvider.notifier).loadMore(),
-                          child: const Text('Load older logs'),
+                          child: Text(context.l10n.intimacyHistoryListLoadOlderButton),
                         ),
                 ),
               ),
@@ -173,49 +174,6 @@ class IntimacyHistoryList extends ConsumerWidget {
     );
   }
 
-  String _formatMonthYear(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return '${months[date.month - 1]} ${date.year}';
-  }
-
-  DateTime _parseMonthYear(String monthYear) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    final parts = monthYear.split(' ');
-    if (parts.length == 2) {
-      final monthIndex = months.indexOf(parts[0]);
-      final year = int.tryParse(parts[1]);
-      if (monthIndex != -1 && year != null) {
-        return DateTime(year, monthIndex + 1);
-      }
-    }
-    return DateTime.now();
-  }
 }
 
 /// Month section header with list of logs
@@ -357,20 +315,9 @@ class _DateSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
+    final monthLabel = DateFormat.MMM(
+      Localizations.localeOf(context).toString(),
+    ).format(date);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,7 +332,7 @@ class _DateSection extends StatelessWidget {
               ),
         ),
         Text(
-          months[date.month - 1],
+          monthLabel,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w500,
                 color: context.colors.textSecondary,
@@ -549,7 +496,7 @@ class _DurationDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          '$durationMinutes min',
+          context.l10n.intimacyHistoryListDurationMinutes(durationMinutes),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.colors.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -702,7 +649,7 @@ class _ErrorState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'Error loading logs',
+              context.l10n.intimacyHistoryListErrorTitle,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: context.colors.text,
@@ -742,7 +689,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'No memories yet',
+              context.l10n.intimacyHistoryListEmptyTitle,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: context.colors.text,
@@ -750,7 +697,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Time to change that? 😉',
+              context.l10n.intimacyHistoryListEmptySubtitle,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                   ),

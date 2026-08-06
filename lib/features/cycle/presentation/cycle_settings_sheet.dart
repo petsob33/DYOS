@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../data/cycle_repository.dart';
 import '../domain/cycle_calculator.dart';
@@ -34,7 +36,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Please pair with a partner first'),
+              content: Text(context.l10n.cycleSettingsSheetPairFirst),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -62,7 +64,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Settings saved successfully!'),
+            content: Text(context.l10n.cycleSettingsSheetSaved),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -77,7 +79,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(context.l10n.cycleSettingsSheetError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -160,7 +162,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
               child: Row(
                 children: [
                   Text(
-                    'Cycle Settings',
+                    context.l10n.cycleSettingsSheetTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -215,13 +217,13 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Day in Cycle',
+                                        context.l10n.cycleSettingsSheetDayInCycleLabel,
                                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                               color: context.colors.textSecondary,
                                             ),
                                       ),
                                       Text(
-                                        'Day $dayInCycle',
+                                        context.l10n.cycleSettingsSheetDayInCycleValue(dayInCycle),
                                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                               fontWeight: FontWeight.w800,
                                               color: context.colors.primary,
@@ -236,7 +238,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                           const SizedBox(height: AppSpacing.lg),
                         ],
                         Text(
-                          'Last Period Date',
+                          context.l10n.cycleSettingsSheetLastPeriodDateLabel,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: context.colors.text,
@@ -265,8 +267,8 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                       children: [
                                         Text(
                                           settings?.lastPeriodDate != null
-                                              ? _formatDate(settings!.lastPeriodDate!)
-                                              : 'Not set',
+                                              ? _formatDate(context, settings!.lastPeriodDate!)
+                                              : context.l10n.cycleSettingsSheetNotSet,
                                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                 fontWeight: FontWeight.w600,
                                                 color: settings?.lastPeriodDate != null
@@ -278,7 +280,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                           const SizedBox(height: 2),
                                         if (settings?.lastPeriodDate != null)
                                           Text(
-                                            'Tap to change',
+                                            context.l10n.cycleSettingsSheetTapToChange,
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                   color: context.colors.textSecondary,
                                                 ),
@@ -304,7 +306,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Average Cycle Length',
+                          context.l10n.cycleSettingsSheetAvgCycleLengthLabel,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: context.colors.text,
@@ -312,14 +314,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '${settings?.averageCycleLength ?? 28} days',
+                          context.l10n.cycleSettingsSheetDaysValue(settings?.averageCycleLength ?? 28),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: context.colors.textSecondary,
                               ),
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Period Length',
+                          context.l10n.cycleSettingsSheetPeriodLengthLabel,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: context.colors.text,
@@ -327,7 +329,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '${settings?.periodLength ?? 5} days',
+                          context.l10n.cycleSettingsSheetDaysValue(settings?.periodLength ?? 5),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: context.colors.textSecondary,
                               ),
@@ -341,7 +343,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Hide Menstruation',
+                                    context.l10n.cycleSettingsSheetHideMenstruationLabel,
                                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.w700,
                                           color: context.colors.text,
@@ -349,7 +351,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Hide menstruation tracking and display in calendar',
+                                    context.l10n.cycleSettingsSheetHideMenstruationDescription,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                           color: context.colors.textSecondary,
                                         ),
@@ -374,7 +376,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                     if (mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
-                                          content: const Text('Please pair with a partner first'),
+                                          content: Text(context.l10n.cycleSettingsSheetPairFirst),
                                           backgroundColor: context.colors.love,
                                           behavior: SnackBarBehavior.floating,
                                           shape: RoundedRectangleBorder(
@@ -403,7 +405,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Error: ${e.toString()}'),
+                                        content: Text(context.l10n.cycleSettingsSheetError(e.toString())),
                                         backgroundColor: context.colors.love,
                                         behavior: SnackBarBehavior.floating,
                                         shape: RoundedRectangleBorder(
@@ -442,14 +444,14 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                       child: Column(
                         children: [
                           Text(
-                            'Error loading settings',
+                            context.l10n.cycleSettingsSheetLoadError,
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Last Period Date',
+                            context.l10n.cycleSettingsSheetLastPeriodDateLabel,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: context.colors.text,
@@ -474,7 +476,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                                     const SizedBox(width: AppSpacing.md),
                                     Expanded(
                                       child: Text(
-                                        'Not set',
+                                        context.l10n.cycleSettingsSheetNotSet,
                                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                               fontWeight: FontWeight.w600,
                                               color: context.colors.textSecondary,
@@ -510,21 +512,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  String _formatDate(BuildContext context, DateTime date) {
+    return DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(date);
   }
 }

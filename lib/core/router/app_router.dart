@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/constants/app_spacing.dart';
+import '../l10n/build_context_l10n_extension.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/adaptive_banner_ad.dart';
 import '../../features/auth/presentation/auth_providers.dart';
@@ -374,8 +375,8 @@ GoRouter appRouter(AppRouterRef ref) {
             return buildPageWithSlideTransition(
               context,
               state,
-              const Scaffold(
-                body: Center(child: Text('Memory not found')),
+              Scaffold(
+                body: Center(child: Text(context.l10n.appRouterMemoryNotFound)),
               ),
             );
           }
@@ -404,8 +405,8 @@ GoRouter appRouter(AppRouterRef ref) {
             return buildPageWithSlideTransition(
               context,
               state,
-              const Scaffold(
-                body: Center(child: Text('Memory not found')),
+              Scaffold(
+                body: Center(child: Text(context.l10n.appRouterMemoryNotFound)),
               ),
             );
           }
@@ -549,10 +550,10 @@ class RootShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
     final items = [
-      _NavItem('Home', PhosphorIconsBold.house),
-      _NavItem('Memory', PhosphorIconsBold.clockCounterClockwise),
-      _NavItem('Data', PhosphorIconsBold.chartPieSlice),
-      _NavItem('Calendar', PhosphorIconsBold.calendar),
+      _NavItem(context.l10n.appRouterNavHome, PhosphorIconsBold.house),
+      _NavItem(context.l10n.appRouterNavMemory, PhosphorIconsBold.clockCounterClockwise),
+      _NavItem(context.l10n.appRouterNavData, PhosphorIconsBold.chartPieSlice),
+      _NavItem(context.l10n.appRouterNavCalendar, PhosphorIconsBold.calendar),
     ];
 
     return Scaffold(
@@ -740,7 +741,7 @@ class _QuickAddSheet extends ConsumerWidget {
             ),
           ),
           Text(
-            'Quick actions',
+            context.l10n.appRouterQuickActionsHeading,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: context.colors.text,
@@ -753,12 +754,12 @@ class _QuickAddSheet extends ConsumerWidget {
             children: [
               _QuickActionChip(
                 icon: PhosphorIconsBold.chatTeardropText,
-                label: 'Add note',
+                label: context.l10n.appRouterQuickActionAddNote,
                 navigationRoute: '/add-note',
               ),
               _QuickActionChip(
                 icon: PhosphorIconsBold.camera,
-                label: 'Add memory',
+                label: context.l10n.appRouterQuickActionAddMemory,
                 navigationRoute: memoriesUnlocked ? '/add-memory' : null,
                 onTap: memoriesUnlocked
                     ? null
@@ -772,14 +773,14 @@ class _QuickAddSheet extends ConsumerWidget {
               ),
               _QuickActionChip(
                 icon: PhosphorIconsBold.heart,
-                label: 'Log intimacy',
+                label: context.l10n.appRouterQuickActionLogIntimacy,
                 onTap: () {
                   AddIntimacySheet.show(context);
                 },
               ),
               _QuickActionChip(
                 icon: PhosphorIconsBold.calendarPlus,
-                label: 'Add event',
+                label: context.l10n.appRouterQuickActionAddEvent,
                 onTap: () {
                   AddEventSheet.show(context);
                 },

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/progression_plan.dart';
 import '../../../premium/presentation/widgets/paywall_modal.dart';
@@ -24,16 +25,16 @@ void showLevelUpUnlockSheet(
   );
 }
 
-String _featureDisplayName(FeatureID feature) {
+String _featureDisplayName(BuildContext context, FeatureID feature) {
   switch (feature) {
     case FeatureID.memories:
-      return 'Memories';
+      return context.l10n.levelUpUnlockSheetFeatureMemories;
     case FeatureID.blueprints:
-      return 'Daily Questions';
+      return context.l10n.levelUpUnlockSheetFeatureBlueprints;
     case FeatureID.quickMessages:
-      return 'Quick Messages';
+      return context.l10n.levelUpUnlockSheetFeatureQuickMessages;
     case FeatureID.mapView:
-      return 'Memory Map';
+      return context.l10n.levelUpUnlockSheetFeatureMapView;
   }
 }
 
@@ -46,7 +47,7 @@ class _LevelUpUnlockSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentSp = ref.watch(currentXpProvider);
     final requiredSp = ProgressionPlan.spRequiredForFeature(feature);
-    final featureName = _featureDisplayName(feature);
+    final featureName = _featureDisplayName(context, feature);
     final c = context.colors;
 
     return Container(
@@ -83,7 +84,7 @@ class _LevelUpUnlockSheet extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Level up to unlock',
+            context.l10n.levelUpUnlockSheetTitle,
             style: GoogleFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -101,7 +102,7 @@ class _LevelUpUnlockSheet extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'You need $requiredSp SP to unlock $featureName. You have $currentSp SP.',
+            context.l10n.levelUpUnlockSheetRequirementBody(requiredSp, featureName, currentSp),
             style: GoogleFonts.inter(
               fontSize: 14,
               color: c.textSecondary,
@@ -119,7 +120,7 @@ class _LevelUpUnlockSheet extends ConsumerWidget {
                     });
                   },
                   icon: const Icon(PhosphorIconsBold.mapTrifold, size: 20),
-                  label: const Text('View roadmap'),
+                  label: Text(context.l10n.levelUpUnlockSheetViewRoadmap),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -138,7 +139,7 @@ class _LevelUpUnlockSheet extends ConsumerWidget {
                     });
                   },
                   icon: const Icon(PhosphorIconsBold.crown, size: 20),
-                  label: const Text('Get DYOS+'),
+                  label: Text(context.l10n.levelUpUnlockSheetGetPremium),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(

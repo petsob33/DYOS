@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../domain/blueprint_question.dart';
 
 /// Renders one Blueprint question in a minimalistic white card.
@@ -52,10 +53,10 @@ class BlueprintQuestionCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           _buildInput(c),
-          if (partnerValue != null && _partnerDisplayValue != null) ...[
+          if (partnerValue != null && _partnerDisplayValue(context) != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Partner: $_partnerDisplayValue',
+              context.l10n.blueprintQuestionCardPartnerValue(_partnerDisplayValue(context)!),
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: c.textSecondary,
@@ -68,14 +69,18 @@ class BlueprintQuestionCard extends StatelessWidget {
     );
   }
 
-  String? get _partnerDisplayValue {
+  String? _partnerDisplayValue(BuildContext context) {
     if (partnerValue == null) return null;
     if (partnerValue is List) {
       final l = partnerValue as List;
       if (l.isEmpty) return null;
       return l.join(', ');
     }
-    if (partnerValue is bool) return (partnerValue as bool) ? 'Yes' : 'No';
+    if (partnerValue is bool) {
+      return (partnerValue as bool)
+          ? context.l10n.blueprintQuestionCardYes
+          : context.l10n.blueprintQuestionCardNo;
+    }
     if (partnerValue is num) return partnerValue.toString();
     return partnerValue.toString();
   }
@@ -346,7 +351,7 @@ class _SwitchInput extends StatelessWidget {
     return Row(
       children: [
         Text(
-          value ? 'Yes' : 'No',
+          value ? context.l10n.blueprintQuestionCardYes : context.l10n.blueprintQuestionCardNo,
           style: GoogleFonts.inter(
             fontSize: 15,
             color: c.text,

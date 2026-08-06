@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../../core/services/firebase_service.dart';
@@ -104,7 +105,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
                     if (!unlocked) ...[
                       const SizedBox(height: 8),
                       Text(
-                        'Unlock with DYOS+ or via the Roadmap',
+                        context.l10n.tapticTouchCardUnlockPrompt,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: context.colors.textSecondary,
                         ),
@@ -113,7 +114,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
                     if (_justSent) ...[
                       const SizedBox(height: 8),
                       Text(
-                        'Sent',
+                        context.l10n.tapticTouchCardSentLabel,
                         style: Theme.of(context).textTheme.labelMedium
                             ?.copyWith(
                               color: context.colors.success,
@@ -176,7 +177,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
           setState(() => _justSent = true);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Sent to partner'),
+              content: Text(context.l10n.tapticTouchCardSentToPartnerMessage),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -192,7 +193,7 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error sending: $error'),
+                content: Text(context.l10n.tapticTouchCardSendErrorMessage(error.toString())),
                 backgroundColor: context.colors.love,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(

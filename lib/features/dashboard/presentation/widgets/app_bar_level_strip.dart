@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import 'package:flutter/services.dart';
 import '../../../gamification/domain/level_manager.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
@@ -54,7 +55,7 @@ class AppBarLevelStrip extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$currentXp SP',
+                  context.l10n.appBarLevelStripXpLabel(currentXp),
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: c.textSecondary,
                     fontWeight: FontWeight.w600,

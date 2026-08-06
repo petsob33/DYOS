@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 
 class QuickNoteCard extends StatelessWidget {
   const QuickNoteCard({
@@ -16,17 +17,18 @@ class QuickNoteCard extends StatelessWidget {
   final String content;
   final VoidCallback? onTap;
 
-  static const List<String> _placeholderPrompts = [
-    'Write me something nice...',
-    'Don\'t forget...',
-    'The door code is...',
-    'Today\'s secret phrase?',
-  ];
+  List<String> _placeholderPrompts(BuildContext context) => [
+        context.l10n.quickNoteCardPromptWriteSomethingNice,
+        context.l10n.quickNoteCardPromptDontForget,
+        context.l10n.quickNoteCardPromptDoorCode,
+        context.l10n.quickNoteCardPromptSecretPhrase,
+      ];
 
-  String _getDisplayText() {
+  String _getDisplayText(BuildContext context) {
     if (content.isEmpty) {
       final random = Random();
-      return _placeholderPrompts[random.nextInt(_placeholderPrompts.length)];
+      final prompts = _placeholderPrompts(context);
+      return prompts[random.nextInt(prompts.length)];
     }
     return content;
   }
@@ -39,7 +41,7 @@ class QuickNoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayText = _getDisplayText();
+    final displayText = _getDisplayText(context);
     final textColor = _getTextColor(context);
 
     return GestureDetector(
@@ -69,7 +71,7 @@ class QuickNoteCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'STICKY NOTE',
+                  context.l10n.quickNoteCardHeaderLabel,
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,

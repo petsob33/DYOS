@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../dashboard/domain/haptic_signal_stats.dart';
@@ -25,7 +27,7 @@ class DataScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
-      appBar: AppBar(title: const Text('Data & Analytics')),
+      appBar: AppBar(title: Text(context.l10n.dataScreenTitle)),
       body: SafeArea(
         child: logsAsync.when(
           data: (logs) {
@@ -39,7 +41,7 @@ class DataScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Relationship Insights',
+                          context.l10n.dataScreenHeading,
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: context.colors.text,
@@ -47,7 +49,7 @@ class DataScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          'Track patterns and trends in your relationship',
+                          context.l10n.dataScreenSubheading,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -105,7 +107,7 @@ class DataScreen extends ConsumerWidget {
                       bottom: AppSpacing.md,
                     ),
                     child: Text(
-                      'History',
+                      context.l10n.dataScreenHistoryHeading,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: context.colors.text,
@@ -124,7 +126,7 @@ class DataScreen extends ConsumerWidget {
           },
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
-            child: Text('Error: ${error.toString()}'),
+            child: Text(context.l10n.dataScreenError(error.toString())),
           ),
         ),
       ),
@@ -162,17 +164,19 @@ class _StatsRow extends StatelessWidget {
     final favoriteDayIndex = dayCounts.entries.isEmpty
         ? 1
         : dayCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
-    final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    final favoriteDay = weekdays[favoriteDayIndex - 1];
+    // DateTime(2024, 1, N) for N=1..7 lands on Mon..Sun respectively, so this
+    // is a locale-agnostic way to format an arbitrary weekday index.
+    final favoriteDay = DateFormat.E(Localizations.localeOf(context).toString())
+        .format(DateTime(2024, 1, favoriteDayIndex));
 
     return Row(
       children: [
         Expanded(
           child: _StatCard(
             icon: PhosphorIconsBold.heart,
-            title: 'Total Count',
+            title: context.l10n.dataScreenTotalCountTitle,
             value: totalCount.toString(),
-            subtitle: 'All time',
+            subtitle: context.l10n.dataScreenAllTime,
             color: context.colors.love,
           ),
         ),
@@ -180,9 +184,9 @@ class _StatsRow extends StatelessWidget {
         Expanded(
           child: _StatCard(
             icon: PhosphorIconsBold.calendar,
-            title: 'Avg/Week',
+            title: context.l10n.dataScreenAvgPerWeekTitle,
             value: avgPerWeek.toStringAsFixed(1),
-            subtitle: 'Average',
+            subtitle: context.l10n.dataScreenAverage,
             color: context.colors.primary,
           ),
         ),
@@ -190,9 +194,9 @@ class _StatsRow extends StatelessWidget {
         Expanded(
           child: _StatCard(
             icon: PhosphorIconsBold.star,
-            title: 'Favorite Day',
+            title: context.l10n.dataScreenFavoriteDayTitle,
             value: favoriteDay,
-            subtitle: 'Most active',
+            subtitle: context.l10n.dataScreenMostActive,
             color: context.colors.warning,
           ),
         ),
@@ -222,23 +226,23 @@ class _BestOfCarousel extends ConsumerWidget {
     final cards = [
       _StatCard(
         icon: PhosphorIconsBold.trophy,
-        title: 'Longest Sex',
+        title: context.l10n.dataScreenLongestSexTitle,
         value: allTimeLongest == null ? '–' : '${allTimeLongest}m',
-        subtitle: 'All time',
+        subtitle: context.l10n.dataScreenAllTime,
         color: context.colors.primary,
       ),
       _StatCard(
         icon: PhosphorIconsBold.clock,
-        title: 'Longest Sex',
+        title: context.l10n.dataScreenLongestSexTitle,
         value: monthLongest == null ? '–' : '${monthLongest}m',
-        subtitle: 'This month',
+        subtitle: context.l10n.dataScreenThisMonthSubtitle,
         color: context.colors.warning,
       ),
       _StatCard(
         icon: PhosphorIconsBold.fire,
-        title: 'Hearts Streak',
+        title: context.l10n.dataScreenHeartsStreakTitle,
         value: streak.toString(),
-        subtitle: streak == 1 ? 'day in a row' : 'days in a row',
+        subtitle: context.l10n.dataScreenStreakDaySubtitle(streak),
         color: context.colors.love,
       ),
     ];
@@ -257,7 +261,7 @@ class _BestOfCarousel extends ConsumerWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Best Of',
+                context.l10n.dataScreenBestOfHeading,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.colors.text,
@@ -306,7 +310,7 @@ class _CurrentMonthStats extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'This Month',
+                context.l10n.dataScreenCurrentMonthHeading,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.colors.text,
@@ -325,25 +329,25 @@ class _CurrentMonthStats extends StatelessWidget {
                 final cards = [
                   _StatCard(
                     icon: PhosphorIconsBold.heart,
-                    title: 'Total',
+                    title: context.l10n.dataScreenTotalTitle,
                     value: stats.count.toString(),
-                    subtitle: 'This month',
+                    subtitle: context.l10n.dataScreenThisMonthSubtitle,
                     color: context.colors.love,
                   ),
                   _StatCard(
                     icon: PhosphorIconsBold.timer,
-                    title: 'Avg Duration',
+                    title: context.l10n.dataScreenAvgDurationTitle,
                     value: stats.avgDurationMinutes == null
                         ? '–'
                         : '${stats.avgDurationMinutes!.toStringAsFixed(1)}m',
-                    subtitle: 'This month',
+                    subtitle: context.l10n.dataScreenThisMonthSubtitle,
                     color: context.colors.warning,
                   ),
                   _StatCard(
                     icon: PhosphorIconsBold.fire,
-                    title: 'Avg Orgasms',
+                    title: context.l10n.dataScreenAvgOrgasmsTitle,
                     value: stats.avgOrgasms.toStringAsFixed(1),
-                    subtitle: 'This month',
+                    subtitle: context.l10n.dataScreenThisMonthSubtitle,
                     color: context.colors.love,
                   ),
                 ];
@@ -408,10 +412,8 @@ class _FrequencyChart extends StatelessWidget {
       );
     }).toList();
 
-    final monthLabels = months.map((m) {
-      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return months[m.month - 1];
-    }).toList();
+    final localeName = Localizations.localeOf(context).toString();
+    final monthLabels = months.map((m) => DateFormat.MMM(localeName).format(m)).toList();
 
     return BentoCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -427,7 +429,7 @@ class _FrequencyChart extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Frequency Chart',
+                context.l10n.dataScreenFrequencyChartHeading,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.colors.text,
@@ -559,7 +561,7 @@ class _InitiatorChart extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Initiator Chart',
+                context.l10n.dataScreenInitiatorChartHeading,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.colors.text,
@@ -609,13 +611,13 @@ class _InitiatorChart extends StatelessWidget {
                   children: [
                     _LegendItem(
                       color: context.colors.primary,
-                      label: 'You',
+                      label: context.l10n.dataScreenYouLabel,
                       count: currentUserCount,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     _LegendItem(
                       color: context.colors.love,
-                      label: 'Partner',
+                      label: context.l10n.dataScreenPartnerLabel,
                       count: partnerCount,
                     ),
                   ],
@@ -655,7 +657,7 @@ class _OrgasmComparisonChart extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  'Orgasm Comparison',
+                  context.l10n.dataScreenOrgasmComparisonHeading,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: context.colors.text,
@@ -666,7 +668,7 @@ class _OrgasmComparisonChart extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
-                'No data yet',
+                context.l10n.dataScreenNoDataYet,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -694,7 +696,7 @@ class _OrgasmComparisonChart extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Orgasm Comparison',
+                context.l10n.dataScreenOrgasmComparisonHeading,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.colors.text,
@@ -744,13 +746,13 @@ class _OrgasmComparisonChart extends StatelessWidget {
                   children: [
                     _LegendItem(
                       color: context.colors.primary,
-                      label: 'You',
+                      label: context.l10n.dataScreenYouLabel,
                       count: totals.user,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     _LegendItem(
                       color: context.colors.love,
-                      label: 'Partner',
+                      label: context.l10n.dataScreenPartnerLabel,
                       count: totals.partner,
                     ),
                   ],
@@ -836,7 +838,7 @@ class _TagsRadarChart extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  'Tags Radar',
+                  context.l10n.dataScreenTagsRadarHeading,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: context.colors.text,
@@ -847,7 +849,7 @@ class _TagsRadarChart extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
-                'No tags yet',
+                context.l10n.dataScreenNoTagsYet,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -877,7 +879,7 @@ class _TagsRadarChart extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Tags Radar',
+                context.l10n.dataScreenTagsRadarHeading,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.colors.text,

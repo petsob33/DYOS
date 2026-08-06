@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/widgets/bento_card.dart';
 import 'auth_providers.dart';
 
@@ -20,7 +21,7 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(context.l10n.profileScreenTitle),
       ),
       body: SafeArea(
         child: CustomScrollView(
@@ -31,8 +32,8 @@ class ProfileScreen extends ConsumerWidget {
                 child: currentUserAsync.when(
                   data: (user) {
                     if (user == null) {
-                      return const Center(
-                        child: Text('User not found'),
+                      return Center(
+                        child: Text(context.l10n.profileScreenUserNotFound),
                       );
                     }
 
@@ -70,7 +71,7 @@ class ProfileScreen extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      user.displayName ?? 'No name',
+                                      user.displayName ?? context.l10n.profileScreenNoName,
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleLarge
@@ -99,7 +100,7 @@ class ProfileScreen extends ConsumerWidget {
 
                         // Partner Section
                         Text(
-                          'Partner',
+                          context.l10n.profileScreenPartnerHeading,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: context.colors.text,
@@ -119,7 +120,7 @@ class ProfileScreen extends ConsumerWidget {
                                     const SizedBox(width: AppSpacing.md),
                                     Expanded(
                                       child: Text(
-                                        'No partner paired',
+                                        context.l10n.profileScreenNoPartnerPaired,
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium
@@ -157,7 +158,7 @@ class ProfileScreen extends ConsumerWidget {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          partner.displayName ?? 'No name',
+                                          partner.displayName ?? context.l10n.profileScreenNoName,
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleMedium
@@ -190,7 +191,7 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           error: (error, stackTrace) => BentoCard(
                             child: Text(
-                              'Error loading partner: ${error.toString()}',
+                              context.l10n.profileScreenErrorLoadingPartner(error.toString()),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -204,7 +205,7 @@ class ProfileScreen extends ConsumerWidget {
 
                         // Actions
                         Text(
-                          'Actions',
+                          context.l10n.profileScreenActionsHeading,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: context.colors.text,
@@ -224,7 +225,7 @@ class ProfileScreen extends ConsumerWidget {
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: Text(
-                                  'DYOS+ / Upgrade',
+                                  context.l10n.profileScreenUpgradeAction,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyLarge
@@ -256,7 +257,7 @@ class ProfileScreen extends ConsumerWidget {
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: Text(
-                                  'Secret gift / Private',
+                                  context.l10n.profileScreenSecretGiftAction,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyLarge
@@ -288,7 +289,7 @@ class ProfileScreen extends ConsumerWidget {
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: Text(
-                                  'Settings',
+                                  context.l10n.profileScreenSettingsAction,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyLarge
@@ -314,7 +315,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   error: (error, stackTrace) => Center(
                     child: Text(
-                      'Error loading profile: ${error.toString()}',
+                      context.l10n.profileScreenErrorLoadingProfile(error.toString()),
                       style: TextStyle(color: context.colors.love),
                     ),
                   ),

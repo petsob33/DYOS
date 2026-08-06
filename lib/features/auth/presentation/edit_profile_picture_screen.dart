@@ -9,6 +9,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../data/user_repository.dart';
 import 'auth_providers.dart';
@@ -53,7 +54,7 @@ class _EditProfilePictureScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error picking image: ${e.toString()}'),
+            content: Text(context.l10n.editProfilePictureScreenPickError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -70,7 +71,7 @@ class _EditProfilePictureScreenState
     if (_selectedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please select an image first'),
+          content: Text(context.l10n.editProfilePictureScreenSelectImageFirst),
           backgroundColor: context.colors.love,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -88,7 +89,7 @@ class _EditProfilePictureScreenState
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('User not found'),
+              content: Text(context.l10n.editProfilePictureScreenUserNotFound),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -132,7 +133,7 @@ class _EditProfilePictureScreenState
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Profile picture updated successfully!'),
+              content: Text(context.l10n.editProfilePictureScreenUpdateSuccess),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -150,7 +151,7 @@ class _EditProfilePictureScreenState
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${e.toString()}'),
+              content: Text(context.l10n.editProfilePictureScreenGenericError(e.toString())),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -170,14 +171,14 @@ class _EditProfilePictureScreenState
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: const Text('Edit Profile Picture'),
+        title: Text(context.l10n.editProfilePictureScreenTitle),
       ),
       body: SafeArea(
         child: userDataAsync.when(
           data: (userData) {
             if (userData == null) {
-              return const Center(
-                child: Text('User not found'),
+              return Center(
+                child: Text(context.l10n.editProfilePictureScreenUserNotFound),
               );
             }
 
@@ -240,7 +241,7 @@ class _EditProfilePictureScreenState
                           child: OutlinedButton.icon(
                             onPressed: _isUploading ? null : _pickImage,
                             icon: const Icon(PhosphorIconsBold.image),
-                            label: const Text('Choose Image'),
+                            label: Text(context.l10n.editProfilePictureScreenChooseImage),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: context.colors.primary,
                               side: BorderSide(
@@ -288,9 +289,9 @@ class _EditProfilePictureScreenState
                                     AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
-                          : const Text(
-                              'Save Profile Picture',
-                              style: TextStyle(
+                          : Text(
+                              context.l10n.editProfilePictureScreenSaveButton,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 16,
                               ),
@@ -305,7 +306,7 @@ class _EditProfilePictureScreenState
             child: CircularProgressIndicator(),
           ),
           error: (error, stack) => Center(
-            child: Text('Error: ${error.toString()}'),
+            child: Text(context.l10n.editProfilePictureScreenGenericError(error.toString())),
           ),
         ),
       ),

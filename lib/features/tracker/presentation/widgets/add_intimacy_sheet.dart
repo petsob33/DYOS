@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/auth_providers.dart';
@@ -196,7 +198,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Please pair with a partner first'),
+              content: Text(context.l10n.addIntimacySheetPairFirst),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -212,7 +214,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Please select an initiator'),
+              content: Text(context.l10n.addIntimacySheetSelectInitiator),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -269,8 +271,8 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
               SnackBar(
                 content: Text(
                   xpGranted
-                      ? 'Intimacy log added! +20 XP'
-                      : 'Intimacy log added! XP for this activity is granted once per day.',
+                      ? context.l10n.addIntimacySheetAddedWithXp
+                      : context.l10n.addIntimacySheetAddedXpAlreadyGranted,
                 ),
                 backgroundColor: context.colors.success,
                 behavior: SnackBarBehavior.floating,
@@ -290,8 +292,8 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
             SnackBar(
               content: Text(
                 isEditing
-                    ? 'Intimacy log updated successfully!'
-                    : 'Intimacy log added successfully!',
+                    ? context.l10n.addIntimacySheetUpdatedSuccess
+                    : context.l10n.addIntimacySheetAddedSuccess,
               ),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
@@ -310,7 +312,7 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${e.toString()}'),
+              content: Text(context.l10n.addIntimacySheetError(e.toString())),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -375,7 +377,9 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
               child: Row(
                 children: [
                   Text(
-                    widget.logToEdit != null ? 'Edit Intimacy Log' : 'Add Intimacy Log',
+                    widget.logToEdit != null
+                        ? context.l10n.addIntimacySheetEditTitle
+                        : context.l10n.addIntimacySheetAddTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: context.colors.text,
@@ -418,8 +422,8 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                           currentUserId: userData?.uid ?? '',
                           partnerId: partnerData?.uid ?? '',
                           selectedId: _initiatorId,
-                          currentUserDisplayName: userData?.displayName ?? 'Me',
-                          partnerDisplayName: partnerData?.displayName ?? 'Partner',
+                          currentUserDisplayName: userData?.displayName ?? context.l10n.addIntimacySheetMeFallback,
+                          partnerDisplayName: partnerData?.displayName ?? context.l10n.dataScreenPartnerLabel,
                           currentUserPhotoUrl: userData?.photoUrl,
                           partnerPhotoUrl: partnerData?.photoUrl,
                           onSelected: (id) {
@@ -460,8 +464,8 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                     userDataAsync.when(
                       data: (userData) => partnerAsync.when(
                         data: (partnerData) => _OrgasmsSection(
-                          currentUserDisplayName: userData?.displayName ?? 'Me',
-                          partnerDisplayName: partnerData?.displayName ?? 'Partner',
+                          currentUserDisplayName: userData?.displayName ?? context.l10n.addIntimacySheetMeFallback,
+                          partnerDisplayName: partnerData?.displayName ?? context.l10n.dataScreenPartnerLabel,
                           orgasmsMe: _orgasmsMe,
                           orgasmsPartner: _orgasmsPartner,
                           onOrgasmsMeChanged: (value) {
@@ -501,8 +505,8 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                     TextField(
                       controller: _noteController,
                       decoration: InputDecoration(
-                        labelText: 'Note (optional)',
-                        hintText: 'Add any notes...',
+                        labelText: context.l10n.addIntimacySheetNoteFieldLabel,
+                        hintText: context.l10n.addIntimacySheetNoteHint,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
@@ -559,7 +563,9 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
                                 ),
                               )
                             : Text(
-                                widget.logToEdit != null ? 'Update Log' : 'Add Log',
+                                widget.logToEdit != null
+                                    ? context.l10n.addIntimacySheetUpdateButton
+                                    : context.l10n.addIntimacySheetAddButton,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
@@ -595,7 +601,7 @@ class _DatePickerSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Date & Time',
+          context.l10n.addIntimacySheetDateTimeLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -623,7 +629,7 @@ class _DatePickerSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _formatDate(selectedDate),
+                          _formatDate(context, selectedDate),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: context.colors.text,
@@ -653,31 +659,19 @@ class _DatePickerSection extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final selectedDay = DateTime(date.year, date.month, date.day);
 
     if (selectedDay == today) {
-      return 'Today';
+      return context.l10n.addIntimacySheetToday;
     } else if (selectedDay == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday';
+      return context.l10n.addIntimacySheetYesterday;
     } else {
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
-      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+      final locale = Localizations.localeOf(context).toString();
+      final month = DateFormat.MMM(locale).format(date);
+      return '$month ${date.day}, ${date.year}';
     }
   }
 
@@ -704,7 +698,7 @@ class _RatingSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Rating',
+          context.l10n.addIntimacySheetRatingLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -764,7 +758,7 @@ class _InitiatorSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Initiator',
+          context.l10n.addIntimacySheetInitiatorLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -889,7 +883,7 @@ class _TagsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Tags',
+          context.l10n.addIntimacySheetTagsLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -949,14 +943,14 @@ class _ProtectionSwitch extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: SwitchListTile(
         title: Text(
-          'Protection Used',
+          context.l10n.addIntimacySheetProtectionUsedLabel,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: context.colors.text,
               ),
         ),
         subtitle: Text(
-          'Was protection used during intimacy?',
+          context.l10n.addIntimacySheetProtectionSubtitle,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.colors.textSecondary,
               ),
@@ -1000,7 +994,7 @@ class _OrgasmsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Orgasms',
+          context.l10n.addIntimacySheetOrgasmsLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -1141,7 +1135,7 @@ class _DurationSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Duration',
+          context.l10n.addIntimacySheetDurationLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -1155,8 +1149,8 @@ class _DurationSection extends StatelessWidget {
             FilteringTextInputFormatter.digitsOnly,
           ],
           decoration: InputDecoration(
-            labelText: 'Duration (minutes)',
-            hintText: 'e.g., 30',
+            labelText: context.l10n.addIntimacySheetDurationFieldLabel,
+            hintText: context.l10n.addIntimacySheetDurationHint,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
@@ -1207,7 +1201,7 @@ class _LocationSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Location',
+          context.l10n.addIntimacySheetLocationLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -1217,8 +1211,8 @@ class _LocationSection extends StatelessWidget {
         TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: 'Location (optional)',
-            hintText: 'e.g., Home, Hotel, Beach...',
+            labelText: context.l10n.addIntimacySheetLocationFieldLabel,
+            hintText: context.l10n.addIntimacySheetLocationHint,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(

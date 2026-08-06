@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 
 class QuickMessageNotificationOverlay extends StatefulWidget {
@@ -145,7 +146,7 @@ class _QuickMessageNotificationOverlayState
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'Quick Message',
+                                  context.l10n.quickMessageNotificationOverlayLabel,
                                   style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(
                                         color: context.colors.textSecondary,

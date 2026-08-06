@@ -5,21 +5,22 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/services/firebase_service.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../domain/chat_event.dart';
 import '../chat_history_provider.dart';
 
 /// Predefined quick-message shortcuts shown above the composer.
-const _quickMessageShortcuts = [
-  'Thinking of you 💭',
-  'Miss you ❤️',
-  'Love you 😘',
-  'See you soon 👋',
-  'Good morning ☀️',
-  'Good night 🌙',
-  'How are you? 😊',
-];
+List<String> _quickMessageShortcuts(BuildContext context) => [
+      context.l10n.chatScreenShortcutThinkingOfYou,
+      context.l10n.chatScreenShortcutMissYou,
+      context.l10n.chatScreenShortcutLoveYou,
+      context.l10n.chatScreenShortcutSeeYouSoon,
+      context.l10n.chatScreenShortcutGoodMorning,
+      context.l10n.chatScreenShortcutGoodNight,
+      context.l10n.chatScreenShortcutHowAreYou,
+    ];
 
 /// A persistent chat thread showing every quick message and haptic touch
 /// exchanged with your partner, with a composer to send new ones.
@@ -54,7 +55,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not send message: $e'),
+            content: Text(context.l10n.chatScreenSendMessageError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
@@ -76,7 +77,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not send touch: $e'),
+            content: Text(context.l10n.chatScreenSendTouchError(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
           ),
@@ -94,7 +95,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     final couple = coupleAsync.valueOrNull;
     final userId = currentUserAsync.valueOrNull?.uid ?? '';
-    final partnerName = partnerAsync.valueOrNull?.displayName ?? 'Partner';
+    final partnerName =
+        partnerAsync.valueOrNull?.displayName ?? context.l10n.chatScreenPartnerFallback;
 
     return Scaffold(
       backgroundColor: c.background,
@@ -102,7 +104,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       body: couple == null
           ? Center(
               child: Text(
-                'Pair with your partner to start chatting.',
+                context.l10n.chatScreenPairPrompt,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: c.textSecondary,
                     ),
@@ -146,7 +148,7 @@ class _ChatHistoryList extends ConsumerWidget {
         if (events.isEmpty) {
           return Center(
             child: Text(
-              'No messages or touches yet.\nSay hi 👋',
+              context.l10n.chatScreenEmptyState,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: c.textSecondary,
@@ -173,7 +175,7 @@ class _ChatHistoryList extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) => Center(
         child: Text(
-          'Could not load chat history.',
+          context.l10n.chatScreenLoadHistoryError,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: c.love),
         ),
       ),
@@ -200,7 +202,7 @@ class _ChatBubble extends StatelessWidget {
             children: [
               Icon(PhosphorIconsBold.heart, size: 16, color: textColor),
               const SizedBox(width: AppSpacing.xs),
-              Text('Touch', style: TextStyle(color: textColor)),
+              Text(context.l10n.chatScreenTouchLabel, style: TextStyle(color: textColor)),
             ],
           )
         : Text(event.message ?? '', style: TextStyle(color: textColor));
@@ -254,6 +256,7 @@ class _Composer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final quickMessageShortcuts = _quickMessageShortcuts(context);
     return Material(
       color: c.card,
       child: SafeArea(
@@ -267,10 +270,10 @@ class _Composer extends StatelessWidget {
                 height: 36,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: _quickMessageShortcuts.length,
+                  itemCount: quickMessageShortcuts.length,
                   separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
                   itemBuilder: (context, index) {
-                    final shortcut = _quickMessageShortcuts[index];
+                    final shortcut = quickMessageShortcuts[index];
                     return ActionChip(
                       label: Text(shortcut),
                       onPressed: () => onSendMessage(shortcut),
@@ -284,7 +287,7 @@ class _Composer extends StatelessWidget {
               Row(
                 children: [
                   IconButton(
-                    tooltip: 'Send a touch',
+                    tooltip: context.l10n.chatScreenSendTouchTooltip,
                     onPressed: onSendTouch,
                     icon: Icon(PhosphorIconsBold.heart, color: c.love),
                   ),
@@ -293,7 +296,7 @@ class _Composer extends StatelessWidget {
                       controller: controller,
                       maxLength: 100,
                       decoration: InputDecoration(
-                        hintText: 'Type a message...',
+                        hintText: context.l10n.chatScreenMessageHint,
                         counterText: '',
                         filled: true,
                         fillColor: c.background,
@@ -311,7 +314,7 @@ class _Composer extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   IconButton(
-                    tooltip: 'Send',
+                    tooltip: context.l10n.chatScreenSendTooltip,
                     onPressed: sending ? null : () => onSendMessage(controller.text),
                     icon: Icon(PhosphorIconsBold.paperPlaneRight, color: c.primary),
                   ),

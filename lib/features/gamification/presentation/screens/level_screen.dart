@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
@@ -38,7 +39,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
     setState(() => _rewarding = false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(rewarded ? 'Reward received: +30 SP' : 'No reward granted this time'),
+        content: Text(rewarded ? context.l10n.levelScreenRewardReceived : context.l10n.levelScreenNoRewardGranted),
         backgroundColor: rewarded ? context.colors.success : context.colors.warning,
         behavior: SnackBarBehavior.floating,
       ),
@@ -76,7 +77,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          'Your Level',
+          context.l10n.levelScreenTitle,
           style: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -127,7 +128,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
-                            currentPhase?.name ?? 'Boot Sequence',
+                            currentPhase?.name ?? context.l10n.levelScreenBootSequence,
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -145,7 +146,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                           const SizedBox(height: AppSpacing.sm),
                           if (nextTier != null && spToNext != null)
                             Text(
-                              'Collect $spToNext SP to get to $nextTier',
+                              context.l10n.levelScreenCollectSpToNextTier(spToNext, nextTier),
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 color: c.textSecondary,
@@ -154,7 +155,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                             ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            '$currentSp SP',
+                            context.l10n.levelScreenSpValue(currentSp),
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -175,7 +176,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
                 child: Text(
-                  'Progression & Rewards',
+                  context.l10n.levelScreenProgressionRewardsHeading,
                   style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -196,7 +197,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
                 child: Text(
-                  'Complete tasks & win rewards',
+                  context.l10n.levelScreenCompleteTasksHeading,
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -214,7 +215,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                     children: [
                       _QuestRow(
                         questId: 'blueprint',
-                        title: 'Complete a Blueprint section',
+                        title: context.l10n.levelScreenQuestBlueprintTitle,
                         sp: 100,
                         icon: PhosphorIconsBold.clipboardText,
                         completedToday: isQuestCompletedToday(couple, 'blueprint'),
@@ -223,7 +224,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                       const SizedBox(height: AppSpacing.sm),
                       _QuestRow(
                         questId: 'memory',
-                        title: 'Add a memory',
+                        title: context.l10n.levelScreenQuestMemoryTitle,
                         sp: 25,
                         icon: PhosphorIconsBold.image,
                         completedToday: isQuestCompletedToday(couple, 'memory'),
@@ -238,7 +239,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                       const SizedBox(height: AppSpacing.sm),
                       _QuestRow(
                         questId: 'event',
-                        title: 'Add an event',
+                        title: context.l10n.levelScreenQuestEventTitle,
                         sp: 15,
                         icon: PhosphorIconsBold.calendar,
                         completedToday: isQuestCompletedToday(couple, 'event'),
@@ -247,7 +248,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                       const SizedBox(height: AppSpacing.sm),
                       _QuestRow(
                         questId: 'intimacy',
-                        title: 'Log intimacy',
+                        title: context.l10n.levelScreenQuestIntimacyTitle,
                         sp: 20,
                         icon: PhosphorIconsBold.heart,
                         completedToday: isQuestCompletedToday(couple, 'intimacy'),
@@ -274,7 +275,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Text(
-                            'Watch an ad and get +30 SP',
+                            context.l10n.levelScreenWatchAdCta,
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -297,7 +298,7 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text('Watch'),
+                              : Text(context.l10n.levelScreenWatchButton),
                         ),
                       ],
                     ),
@@ -550,7 +551,7 @@ class _MilestoneRow extends StatelessWidget {
                   ),
                   if (!unlocked)
                     Text(
-                      '${milestone.spRequired} SP',
+                      context.l10n.levelScreenSpValue(milestone.spRequired),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -621,7 +622,7 @@ class _QuestRow extends StatelessWidget {
                   ),
                   if (completedToday)
                     Text(
-                      'Completed today',
+                      context.l10n.levelScreenCompletedToday,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: c.success,
@@ -639,7 +640,7 @@ class _QuestRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '+$sp SP',
+                  context.l10n.levelScreenQuestRewardBadge(sp),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

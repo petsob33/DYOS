@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
 import '../../../premium/presentation/premium_provider.dart';
@@ -92,7 +94,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error picking images: ${e.toString()}'),
+            content: Text(context.l10n.addMemoryScreenErrorPickingImages(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -127,7 +129,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error picking image: ${e.toString()}'),
+            content: Text(context.l10n.addMemoryScreenErrorPickingImage(e.toString())),
             backgroundColor: context.colors.love,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -201,7 +203,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
         ref.read(addMemoryControllerProvider.notifier).reset();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Memory updated'),
+            content: Text(context.l10n.addMemoryScreenMemoryUpdated),
             backgroundColor: context.colors.success,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -224,9 +226,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              'You have reached the free limit of 30 memories. Unlock unlimited Memories in DYOS+.',
-            ),
+            content: Text(context.l10n.addMemoryScreenFreeLimitMessage),
             backgroundColor: context.colors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -242,7 +242,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     if (_selectedFiles.isEmpty && _captionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please add at least one image or a caption'),
+          content: Text(context.l10n.addMemoryScreenAddImageOrCaption),
           backgroundColor: context.colors.love,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -288,9 +288,13 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
               content: Text(
                 isNewMemory
                     ? (xpGranted
-                        ? 'Memory saved! +25 XP'
-                        : 'Memory saved! XP for this activity is granted once per day.')
-                    : 'Memory "${next.memory.caption.isEmpty ? 'Untitled' : next.memory.caption}" updated.',
+                        ? context.l10n.addMemoryScreenMemorySavedXp
+                        : context.l10n.addMemoryScreenMemorySavedXpOncePerDay)
+                    : context.l10n.addMemoryScreenMemoryUpdatedWithCaption(
+                        next.memory.caption.isEmpty
+                            ? context.l10n.addMemoryScreenUntitledCaption
+                            : next.memory.caption,
+                      ),
               ),
               backgroundColor: context.colors.success,
               behavior: SnackBarBehavior.floating,
@@ -323,7 +327,11 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
     return Scaffold(
       backgroundColor: context.colors.background,
       appBar: AppBar(
-        title: Text(_isEditMode ? 'Edit Memory' : 'Add Memory'),
+        title: Text(
+          _isEditMode
+              ? context.l10n.addMemoryScreenEditMemoryTitle
+              : context.l10n.addMemoryScreenAddMemoryTitle,
+        ),
         actions: [
           if (isUploading)
             const Padding(
@@ -343,7 +351,7 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
             TextButton(
               onPressed: _saveMemory,
               child: Text(
-                'Save',
+                context.l10n.commonSave,
                 style: TextStyle(
                   color: context.colors.primary,
                   fontWeight: FontWeight.w700,
@@ -374,8 +382,8 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                 TextFormField(
                   controller: _captionController,
                   decoration: InputDecoration(
-                    labelText: 'Caption',
-                    hintText: 'What\'s this memory about?',
+                    labelText: context.l10n.addMemoryScreenCaptionLabel,
+                    hintText: context.l10n.addMemoryScreenCaptionHint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
@@ -466,7 +474,9 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
                           ),
                         )
                       : Text(
-                          _isEditMode ? 'Update Memory' : 'Save Memory',
+                          _isEditMode
+                              ? context.l10n.addMemoryScreenUpdateMemoryButton
+                              : context.l10n.addMemoryScreenSaveMemoryButton,
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
@@ -502,7 +512,7 @@ class _ImagePickerSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Photos & Videos',
+          context.l10n.addMemoryScreenPhotosVideosLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -564,7 +574,9 @@ class _ImagePickerSection extends StatelessWidget {
           onPressed: onPickImages,
           icon: const Icon(PhosphorIconsBold.image),
           label: Text(
-            thumbnails.isEmpty ? 'Add Photos' : 'Add More Photos',
+            thumbnails.isEmpty
+                ? context.l10n.addMemoryScreenAddPhotos
+                : context.l10n.addMemoryScreenAddMorePhotos,
             style: TextStyle(
               color: context.colors.primary,
               fontWeight: FontWeight.w600,
@@ -605,7 +617,7 @@ class _DatePickerSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Date',
+          context.l10n.addMemoryScreenDateLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -633,7 +645,7 @@ class _DatePickerSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _formatDate(selectedDate),
+                          _formatDate(context, selectedDate),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: context.colors.text,
@@ -663,22 +675,9 @@ class _DatePickerSection extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  String _formatDate(BuildContext context, DateTime date) {
+    final localeName = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMMd(localeName).format(date);
   }
 
   String _formatTime(DateTime date) {
@@ -704,7 +703,7 @@ class _CategorySelectionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Category',
+          context.l10n.addMemoryScreenCategoryLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -791,7 +790,7 @@ class _PlaceSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Place',
+          context.l10n.addMemoryScreenPlaceLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -817,7 +816,7 @@ class _PlaceSection extends StatelessWidget {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
-                        'Add place',
+                        context.l10n.addMemoryScreenAddPlace,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: context.colors.text,
@@ -853,7 +852,7 @@ class _PlaceSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          name ?? 'Location set',
+                          name ?? context.l10n.addMemoryScreenLocationSet,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: context.colors.text,
@@ -869,7 +868,7 @@ class _PlaceSection extends StatelessWidget {
                       color: context.colors.primary,
                       size: 20,
                     ),
-                    tooltip: 'Change place',
+                    tooltip: context.l10n.addMemoryScreenChangePlaceTooltip,
                   ),
                   IconButton(
                     onPressed: onRemovePlace,
@@ -878,7 +877,7 @@ class _PlaceSection extends StatelessWidget {
                       color: context.colors.love,
                       size: 20,
                     ),
-                    tooltip: 'Remove place',
+                    tooltip: context.l10n.addMemoryScreenRemovePlaceTooltip,
                   ),
                 ],
               ),

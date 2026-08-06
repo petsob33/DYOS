@@ -9,10 +9,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_autocomplete/google_places_autocomplete.dart';
+import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/config/maps_api_config.dart';
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/services/geocoding_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/memory_model.dart';
@@ -42,10 +44,10 @@ class MemoriesMapScreen extends ConsumerWidget {
         leading: IconButton(
           icon: Icon(PhosphorIconsBold.arrowLeft, color: context.colors.text),
           onPressed: () => context.pop(),
-          tooltip: 'Back',
+          tooltip: context.l10n.memoriesMapScreenBackTooltip,
         ),
         title: Text(
-          'Memories map',
+          context.l10n.memoriesMapScreenTitle,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colors.text,
@@ -74,7 +76,7 @@ class MemoriesMapScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'No memories with a place yet',
+                    context.l10n.memoriesMapScreenNoMemoriesYet,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: context.colors.textSecondary,
                         ),
@@ -87,7 +89,9 @@ class MemoriesMapScreen extends ConsumerWidget {
           return _MemoriesMapContent(memories: memoriesWithLocation);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('Error: $error')),
+        error: (error, _) => Center(
+          child: Text(context.l10n.memoriesMapScreenError(error.toString())),
+        ),
       ),
     );
   }
@@ -384,7 +388,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                         child: TextField(
                           controller: _searchController,
                           decoration: InputDecoration(
-                            hintText: 'Search place or address...',
+                            hintText: context.l10n.memoriesMapScreenSearchHint,
                             hintStyle: TextStyle(color: context.colors.textSecondary),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -442,7 +446,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                                 PhosphorIconsBold.navigationArrow,
                                 color: context.colors.primary,
                               ),
-                        tooltip: 'My location',
+                        tooltip: context.l10n.memoriesMapScreenMyLocationTooltip,
                       ),
                     ),
                   ],
@@ -528,7 +532,7 @@ class _MapKeyMissingFallback extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
           child: Text(
-            'Map preview needs a Google Maps API key (see docs/ANDROID_GOOGLE_API_KEY.md). Memories with a place are listed below.',
+            context.l10n.memoriesMapScreenMapKeyMissingMessage,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.textSecondary,
@@ -550,13 +554,13 @@ class _MapKeyMissingFallback extends StatelessWidget {
                   ? subtitle
                   : (lat != null && lng != null)
                       ? '${lat.toStringAsFixed(3)}, ${lng.toStringAsFixed(3)}'
-                      : 'Place';
+                      : context.l10n.memoriesMapScreenPlaceFallback;
               return Material(
                 color: context.colors.card,
                 borderRadius: BorderRadius.circular(12),
                 child: ListTile(
                   title: Text(
-                    m.caption.isEmpty ? 'Memory' : m.caption,
+                    m.caption.isEmpty ? context.l10n.memoriesMapScreenMemoryFallback : m.caption,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -588,18 +592,17 @@ class _MemoryInfoCard extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback onTap;
 
-  static String _formatDate(DateTime date) {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  static String _formatDate(BuildContext context, DateTime date) {
+    final localeName = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMd(localeName).format(date);
   }
 
   @override
   Widget build(BuildContext context) {
     final locationName = memory.location?['name'] as String?;
-    final caption = memory.caption.isEmpty ? 'Untitled' : memory.caption;
+    final caption = memory.caption.isEmpty
+        ? context.l10n.memoriesMapScreenUntitledCaption
+        : memory.caption;
 
     return Positioned(
       left: AppSpacing.lg,
@@ -650,7 +653,7 @@ class _MemoryInfoCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              _formatDate(memory.date),
+                              _formatDate(context, memory.date),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: context.colors.textSecondary,
                                   ),

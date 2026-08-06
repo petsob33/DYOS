@@ -6,6 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ouros_app/core/theme/app_theme.dart';
 import 'package:ouros_app/features/auth/presentation/pairing_screen.dart';
+import 'package:ouros_app/l10n/generated/app_localizations.dart';
 import 'package:ouros_app/core/services/firebase_service.dart';
 import 'package:ouros_app/core/services/pairing_exceptions.dart';
 import 'package:ouros_app/core/services/auth_service.dart';
@@ -111,6 +112,8 @@ void main() {
       ],
       child: MaterialApp.router(
         theme: AppTheme.light,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
       ),
     );

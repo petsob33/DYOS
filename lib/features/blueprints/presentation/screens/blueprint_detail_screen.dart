@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/services/firebase_service.dart';
 import '../../../auth/domain/couple_model.dart';
 import '../../../auth/presentation/auth_providers.dart';
@@ -97,8 +98,8 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
           SnackBar(
             content: Text(
               xpGranted
-                  ? 'System Updated: +100 XP acquired! 🚀'
-                  : 'Section saved. (XP already earned today.)',
+                  ? context.l10n.blueprintDetailScreenXpGranted
+                  : context.l10n.blueprintDetailScreenAlreadyEarned,
             ),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -111,7 +112,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Section complete!'),
+            content: Text(context.l10n.blueprintDetailScreenSectionComplete),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -152,7 +153,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
         appBar: AppBar(backgroundColor: c.background, elevation: 0),
         body: Center(
           child: Text(
-            'Could not load this Blueprint section.',
+            context.l10n.blueprintDetailScreenLoadError,
             style: GoogleFonts.inter(color: c.textSecondary),
           ),
         ),
@@ -164,7 +165,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
             appBar: AppBar(backgroundColor: c.background, elevation: 0),
             body: Center(
               child: Text(
-                'Blueprint section not found.',
+                context.l10n.blueprintDetailScreenNotFound,
                 style: GoogleFonts.inter(color: c.textSecondary),
               ),
             ),
@@ -283,7 +284,7 @@ class _BlueprintDetailScreenState extends ConsumerState<BlueprintDetailScreen> {
                     ),
                   ),
                   child: Text(
-                    'Complete Section',
+                    context.l10n.blueprintDetailScreenCompleteButton,
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
