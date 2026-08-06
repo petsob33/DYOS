@@ -13,7 +13,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'app.dart';
-import 'core/services/ad_service.dart';
 import 'core/services/app_logger.dart';
 import 'firebase_options.dart';
 
@@ -206,7 +205,6 @@ Future<void> main() async {
       await _configureRevenueCat();
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
       runApp(const ProviderScope(child: OurOSRoot()));
-      unawaited(initializeGoogleMobileAdsSdk());
     },
     (error, stack) {
       // Errors outside the Flutter framework and not caught by

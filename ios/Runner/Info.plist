@@ -51,8 +51,5 @@
 	<string>DYOS needs access to your photo library so you can attach photos to your memories.</string>
 	<key>GOOGLE_PLACES_API_KEY</key>
 	<string>$(GOOGLE_PLACES_API_KEY)</string>
-	<!-- iOS AdMob: production GADApplicationIdentifier when you ship iOS ads. Test ID keeps SDK happy if you build iOS. -->
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
 </dict>
 </plist>

@@ -7,11 +7,9 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/l10n/build_context_l10n_extension.dart';
-import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/auth_providers.dart';
 import '../../../gamification/presentation/user_stats_provider.dart';
-import '../../../premium/presentation/premium_provider.dart';
 import '../../data/intimacy_repository.dart';
 import '../../domain/intimacy_log_model.dart';
 
@@ -262,10 +260,6 @@ class _AddIntimacySheetState extends ConsumerState<AddIntimacySheet> {
           await repository.addLog(log, userData.coupleId!);
           final xpGranted =
               await grantQuestXpIfEligible(ref, 'intimacy', 20);
-          final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
-          await ref.read(adServiceProvider).maybeShowAdAfterIntimacyOrEventAdded(
-                isPremium: isPremium,
-              );
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
