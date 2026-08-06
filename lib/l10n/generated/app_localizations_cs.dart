@@ -1422,12 +1422,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get levelScreenTitle => 'Tvoje úroveň';
 
   @override
-  String get levelScreenRewardReceived => 'Odměna získána: +30 SP';
-
-  @override
-  String get levelScreenNoRewardGranted => 'Tentokrát žádná odměna';
-
-  @override
   String get levelScreenBootSequence => 'Spouštění systému';
 
   @override
@@ -1457,12 +1451,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get levelScreenQuestIntimacyTitle => 'Zaznamenej intimitu';
-
-  @override
-  String get levelScreenWatchAdCta => 'Sleduj reklamu a získej +30 SP';
-
-  @override
-  String get levelScreenWatchButton => 'Sledovat';
 
   @override
   String get levelScreenCompletedToday => 'Dnes splněno';

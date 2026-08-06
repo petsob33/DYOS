@@ -2522,18 +2522,6 @@ abstract class AppLocalizations {
   /// **'Your Level'**
   String get levelScreenTitle;
 
-  /// No description provided for @levelScreenRewardReceived.
-  ///
-  /// In en, this message translates to:
-  /// **'Reward received: +30 SP'**
-  String get levelScreenRewardReceived;
-
-  /// No description provided for @levelScreenNoRewardGranted.
-  ///
-  /// In en, this message translates to:
-  /// **'No reward granted this time'**
-  String get levelScreenNoRewardGranted;
-
   /// No description provided for @levelScreenBootSequence.
   ///
   /// In en, this message translates to:
@@ -2587,18 +2575,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log intimacy'**
   String get levelScreenQuestIntimacyTitle;
-
-  /// No description provided for @levelScreenWatchAdCta.
-  ///
-  /// In en, this message translates to:
-  /// **'Watch an ad and get +30 SP'**
-  String get levelScreenWatchAdCta;
-
-  /// No description provided for @levelScreenWatchButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Watch'**
-  String get levelScreenWatchButton;
 
   /// No description provided for @levelScreenCompletedToday.
   ///

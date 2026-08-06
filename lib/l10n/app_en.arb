@@ -754,8 +754,6 @@
   "pickPlaceScreenPlaceNameLabel": "Place name (optional)",
   "pickPlaceScreenPlaceNameHint": "e.g. Restaurant, Park",
   "levelScreenTitle": "Your Level",
-  "levelScreenRewardReceived": "Reward received: +30 SP",
-  "levelScreenNoRewardGranted": "No reward granted this time",
   "levelScreenBootSequence": "Boot Sequence",
   "levelScreenCollectSpToNextTier": "Collect {spToNext} SP to get to {nextTier}",
   "@levelScreenCollectSpToNextTier": {
@@ -782,8 +780,6 @@
   "levelScreenQuestMemoryTitle": "Add a memory",
   "levelScreenQuestEventTitle": "Add an event",
   "levelScreenQuestIntimacyTitle": "Log intimacy",
-  "levelScreenWatchAdCta": "Watch an ad and get +30 SP",
-  "levelScreenWatchButton": "Watch",
   "levelScreenCompletedToday": "Completed today",
   "levelScreenQuestRewardBadge": "+{sp} SP",
   "@levelScreenQuestRewardBadge": {
