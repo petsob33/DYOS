@@ -1406,12 +1406,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get levelScreenTitle => 'Your Level';
 
   @override
-  String get levelScreenRewardReceived => 'Reward received: +30 SP';
-
-  @override
-  String get levelScreenNoRewardGranted => 'No reward granted this time';
-
-  @override
   String get levelScreenBootSequence => 'Boot Sequence';
 
   @override
@@ -1441,12 +1435,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get levelScreenQuestIntimacyTitle => 'Log intimacy';
-
-  @override
-  String get levelScreenWatchAdCta => 'Watch an ad and get +30 SP';
-
-  @override
-  String get levelScreenWatchButton => 'Watch';
 
   @override
   String get levelScreenCompletedToday => 'Completed today';
