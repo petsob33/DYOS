@@ -8,7 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/constants/app_spacing.dart';
 import '../l10n/build_context_l10n_extension.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/adaptive_banner_ad.dart';
 import '../../features/auth/presentation/auth_providers.dart';
 import '../../features/gamification/domain/progression_plan.dart';
 import '../../features/gamification/presentation/user_stats_provider.dart';
@@ -576,7 +575,6 @@ class RootShell extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!isPremium) const AdaptiveBannerAd(),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.lg,

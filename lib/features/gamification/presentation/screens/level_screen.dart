@@ -6,7 +6,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/l10n/build_context_l10n_extension.dart';
-import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../tracker/presentation/widgets/add_intimacy_sheet.dart';
@@ -26,26 +25,6 @@ class LevelScreen extends ConsumerStatefulWidget {
 }
 
 class _LevelScreenState extends ConsumerState<LevelScreen> {
-  bool _rewarding = false;
-
-  Future<void> _watchAdForSp() async {
-    if (_rewarding) return;
-    setState(() => _rewarding = true);
-    final rewarded = await ref.read(adServiceProvider).showRewardedAdForSp();
-    if (rewarded) {
-      await addCoupleXp(ref, 30);
-    }
-    if (!mounted) return;
-    setState(() => _rewarding = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(rewarded ? context.l10n.levelScreenRewardReceived : context.l10n.levelScreenNoRewardGranted),
-        backgroundColor: rewarded ? context.colors.success : context.colors.warning,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -260,52 +239,6 @@ class _LevelScreenState extends ConsumerState<LevelScreen> {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
-            if (!isPremium)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  child: BentoCard(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Row(
-                      children: [
-                        Icon(
-                          PhosphorIconsBold.videoCamera,
-                          color: c.primary,
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Text(
-                            context.l10n.levelScreenWatchAdCta,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: c.text,
-                            ),
-                          ),
-                        ),
-                        FilledButton(
-                          onPressed: _rewarding ? null : _watchAdForSp,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: c.primary,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: _rewarding
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(context.l10n.levelScreenWatchButton),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            if (!isPremium) const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),

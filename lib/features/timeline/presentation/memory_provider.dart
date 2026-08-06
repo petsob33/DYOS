@@ -5,8 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import '../domain/memory_model.dart';
 import '../data/memory_repository.dart';
 import '../../auth/presentation/auth_providers.dart';
-import '../../premium/presentation/premium_provider.dart';
-import '../../../../core/services/ad_service.dart';
 
 final selectedCategoryProvider = StateProvider<MemoryCategory?>((ref) => null);
 
@@ -179,11 +177,6 @@ class AddMemoryController extends StateNotifier<AddMemoryState> {
         memory: memoryToCreate,
         mediaFiles: mediaFiles,
       );
-
-      final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
-      await ref.read(adServiceProvider).maybeShowAdAfterMemoryAdded(
-            isPremium: isPremium,
-          );
 
       state = AddMemorySuccess(createdMemory);
     } catch (e) {

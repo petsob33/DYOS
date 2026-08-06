@@ -62,7 +62,6 @@ dependencies:
   google_places_autocomplete: ^2.1.1
   device_info_plus: ^11.4.0
   firebase_app_check: ^0.4.5
-  google_mobile_ads: ^7.0.0
   shared_preferences: ^2.5.4
   firebase_crashlytics: ^5.2.4
   url_launcher: ^6.3.1
@@ -95,9 +94,8 @@ dependency_overrides:
 # The following section is specific to Flutter packages.
 flutter:
 
-  # google_mobile_ads only supports CocoaPods, which conflicts with
-  # plugins (e.g. webview_flutter_wkwebview) that ship Swift Package
-  # Manager support, breaking iOS pod install dependency resolution.
+  # Disabled to avoid mixed CocoaPods/SPM iOS dependency resolution issues.
+  # Revisit if all remaining plugins support Swift Package Manager.
   config:
     enable-swift-package-manager: false
 
