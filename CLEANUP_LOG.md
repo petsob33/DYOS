@@ -8,7 +8,7 @@ Started: 2026-08-08
 
 Tento soubor je jediný zdroj pravdy pro tento cleanup projekt — pravidla níže **nejsou** v `CLAUDE.md`, žila jen v původní konverzaci. Nová session musí nejdřív přečíst celý tento soubor, pak pokračovat.
 
-**Stav k poslední aktualizaci**: Fáze 0 (baseline) hotová, Priorita 1 (mrtvý kód) uzavřena, Priorita 2 (Firestore náklady) uzavřena — 3 atomické změny commitnuté, viz tabulka níže. **Další krok: Priorita 3 (rebuild performance)** — chybějící `const`, `setState` na příliš vysoké úrovni, chybějící `Selector`/`select`, těžké výpočty v `build()`.
+**Stav k poslední aktualizaci**: Fáze 0 (baseline) hotová, Priorita 1 (mrtvý kód) uzavřena, Priorita 2 (Firestore náklady) uzavřena, Priorita 3 (rebuild performance) rozpracovaná — 4 atomické změny commitnuté celkem, viz tabulka níže. **Další krok: pokračovat v Prioritě 3** — audit nálezů a pořadí viz sekce "Priorita 3 — Rebuild performance" níže, další na řadě je nález #2 (redundantní `ref.watch` v `home_screen.dart`).
 
 **⚠️ Akce, které čekají na tebe (mimo Claude):**
 1. **Nasadit Firestore composite index** před/spolu s vydáním této branch: `firebase deploy --only firestore:indexes`. Nový index (`notes` kolekce, `type` + `createdAt`) je potřeba pro commit `89300dc` (`NotesRepository.getLatestSharedNote`) — bez něj dotaz v produkci spadne na `failed-precondition`.
@@ -108,6 +108,7 @@ Tyto změny se přenesly na novou branch (git checkout -b nic nemaže). Nejsou s
 | 1 | Odstranění nepoužité lokální `isPremium` v `RootShell.build()` (mrtvý kód + zbytečný rebuild trigger na `isPremiumProvider`) | `lib/core/router/app_router.dart:550` | 389→388 issues (warning zmizel) | 148/148 ✅ | commit `547990f` |
 | 2 | `HapticSignalRepository.watchSignals` bounded na posledních 90 dní (`where(timestamp > cutoff)`) místo neomezené historie. Přidán test na hranici okna. | `lib/features/dashboard/data/haptic_signal_repository.dart`, `test/dashboard/haptic_signal_repository_test.dart` | 388 issues (beze změny) | 149/149 ✅ | commit `134d8e6` |
 | 3 | `NotesRepository.getLatestSharedNote` přepnuto z "načti vše + seřaď v paměti" na `orderBy+limit(1)`; přidán composite index do `firestore.indexes.json`; `NotesRepository` dostal injectable `firestore` konstruktor (konzistence s ostatními repozitáři) + nový test soubor (dosud netestováno). | `lib/features/notes/data/notes_repository.dart`, `firestore.indexes.json`, `test/notes/notes_repository_test.dart` | 388 issues (beze změny) | 153/153 ✅ | commit `89300dc` — **⚠️ vyžaduje `firebase deploy --only firestore:indexes` před/spolu s vydáním, jinak dotaz v produkci spadne** |
+| 4 | `IntimacySparkCard.build()` — nahrazen `List.from(logs)..sort()` (kopie + O(n log n) třídění celé historie) za `logs.reduce()` (O(n), bez kopie) pro nalezení jen nejnovějšího logu. Vedlejší úklid: odstraněn nyní nepoužitý import `intimacy_log_model.dart`. | `lib/features/dashboard/presentation/widgets/intimacy_spark_card.dart` | 388 issues (beze změny) | 153/153 ✅ | commit `f6a6158` |
 
 ### Priorita 1 (mrtvý kód) — uzavřeno
 Po change #1 byly provedeny další kontroly, žádný další nález:
@@ -140,3 +141,22 @@ Prošel jsem všech 30 souborů dotýkajících se Firestore (`repositories`, `s
 **Rozhodnuto uživatelem (implementováno, viz change #2 a #3 v tabulce výše):**
 1. Haptic streak → **bound na posledních 90 dní** (`where(timestamp > cutoff)`). Hotovo v commitu `134d8e6`.
 2. Latest shared note → **`orderBy + limit(1)` + composite index** v `firestore.indexes.json`. Hotovo v commitu `89300dc`. **Čeká na `firebase deploy --only firestore:indexes` od tebe** (viz akce na začátku souboru).
+
+## Priorita 3 — Rebuild performance (audit)
+
+Projekt používá **Riverpod** (ne Provider) — ekvivalent `Selector`/`select` je `ref.watch(provider.select(...))` / `provider.select(...)`. Grep potvrdil **0 výskytů** `.select(` v `lib/` před touto prioritou — každý nález níže je reálná, dosud neošetřená mezera.
+
+Nálezy seřazené podle odhadovaného dopadu (frekvence rebuildu × šíře/cena zbytečné práce). Zaškrtnuté = hotovo.
+
+1. `lib/features/cycle/presentation/cycle_tracking_screen.dart:63-613` — `build()` má ~550 řádků; přebuduje 3× `Map<DateTime,List<...>>` z `events`/`intimacyLogs`/`memories` na každý build, kalendářní `eventLoader` dělá lineární `firstWhere`/`.any()` scany na buňku (~35-42 buněk/měsíc). `setState` na řádcích 158 a 525 (tap na den) re-triggeruje celé přepočítání + rebuild celé obrazovky. **Největší nález, ale i nejrizikovější refaktor** (velký soubor, komplexní kalendářní logika) — promyslet rozsah než se do toho jde.
+2. `lib/features/dashboard/presentation/screens/home_screen.dart:386-387` — `ref.watch(hapticSignalsStreamProvider)` a `ref.watch(quickMessagesStreamProvider)` sledovány jen "aby zůstaly aktivní" (dle komentáře), ale side-effecty už řeší `ref.listenManual` v `_setupListeners()`. Každá emise rebuilduje celý home dashboard zbytečně. **← další na řadě, vypadá jako nejbezpečnější dalši krok** (jasně redundantní watch vedle existujícího listen).
+3. `lib/features/timeline/presentation/screens/memories_map_screen.dart:284-304,345` — `_buildMarkers()` rekonstruuje celou `Set<Marker>` (nové closures) na každý build `_MemoriesMapContentState`, který má ~15 nesouvisejících `setState` (psaní do search boxu, autocomplete). Psaní do vyhledávání překresluje všechny mapové markery.
+4. `lib/features/tracker/presentation/widgets/intimacy_history_list.dart:50-75` — watchuje `userProvider`/`currentUserDataProvider`/`partnerProvider` celé jen kvůli `.uid`/`.photoUrl`, plus group-by-month + sort inline v `build()`.
+5. `lib/features/tracker/presentation/data_screen.dart:26,86,829-847` — `ref.watch(userProvider)` celý jen kvůli `.uid`; `_TagsRadarChart.build()` počítá výskyty tagů přes všechny logy + `.sort()` na každý build.
+6. `lib/features/timeline/presentation/screens/timeline_screen.dart:26,39-40,152-156` — watchuje `currentXpProvider`/`isPremiumProvider` (jen pro FAB/limit-bar gate) vedle feedu memories; `_TimelineList.build()` přeskupuje memories podle měsíce na každý rebuild.
+7. ✅ `lib/features/dashboard/presentation/widgets/intimacy_spark_card.dart:47-48` — `List.from(logs)..sort()` na celou historii jen pro `sortedLogs.first`. **Hotovo, viz change #4 v tabulce výše (commit `f6a6158`)**: nahrazeno `logs.reduce()`.
+8. `lib/features/timeline/presentation/screens/timeline_screen.dart:418-552` — `MemoryCard`'s `onPageChanged` `setState` (řádek 549) rebuilduje celou ~150řádkovou kartu jen kvůli page-dot indikátoru.
+9. `lib/features/timeline/presentation/screens/timeline_screen.dart:281-292` — `_LoadingState` vytváří `_MemoryCardSkeleton()` (non-const, žádný const konstruktor) uvnitř `ListView.builder(itemCount: 5)`.
+10. `lib/features/dashboard/presentation/widgets/taptic_touch_card.dart:31-40` — watchuje `currentXpProvider`/`isPremiumProvider`/`currentCoupleProvider`/`currentUserDataProvider` celé jen kvůli 1 boolu + 1 uid.
+
+**Pozitivní zjištění**: `home_screen.dart:552-562` — `_cards` je top-level `final` seznam `const` widgetů, sdílený stejnou referencí napříč `MasonryGridView.itemBuilder` → Flutterův `identical()` fast-path už tyto rebuildy přeskakuje. Dobrý vzor, hodný rozšíření jinam.
