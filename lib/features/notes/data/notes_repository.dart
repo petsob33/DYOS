@@ -24,7 +24,10 @@ NotesRepository notesRepository(NotesRepositoryRef ref) {
 /// - Retrieving notes as streams for real-time updates
 /// - Filtering notes by type
 class NotesRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  NotesRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseFirestore _firestore;
 
   /// Create a new note
   /// 
@@ -130,37 +133,29 @@ class NotesRepository {
   }
 
   /// Get the latest shared note for a couple (for QuickNoteCard)
-  /// 
+  ///
   /// Returns the most recent shared note, or null if none exists
   Stream<NoteItem?> getLatestSharedNote(String coupleId) {
     if (coupleId.isEmpty) {
       return Stream.value(null);
     }
-    
-    // Get all shared notes, then sort in memory to avoid composite index requirement
+
+    // Bounded to the single newest doc via orderBy+limit - requires the
+    // composite index on (type, createdAt) declared in firestore.indexes.json.
     return _firestore
         .collection('couples')
         .doc(coupleId)
         .collection('notes')
         .where('type', isEqualTo: NoteType.shared.name)
+        .orderBy('createdAt', descending: true)
+        .limit(1)
         .snapshots()
         .map((snapshot) {
       if (snapshot.docs.isEmpty) {
         return null;
       }
       try {
-        // Parse all notes and sort by createdAt descending
-        final notes = snapshot.docs.map((doc) {
-          try {
-            return NoteItem.fromFirestore(doc);
-          } catch (e) {
-            return null;
-          }
-        }).where((note) => note != null).cast<NoteItem>().toList();
-        
-        // Sort by createdAt descending and return the first one
-        notes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        return notes.isNotEmpty ? notes.first : null;
+        return NoteItem.fromFirestore(snapshot.docs.first);
       } catch (e) {
         return null;
       }
