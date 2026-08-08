@@ -11,7 +11,7 @@ Tento soubor je jediný zdroj pravdy pro tento cleanup projekt — pravidla ní�
 **Stav k poslední aktualizaci**: Fáze 0 (baseline) hotová, Priorita 1 (mrtvý kód) uzavřena, Priorita 2 (Firestore náklady) uzavřena, Priorita 3 (rebuild performance) rozpracovaná — 10 atomických změn commitnutých celkem (7 z nich v Prioritě 3: #4–#10), viz tabulka níže. **Další krok: pokračovat v Prioritě 3** — audit nálezů a pořadí viz sekce "Priorita 3 — Rebuild performance" níže. Zbývají nálezy #1 (`cycle_tracking_screen.dart`, velký/rizikový), zbytek nálezu #4 (`currentUserDataProvider`/`partnerProvider` + group-by-month sort v `intimacy_history_list.dart`), #6 (`timeline_screen.dart` regroup na XP/premium watch), #8 (`timeline_screen.dart` MemoryCard setState). Nález #2 (`home_screen.dart`) je odložený/rizikový, viz poznámka u něj — nedělat bez výslovné domluvy.
 
 **⚠️ Akce, které čekají na tebe (mimo Claude):**
-1. **Nasadit Firestore composite index** před/spolu s vydáním této branch: `firebase deploy --only firestore:indexes`. Nový index (`notes` kolekce, `type` + `createdAt`) je potřeba pro commit `89300dc` (`NotesRepository.getLatestSharedNote`) — bez něj dotaz v produkci spadne na `failed-precondition`.
+1. ✅ **Nasazeno** — `firebase deploy --only firestore:indexes` proběhlo úspěšně na `dyos-520c2` (2026-08-08). Composite index pro `notes` (`type` + `createdAt`, potřeba pro commit `89300dc`) je teď live v produkci.
 2. Branch `chore/cleanup-optimization` ještě nebyl mergnutý do `main` ani pushnutý — až budeš chtít, řekni.
 
 ### Protokol (pravidla, podle kterých se pracuje — platí do odvolání)
