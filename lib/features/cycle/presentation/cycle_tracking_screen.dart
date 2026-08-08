@@ -9,6 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../../core/widgets/dyos_universal_calendar.dart';
+import '../../../core/utils/time_format.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../events/presentation/event_provider.dart';
 import '../../events/presentation/add_event_sheet.dart';
@@ -625,12 +626,6 @@ class _DayOptionsWidget extends ConsumerWidget {
     }
   }
 
-  String _formatTime(DateTime date) {
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final normalizedDate = DateTime(
@@ -849,7 +844,7 @@ class _DayOptionsWidget extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      _formatTime(event.date),
+                                      formatTime24h(event.date),
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                             color: context.colors.textSecondary,
                                           ),

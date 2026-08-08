@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/l10n/build_context_l10n_extension.dart';
+import '../../../core/utils/time_format.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../gamification/presentation/user_stats_provider.dart';
 import '../data/event_repository.dart';
@@ -452,7 +453,7 @@ class _DatePickerSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          _formatTime(selectedDate),
+                          formatTime24h(selectedDate),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: context.colors.textSecondary,
                               ),
@@ -488,11 +489,5 @@ class _DatePickerSection extends StatelessWidget {
     } else {
       return DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(date);
     }
-  }
-
-  String _formatTime(DateTime date) {
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
   }
 }
