@@ -74,6 +74,8 @@ Tyto změny se přenesly na novou branch (git checkout -b nic nemaže). Nejsou s
 | # | Změna | Soubor | analyze | test | Výsledek |
 |---|---|---|---|---|---|
 | 1 | Odstranění nepoužité lokální `isPremium` v `RootShell.build()` (mrtvý kód + zbytečný rebuild trigger na `isPremiumProvider`) | `lib/core/router/app_router.dart:550` | 389→388 issues (warning zmizel) | 148/148 ✅ | commit `547990f` |
+| 2 | `HapticSignalRepository.watchSignals` bounded na posledních 90 dní (`where(timestamp > cutoff)`) místo neomezené historie. Přidán test na hranici okna. | `lib/features/dashboard/data/haptic_signal_repository.dart`, `test/dashboard/haptic_signal_repository_test.dart` | 388 issues (beze změny) | 149/149 ✅ | commit `134d8e6` |
+| 3 | `NotesRepository.getLatestSharedNote` přepnuto z "načti vše + seřaď v paměti" na `orderBy+limit(1)`; přidán composite index do `firestore.indexes.json`; `NotesRepository` dostal injectable `firestore` konstruktor (konzistence s ostatními repozitáři) + nový test soubor (dosud netestováno). | `lib/features/notes/data/notes_repository.dart`, `firestore.indexes.json`, `test/notes/notes_repository_test.dart` | 388 issues (beze změny) | 153/153 ✅ | commit `89300dc` — **⚠️ vyžaduje `firebase deploy --only firestore:indexes` před/spolu s vydáním, jinak dotaz v produkci spadne** |
 
 ### Priorita 1 (mrtvý kód) — uzavřeno
 Po change #1 byly provedeny další kontroly, žádný další nález:
