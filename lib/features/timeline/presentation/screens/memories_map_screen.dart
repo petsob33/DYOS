@@ -1,7 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -122,10 +122,12 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
   bool _placesLoading = false;
   bool _placesReady = false;
   GooglePlacesAutocomplete? _places;
+  late Set<Marker> _markers;
 
   @override
   void initState() {
     super.initState();
+    _markers = _buildMarkers();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final geoKey = await MapsApiConfig.resolveGeoApiKey();
@@ -172,6 +174,14 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
         if (mounted) setState(() => _placesReady = false);
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant _MemoriesMapContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!listEquals(oldWidget.memories, widget.memories)) {
+      _markers = _buildMarkers();
+    }
   }
 
   @override
@@ -342,7 +352,7 @@ class _MemoriesMapContentState extends State<_MemoriesMapContent> {
                         target: LatLng(_defaultLat, _defaultLng),
                         zoom: _defaultZoom,
                       ),
-                      markers: _buildMarkers(),
+                      markers: _markers,
                       onTap: (_) {
                         setState(() {
                           _selectedMemory = null;
