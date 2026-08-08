@@ -282,8 +282,8 @@ class _LoadingState extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       itemCount: 5,
       itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+        return const Padding(
+          padding: EdgeInsets.only(bottom: AppSpacing.lg),
           child: _MemoryCardSkeleton(),
         );
       },
@@ -757,6 +757,8 @@ class _PageIndicator extends StatelessWidget {
 
 /// Skeleton loader for memory card
 class _MemoryCardSkeleton extends StatelessWidget {
+  const _MemoryCardSkeleton();
+
   @override
   Widget build(BuildContext context) {
     return Container(
