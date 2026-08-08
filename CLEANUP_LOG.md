@@ -70,4 +70,7 @@ Tyto změny se přenesly na novou branch (git checkout -b nic nemaže). Nejsou s
 - **Rozpracovaná práce na main** (`add_intimacy_sheet.dart`, `docs/compliance/`): zůstává na cleanup branch beze změny, drženo odděleně od cleanup commitů (staging po jednotlivých souborech, ne `git add -A`).
 
 ## Fáze 1+ log (atomické změny)
-_(zatím žádné)_
+
+| # | Změna | Soubor | analyze | test | Výsledek |
+|---|---|---|---|---|---|
+| 1 | Odstranění nepoužité lokální `isPremium` v `RootShell.build()` (mrtvý kód + zbytečný rebuild trigger na `isPremiumProvider`) | `lib/core/router/app_router.dart:550` | 389→388 issues (warning zmizel) | 148/148 ✅ | commit `547990f` |
