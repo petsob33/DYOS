@@ -549,8 +549,8 @@ class _LoadingState extends StatelessWidget {
       child: Column(
         children: List.generate(
           5,
-          (index) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          (index) => const Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.md),
             child: _LogCardSkeleton(),
           ),
         ),
@@ -561,6 +561,8 @@ class _LoadingState extends StatelessWidget {
 
 /// Skeleton loader for log card
 class _LogCardSkeleton extends StatelessWidget {
+  const _LogCardSkeleton();
+
   @override
   Widget build(BuildContext context) {
     return BentoCard(
