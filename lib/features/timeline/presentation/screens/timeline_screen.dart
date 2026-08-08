@@ -417,11 +417,12 @@ class MemoryCard extends StatefulWidget {
 
 class _MemoryCardState extends State<MemoryCard> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  final ValueNotifier<int> _currentPageNotifier = ValueNotifier<int>(0);
 
   @override
   void dispose() {
     _pageController.dispose();
+    _currentPageNotifier.dispose();
     super.dispose();
   }
 
@@ -536,7 +537,7 @@ class _MemoryCardState extends State<MemoryCard> {
                       MemoryDetailDialog.show(
                         context,
                         memory: widget.memory,
-                        initialImageIndex: _currentPage,
+                        initialImageIndex: _currentPageNotifier.value,
                       );
                     },
                     child: SizedBox(
@@ -546,9 +547,7 @@ class _MemoryCardState extends State<MemoryCard> {
                           ? PageView.builder(
                               controller: _pageController,
                               onPageChanged: (index) {
-                                setState(() {
-                                  _currentPage = index;
-                                });
+                                _currentPageNotifier.value = index;
                               },
                               itemCount: widget.memory.mediaUrls.length,
                               itemBuilder: (context, index) {
@@ -613,14 +612,19 @@ class _MemoryCardState extends State<MemoryCard> {
                       bottom: AppSpacing.md,
                       left: 0,
                       right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          widget.memory.mediaUrls.length,
-                          (index) => _PageIndicator(
-                            isActive: index == _currentPage,
-                          ),
-                        ).toList(),
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: _currentPageNotifier,
+                        builder: (context, currentPage, _) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              widget.memory.mediaUrls.length,
+                              (index) => _PageIndicator(
+                                isActive: index == currentPage,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                 ],
