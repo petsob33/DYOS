@@ -8,7 +8,9 @@ Started: 2026-08-08
 
 Tento soubor je jediný zdroj pravdy pro tento cleanup projekt — pravidla níže **nejsou** v `CLAUDE.md`, žila jen v původní konverzaci. Nová session musí nejdřív přečíst celý tento soubor, pak pokračovat.
 
-**Stav k poslední aktualizaci**: Fáze 0 (baseline) hotová, Priorita 1 (mrtvý kód) uzavřena, Priorita 2 (Firestore náklady) uzavřena, Priorita 3 (rebuild performance) rozpracovaná — 12 atomických změn commitnutých celkem (9 z nich v Prioritě 3: #4–#12), viz tabulka níže. **Firestore composite index nasazen do produkce** (2026-08-08) — akce z Fáze 0 už není blokující. **Další krok: pokračovat v Prioritě 3, nebo ji považovat za dostatečně hotovou a jít na Prioritu 4** — zbylé nálezy jsou všechny buď vědomě odložené (viz poznámky u nich), nebo by vyžadovaly větší refaktor přesahující jednu atomickou změnu:
+**Stav k poslední aktualizaci**: Fáze 0 (baseline) hotová, Priorita 1 (mrtvý kód) uzavřena, Priorita 2 (Firestore náklady) uzavřena, Priorita 3 (rebuild performance) z větší části uzavřena (zbylé nálezy vědomě odložené), Priorita 4 (duplicita) rozpracovaná — 13 atomických změn commitnutých celkem, viz tabulka níže. **Firestore composite index nasazen do produkce** (2026-08-08) — akce z Fáze 0 už není blokující. **Další krok: pokračovat v Prioritě 4** — audit duplicity viz sekce "Priorita 4 — Duplicita" níže.
+
+Priorita 3 zbylé nálezy (nedělané, viz poznámky u nich v sekci "Priorita 3" níže):
 - #1 (`cycle_tracking_screen.dart`) — lineární scany opraveny (change #12); zbývá memoizace 3 map v `build()`, samostatný krok.
 - #2 (`home_screen.dart`) — odložen, nízký přínos/vysoké riziko (autoDispose timing kolem haptic/quick-message notifikací).
 - #4 zbytek (`intimacy_history_list.dart` — `currentUserDataProvider`/`partnerProvider` nested `.when()` + group-by-month sort).
@@ -29,8 +31,8 @@ Zadání: senior Flutter engineer dělá cleanup + optimalizaci DYOS (Flutter + 
 **Priority v tomto pořadí:**
 1. Mrtvý kód (nepoužité soubory/třídy/metody/importy/assety/závislosti) — **✅ uzavřeno**
 2. Firestore náklady (chybějící `limit()`, N+1, nedisposed streamy, duplicitní subscriptions, chybějící cache; u nálezu vždy odhadnout ušetřené reads/uživatel/den) — **✅ uzavřeno**
-3. Rebuild performance (chybějící `const`, `setState` moc vysoko, `Selector`/`select`, těžké výpočty v `build()`, `ListView.builder`) — **← next**
-4. Duplicita (sdílet jen když ≥3 výskyty)
+3. Rebuild performance (chybějící `const`, `setState` moc vysoko, `Selector`/`select`, těžké výpočty v `build()`, `ListView.builder`) — **z větší části uzavřeno, viz poznámky výše u zbylých nálezů**
+4. Duplicita (sdílet jen když ≥3 výskyty) — **← rozpracováno**
 5. Struktura (soubory >400 řádků, mechanický extract, ne přepis logiky)
 6. Konzistence (error handling, logging, naming; `print()` → logger — **už splněno, viz níže**)
 
@@ -123,6 +125,7 @@ Tyto změny se přenesly na novou branch (git checkout -b nic nemaže). Nejsou s
 | 10 | `DataScreen` watchoval celý `userProvider` jen kvůli `.uid` (předávanému do `_InitiatorChart`) — přepnuto na `.select()`. Zbytek souboru (`_TagsRadarChart`'s tag-counting v `build()`) ponechán — legitimní O(n) práce nutná pro zobrazovaná data, přepočítává se jen při emisi streamu logů, ne hot rebuild path. | `lib/features/tracker/presentation/data_screen.dart` | 387 issues (beze změny) | 153/153 ✅ | commit `e0ca290` |
 | 11 | `MemoryCard`'s `PageView.onPageChanged` volal `setState` na celý ~250řádkový card (header, chip, badge, obrázky) jen kvůli page-dot indikátoru. `_currentPage` přesunuto do `ValueNotifier<int>`, dot-row obalen do `ValueListenableBuilder` — rebuilduje se jen ta malá část při swipu mezi obrázky. | `lib/features/timeline/presentation/screens/timeline_screen.dart` | 387 issues (beze změny) | 153/153 ✅ | commit `befaddb` |
 | 12 | `CycleTrackingScreen`'s `eventLoader`/`markerBuilder` (volané 1× na každou vykreslenou kalendářní buňku, ~35-42×/měsíc) dělaly `firstWhere`/`.any()` lineární scany přes `logs`/`predictedPeriods`/`fertileDays` na každé volání. Postaveno na stejném vzoru jako existující `eventsByDate`/`intimacyByDate`/`memoriesByDate` — nová `logByDate` mapa (`putIfAbsent`, zachovává "první nález vyhrává" sémantiku původního `firstWhere`) + `predictedPeriodDates`/`fertileDates` sety, počítané jednou za data-build místo za buňku. Zároveň odstraněny nepodmíněné `debugPrint` volání uvnitř obou callbacků (běžely na každou buňku bez ohledu na debug/release, čistě overhead, žádný funkční efekt). Ověřeno: `flutter build linux --debug` prošel (žádná compile chyba), `flutter analyze`/`flutter test` beze změny; **vizuální ověření kalendáře (markery) se v této sandboxu nepodařilo provést** (chybí Xvfb + přihlášený/spárovaný Firebase účet) — doporučeno ručně zkontrolovat na zařízení před mergem. | `lib/features/cycle/presentation/cycle_tracking_screen.dart` | 387 issues (beze změny) | 153/153 ✅ | commit `86b7ab7` |
+| 13 | Priorita 4 (duplicita) start. `_formatTime` (24h "HH:mm" formátovač) byl byte-for-byte identický zkopírovaný v 5 souborech. Extrahováno do `lib/core/utils/time_format.dart` (`formatTime24h`) a nahrazeno ve 4 z nich. Páté místo (`add_intimacy_sheet.dart:674`) **záměrně nedotčeno** — má rozpracovanou necommitnutou práci uživatele (viz protokol výše), zůstává samostatný duplicitní kus kódu. | `lib/core/utils/time_format.dart` (nový), `lib/features/cycle/presentation/cycle_tracking_screen.dart`, `lib/features/events/presentation/add_event_sheet.dart`, `lib/features/events/presentation/events_screen.dart`, `lib/features/timeline/presentation/screens/add_memory_screen.dart` | 387 issues (beze změny) | 153/153 ✅ | commit `0c04a14` |
 
 ### Priorita 1 (mrtvý kód) — uzavřeno
 Po change #1 byly provedeny další kontroly, žádný další nález:
@@ -174,3 +177,17 @@ Nálezy seřazené podle odhadovaného dopadu (frekvence rebuildu × šíře/cen
 10. ✅ `lib/features/dashboard/presentation/widgets/taptic_touch_card.dart:31-40` — watchoval `currentCoupleProvider`/`currentUserDataProvider` celé jen kvůli `.id`/`.uid` (`currentXpProvider`/`isPremiumProvider` už byly úzké, nechány beze změny). **Hotovo, viz change #6 v tabulce výše (commit `07e0b48`)**: přepnuto na `.select()`.
 
 **Pozitivní zjištění**: `home_screen.dart:552-562` — `_cards` je top-level `final` seznam `const` widgetů, sdílený stejnou referencí napříč `MasonryGridView.itemBuilder` → Flutterův `identical()` fast-path už tyto rebuildy přeskakuje. Dobrý vzor, hodný rozšíření jinam.
+
+## Priorita 4 — Duplicita (audit)
+
+Pravidlo: sdílet jen když ≥3 výskyty (viz protokol výše). Nálezy seřazené podle hodnoty (počet výskytů × jak identické jsou), zaškrtnuté = hotovo.
+
+1. ✅ `_formatTime` (24h "HH:mm") — byte-for-byte identický v 5 souborech (`cycle_tracking_screen.dart`, `add_event_sheet.dart`, `add_memory_screen.dart`, `events_screen.dart`, `add_intimacy_sheet.dart`). **Hotovo pro 4 z 5, viz change #13 v tabulce výše (commit `0c04a14`)**: extrahováno do `lib/core/utils/time_format.dart`. Páté místo v `add_intimacy_sheet.dart:674` záměrně nedotčeno (rozpracovaná necommitnutá práce uživatele v tomto souboru).
+2. Firestore doc-list → model parsing wrapper — near-identický v 5 repozitářích (`memory_repository.dart:_parseMemories`, `intimacy_repository.dart:_parseLogs`, `notes_repository.dart:_parseNotes`, `cycle_repository.dart:_parseLogs`, `event_repository.dart:_parseEvents`). Jen typ/`fromFirestore` volání se liší — bezpečné na generický `List<T> parseDocs<T>(docs, T Function(doc) fromFirestore)` helper. **Nedělané** — datová vrstva, chce se před extrakcí ověřit řádek po řádku, že se try/catch/logging chování přesně shoduje ve všech 5 (ne jen "vypadá stejně").
+3. Date-only normalizace `DateTime(d.year, d.month, d.day)` — ~20 inline výskytů napříč 9 soubory (`countdown_card.dart`, `haptic_signal_stats.dart` má už privátní `_dateOnly`, `insight_provider.dart`, `add_event_sheet.dart`, `add_intimacy_sheet.dart`, `event_provider.dart`, `cycle_tracking_screen.dart`, `events_screen.dart`). **Nedělané** — hodnota je reálná, ale je to plošná změna přes hodně souborů najednou (včetně `add_intimacy_sheet.dart`, které se nesmí dotknout), takže by musela být rozdělena na víc atomických kroků; zatím neotevřeno.
+4. `AsyncValue.when(loading: ...)` — identická loading větev (`const Center(child: CircularProgressIndicator())`) na 7 místech v 6 souborech. **Nedělané** — nízká hodnota (jen `loading:` větev je identická, `error:` větve se liší), nestojí to za samostatnou atomickou změnu.
+5. Delete-confirmation `AlertDialog` — stejný tvar (Cancel/Delete tlačítka) ve 4 souborech (`memory_detail_screen.dart`, `memory_detail_dialog.dart`, `intimacy_log_detail_sheet.dart`, `events_screen.dart`). **Nedělané** — mechanicky bezpečné, ale je to samostatný atomický krok, ne prozkoumáno do hloubky ještě.
+6. Empty-state layout (`Center > Column > Icon > SizedBox > Text`) ve 4 souborech. **Nedělané**, stejný důvod jako #5.
+7. `_formatDate` one-liner wrapper (`DateFormat.X(locale).format(date)`) v 5 souborech, ale s různým `DateFormat` patternem (yMMMd/MMMd/yMMMMd) na každém místě — **nižší jistota, přeskočeno**: vyžaduje parametrizaci (rozhodovací zásah), ne čistě mechanická extrakce.
+
+**Pod hranicí 3 výskytů (mimo audit)**: "Today/Yesterday/N days ago" relativní formátovač jen ve 2 souborech (`secret_notes_screen.dart`, `lists_screen.dart`) — nekvalifikuje se.
