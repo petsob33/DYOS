@@ -36,100 +36,15 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
       isPremium,
     );
 
-    final coupleAsync = ref.watch(currentCoupleProvider);
-    final currentUserAsync = ref.watch(currentUserDataProvider);
+    final coupleId = ref.watch(
+      currentCoupleProvider.select((async) => async.valueOrNull?.id),
+    );
+    final currentUserId = ref.watch(
+      currentUserDataProvider.select((async) => async.valueOrNull?.uid),
+    );
 
-    return coupleAsync.when(
-      data: (couple) {
-        if (couple == null) {
-          return BentoCard(
-            child: Center(
-              child: Icon(
-                PhosphorIconsBold.heart,
-                color: context.colors.love.withValues(alpha: 0.3),
-                size: 56,
-              ),
-            ),
-          );
-        }
-
-        final currentUserId = currentUserAsync.valueOrNull?.uid ?? '';
-
-        return BentoCard(
-          child: GestureDetector(
-            onTapDown: (_) {
-              if (!unlocked) {
-                HapticFeedback.selectionClick();
-                return;
-              }
-              setState(() {
-                _isPressed = true;
-                _pressStartTime = DateTime.now();
-              });
-              HapticFeedback.mediumImpact();
-            },
-            onTapUp: (_) {
-              if (!unlocked) {
-                context.push('/premium');
-              } else {
-                _handleRelease(couple.id, currentUserId);
-              }
-            },
-            onTapCancel: () {
-              if (!unlocked) return;
-              _handleRelease(couple.id, currentUserId);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: _isPressed
-                    ? context.colors.love.withValues(alpha: 0.1)
-                    : _justSent
-                    ? context.colors.success.withValues(alpha: 0.1)
-                    : context.colors.background,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      PhosphorIconsBold.heart,
-                      color: _isPressed
-                          ? context.colors.love
-                          : _justSent
-                          ? context.colors.success
-                          : context.colors.love.withValues(alpha: 0.6),
-                      size: 56,
-                    ),
-                    if (!unlocked) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        context.l10n.tapticTouchCardUnlockPrompt,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: context.colors.textSecondary,
-                        ),
-                      ),
-                    ],
-                    if (_justSent) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        context.l10n.tapticTouchCardSentLabel,
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              color: context.colors.success,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-      loading: () => BentoCard(
+    if (coupleId == null) {
+      return BentoCard(
         child: Center(
           child: Icon(
             PhosphorIconsBold.heart,
@@ -137,13 +52,79 @@ class _TapticTouchCardState extends ConsumerState<TapticTouchCard> {
             size: 56,
           ),
         ),
-      ),
-      error: (_, __) => BentoCard(
-        child: Center(
-          child: Icon(
-            PhosphorIconsBold.heart,
-            color: context.colors.love.withValues(alpha: 0.3),
-            size: 56,
+      );
+    }
+
+    final resolvedUserId = currentUserId ?? '';
+
+    return BentoCard(
+      child: GestureDetector(
+        onTapDown: (_) {
+          if (!unlocked) {
+            HapticFeedback.selectionClick();
+            return;
+          }
+          setState(() {
+            _isPressed = true;
+            _pressStartTime = DateTime.now();
+          });
+          HapticFeedback.mediumImpact();
+        },
+        onTapUp: (_) {
+          if (!unlocked) {
+            context.push('/premium');
+          } else {
+            _handleRelease(coupleId, resolvedUserId);
+          }
+        },
+        onTapCancel: () {
+          if (!unlocked) return;
+          _handleRelease(coupleId, resolvedUserId);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: _isPressed
+                ? context.colors.love.withValues(alpha: 0.1)
+                : _justSent
+                ? context.colors.success.withValues(alpha: 0.1)
+                : context.colors.background,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  PhosphorIconsBold.heart,
+                  color: _isPressed
+                      ? context.colors.love
+                      : _justSent
+                      ? context.colors.success
+                      : context.colors.love.withValues(alpha: 0.6),
+                  size: 56,
+                ),
+                if (!unlocked) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    context.l10n.tapticTouchCardUnlockPrompt,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                ],
+                if (_justSent) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    context.l10n.tapticTouchCardSentLabel,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: context.colors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),
