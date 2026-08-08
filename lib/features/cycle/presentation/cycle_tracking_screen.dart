@@ -147,7 +147,34 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                         );
                         memoriesByDate.putIfAbsent(normalizedDate, () => []).add(memory);
                       }
-                      
+
+                      // Same O(1)-lookup approach as the maps above, applied
+                      // to what eventLoader (called once per rendered day
+                      // cell, ~35-42 times per month) used to scan linearly
+                      // via firstWhere/.any() on every call.
+                      final logByDate = <DateTime, CycleLog>{};
+                      for (final log in logs) {
+                        final normalizedDate = DateTime(
+                          log.date.year,
+                          log.date.month,
+                          log.date.day,
+                        );
+                        logByDate.putIfAbsent(normalizedDate, () => log);
+                      }
+                      final predictedPeriodDates = effectivePredictedPeriods
+                          .map((d) => DateTime(d.year, d.month, d.day))
+                          .toSet();
+                      final fertileDates = effectiveFertileDays
+                          .map((d) => DateTime(d.year, d.month, d.day))
+                          .toSet();
+                      final ovulationDateNormalized = effectiveOvulationDay != null
+                          ? DateTime(
+                              effectiveOvulationDay.year,
+                              effectiveOvulationDay.month,
+                              effectiveOvulationDay.day,
+                            )
+                          : null;
+
                       return Column(
                         children: [
                           OurOSUniversalCalendar(
@@ -206,74 +233,31 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                         // Skip if hideMenstruation is enabled
                         bool hasPeriod = false;
                         final shouldShowMenstruation = settings == null || !settings.hideMenstruation;
-                        debugPrint('CycleTrackingScreen: eventLoader for $normalizedDate, shouldShowMenstruation: $shouldShowMenstruation, hideMenstruation: ${settings?.hideMenstruation}');
                         if (shouldShowMenstruation) {
-                          try {
-                            final log = logs.firstWhere(
-                              (log) {
-                                final logDate = DateTime(
-                                  log.date.year,
-                                  log.date.month,
-                                  log.date.day,
-                                );
-                                return logDate == normalizedDate;
-                              },
-                            );
-                            
-                            if (log.flowIntensity != FlowIntensity.spotting) {
-                              markers.add('recorded_period');
-                              hasPeriod = true;
-                            }
-                          } catch (e) {
-                            // No log found for this date
+                          final log = logByDate[normalizedDate];
+                          if (log != null && log.flowIntensity != FlowIntensity.spotting) {
+                            markers.add('recorded_period');
+                            hasPeriod = true;
                           }
-                          
+
                           // Check for predicted period
-                          final isPredictedPeriod = effectivePredictedPeriods.any(
-                            (periodDate) {
-                              final periodNormalized = DateTime(
-                                periodDate.year,
-                                periodDate.month,
-                                periodDate.day,
-                              );
-                              return periodNormalized == normalizedDate;
-                            },
-                          );
-                          
-                          if (isPredictedPeriod) {
+                          if (predictedPeriodDates.contains(normalizedDate)) {
                             markers.add('predicted_period');
                             hasPeriod = true;
                           }
                         }
-                        
+
                         // Pokud je menstruace, nezobrazujeme ovulaci a fertile window
                         if (!hasPeriod && shouldShowMenstruation) {
                           // Check for fertile window
-                          final isFertile = effectiveFertileDays.any(
-                            (fertileDate) {
-                              final fertileNormalized = DateTime(
-                                fertileDate.year,
-                                fertileDate.month,
-                                fertileDate.day,
-                              );
-                              return fertileNormalized == normalizedDate;
-                            },
-                          );
-                          
-                          if (isFertile) {
+                          if (fertileDates.contains(normalizedDate)) {
                             markers.add('fertile');
                           }
-                          
+
                           // Check for ovulation
-                          if (effectiveOvulationDay != null) {
-                            final ovulationNormalized = DateTime(
-                              effectiveOvulationDay.year,
-                              effectiveOvulationDay.month,
-                              effectiveOvulationDay.day,
-                            );
-                            if (ovulationNormalized == normalizedDate) {
-                              markers.add('ovulation');
-                            }
+                          if (ovulationDateNormalized != null &&
+                              ovulationDateNormalized == normalizedDate) {
+                            markers.add('ovulation');
                           }
                         }
                         
@@ -370,22 +354,18 @@ class _CycleTrackingScreenState extends ConsumerState<CycleTrackingScreen> {
                                 
                                 // Check if we should show menstruation markers
                                 final shouldShowMenstruation = settings == null || !settings.hideMenstruation;
-                                final normalizedDate = DateTime(date.year, date.month, date.day);
-                                debugPrint('CycleTrackingScreen: markerBuilder for $normalizedDate, events: $events, shouldShowMenstruation: $shouldShowMenstruation, hideMenstruation: ${settings?.hideMenstruation}');
-                                
+
                                 // Filter out menstruation-related markers if hideMenstruation is enabled
                                 // This is a safety check - even if eventLoader returns these markers, we won't display them
-                                final filteredEvents = shouldShowMenstruation 
-                                    ? events 
-                                    : events.where((e) => 
-                                        e != 'recorded_period' && 
-                                        e != 'predicted_period' && 
-                                        e != 'ovulation' && 
+                                final filteredEvents = shouldShowMenstruation
+                                    ? events
+                                    : events.where((e) =>
+                                        e != 'recorded_period' &&
+                                        e != 'predicted_period' &&
+                                        e != 'ovulation' &&
                                         e != 'fertile'
                                       ).toList();
-                                
-                                debugPrint('CycleTrackingScreen: markerBuilder filteredEvents: $filteredEvents');
-                                
+
                                 // Cycle markers (priority: recorded_period > predicted_period > ovulation > fertile)
                                 // Only process if shouldShowMenstruation is true (filteredEvents will already exclude them)
                                 if (filteredEvents.contains('recorded_period')) {
