@@ -11,6 +11,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../core/widgets/bento_card.dart';
 import '../../../core/widgets/dyos_universal_calendar.dart';
+import '../../../core/utils/time_format.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../data/event_repository.dart';
 import '../domain/event_model.dart';
@@ -367,7 +368,7 @@ class _EventCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _formatTime(event.date),
+                formatTime24h(event.date),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: context.colors.primary,
@@ -405,12 +406,6 @@ class _EventCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatTime(DateTime date) {
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
   }
 
   String _formatDate(BuildContext context, DateTime date) {
