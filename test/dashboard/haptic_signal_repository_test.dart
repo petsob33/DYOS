@@ -40,5 +40,15 @@ void main() {
 
       expect(signals.map((s) => s.fromUserId), containsAll(['user_1', 'user_2']));
     });
+
+    test('excludes signals older than the window, includes ones inside it', () async {
+      final now = DateTime(2026, 8, 8);
+      await addSignal('user_1', now.subtract(const Duration(days: 91)));
+      await addSignal('user_2', now.subtract(const Duration(days: 30)));
+
+      final signals = await repository.watchSignals(coupleId, now: now).first;
+
+      expect(signals.map((s) => s.fromUserId), ['user_2']);
+    });
   });
 }

@@ -18,16 +18,28 @@ class HapticSignalRepository {
 
   final FirebaseFirestore _firestore;
 
-  /// All signals ever sent for [coupleId], regardless of read status
-  /// (unlike hapticSignalsStream, which only surfaces unread ones for
-  /// notification purposes).
-  Stream<List<HapticSignal>> watchSignals(String coupleId) {
+  /// Signals sent for [coupleId] in the last [windowDays] days, regardless
+  /// of read status (unlike hapticSignalsStream, which only surfaces unread
+  /// ones for notification purposes).
+  ///
+  /// Bounded rather than full history: the only consumer (heartsStreak) only
+  /// ever looks at consecutive recent days, and 90 days comfortably covers
+  /// any realistic streak while keeping reads from growing unboundedly with
+  /// a couple's account age.
+  Stream<List<HapticSignal>> watchSignals(
+    String coupleId, {
+    int windowDays = 90,
+    DateTime? now,
+  }) {
     if (coupleId.isEmpty) return Stream.value([]);
+
+    final cutoff = (now ?? DateTime.now()).subtract(Duration(days: windowDays));
 
     return _firestore
         .collection('couples')
         .doc(coupleId)
         .collection('haptic_signals')
+        .where('timestamp', isGreaterThan: Timestamp.fromDate(cutoff))
         .snapshots()
         .map((snapshot) => snapshot.docs.map(HapticSignal.fromFirestore).toList());
   }
