@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/firebase/firestore_parsing.dart';
 import '../domain/intimacy_log_model.dart';
 
 part 'intimacy_repository.g.dart';
@@ -214,13 +215,6 @@ class IntimacyRepository {
 
   /// Helper method to parse log documents
   List<IntimacyLog> _parseLogs(List<QueryDocumentSnapshot> docs) {
-    return docs.map((doc) {
-      try {
-        return IntimacyLog.fromFirestore(doc);
-      } catch (e) {
-        // Skip invalid documents
-        return null;
-      }
-    }).where((log) => log != null).cast<IntimacyLog>().toList();
+    return parseFirestoreDocs(docs, IntimacyLog.fromFirestore);
   }
 }
