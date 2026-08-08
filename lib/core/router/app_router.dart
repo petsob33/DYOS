@@ -547,7 +547,6 @@ class RootShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
     final items = [
       _NavItem(context.l10n.appRouterNavHome, PhosphorIconsBold.house),
       _NavItem(context.l10n.appRouterNavMemory, PhosphorIconsBold.clockCounterClockwise),
