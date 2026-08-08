@@ -4,6 +4,38 @@ Branch: `chore/cleanup-optimization`
 Base commit: `13a47d2` (main)
 Started: 2026-08-08
 
+## ⚡ Jak pokračovat (přečti toto jako první v nové konverzaci)
+
+Tento soubor je jediný zdroj pravdy pro tento cleanup projekt — pravidla níže **nejsou** v `CLAUDE.md`, žila jen v původní konverzaci. Nová session musí nejdřív přečíst celý tento soubor, pak pokračovat.
+
+**Stav k poslední aktualizaci**: Fáze 0 (baseline) hotová, Priorita 1 (mrtvý kód) uzavřena, Priorita 2 (Firestore náklady) uzavřena — 3 atomické změny commitnuté, viz tabulka níže. **Další krok: Priorita 3 (rebuild performance)** — chybějící `const`, `setState` na příliš vysoké úrovni, chybějící `Selector`/`select`, těžké výpočty v `build()`.
+
+**⚠️ Akce, které čekají na tebe (mimo Claude):**
+1. **Nasadit Firestore composite index** před/spolu s vydáním této branch: `firebase deploy --only firestore:indexes`. Nový index (`notes` kolekce, `type` + `createdAt`) je potřeba pro commit `89300dc` (`NotesRepository.getLatestSharedNote`) — bez něj dotaz v produkci spadne na `failed-precondition`.
+2. Branch `chore/cleanup-optimization` ještě nebyl mergnutý do `main` ani pushnutý — až budeš chtít, řekni.
+
+### Protokol (pravidla, podle kterých se pracuje — platí do odvolání)
+
+Zadání: senior Flutter engineer dělá cleanup + optimalizaci DYOS (Flutter + Firebase/Firestore couples app). **Nepřidávat featury, neměnit chování.**
+
+**Smyčka (bezvýjimečně)**: jedna atomická změna → popsat v 1 větě → provést → `flutter analyze` + `flutter test` → zelená = `git commit` (`refactor:`/`perf:`/`chore:`), červená = max 2 pokusy opravit, pak revert + zapsat "skipped + důvod" do tohoto logu → vždy zapsat řádek do tabulky níže. Nikdy víc změn najednou, nikdy commit bez zelených testů.
+
+**Priority v tomto pořadí:**
+1. Mrtvý kód (nepoužité soubory/třídy/metody/importy/assety/závislosti) — **✅ uzavřeno**
+2. Firestore náklady (chybějící `limit()`, N+1, nedisposed streamy, duplicitní subscriptions, chybějící cache; u nálezu vždy odhadnout ušetřené reads/uživatel/den) — **✅ uzavřeno**
+3. Rebuild performance (chybějící `const`, `setState` moc vysoko, `Selector`/`select`, těžké výpočty v `build()`, `ListView.builder`) — **← next**
+4. Duplicita (sdílet jen když ≥3 výskyty)
+5. Struktura (soubory >400 řádků, mechanický extract, ne přepis logiky)
+6. Konzistence (error handling, logging, naming; `print()` → logger — **už splněno, viz níže**)
+
+**Co nedělat**: neměnit architekturu/state management/DI, neupgradovat major verze závislostí, neměnit Firestore rules ani schéma, nepřepisovat UI, nepřidávat balíčky bez souhlasu, žádné drive-by opravy nesouvisejících věcí (zapsat jako TODO místo toho).
+
+**Výstup**: po ~5 commitech krátký status (hotovo/další/riziko). Na konci: shrnutí před/po (issues, testy, počet souborů, odhad ušetřených Firestore readů) + seznam věcí, které měl uživatel rozhodnout.
+
+**Rozpracovaná práce uživatele** (nesouvisí s cleanupem, nesahat): `lib/features/tracker/presentation/widgets/add_intimacy_sheet.dart` (necommitnuté změny) a `docs/compliance/` (untracked) — byly na `main` už před začátkem cleanupu, přenesly se na tuto branch, zůstávají netknuté a odděleně stage-ované od cleanup commitů.
+
+---
+
 ## Fáze 0 — Baseline
 
 ### Poznámka k pracovnímu stromu
@@ -105,6 +137,6 @@ Prošel jsem všech 30 souborů dotýkajících se Firestore (`repositories`, `s
 - **Odhad nákladu**: pár s 50 nasdílenými poznámkami = 50 reads při každém otevření/změně místo 1. Na home screenu, který se otevírá nejčastěji ze všech, to při typickém používání (několik otevření denně) znamená řádově stovky zbytečných reads/den u aktivnějších párů, a roste to lineárně s počtem poznámek navždy.
 - **Proč to nefixnu automaticky**: správná oprava (`.where('type', isEqualTo: ...).orderBy('createdAt', descending: true).limit(1)`) potřebuje složený (composite) index ve Firestore, který není součástí tohoto repa (zřejmě `firestore.indexes.json`, mimo dohled tohoto cleanupu) a musel by se nasadit do Firebase projektu *před* vydáním kódu, jinak dotaz v produkci spadne na `failed-precondition`. To je nasazení infrastruktury, ne jen úprava kódu — mimo bezpečný rámec tohoto cleanupu bez tvého souhlasu/koordinace.
 
-**TODO rozhodnutí pro tebe** (obě čekají na tvůj pokyn, nic jsem zatím neměnil):
-1. Haptic streak — mám omezit `watchSignals` na posledních X dní (a jaké X je pro tebe přijatelné jako "streak cap")? Nebo najít jiný přístup (např. bounded live window + separátní `getOlderSignals` pro edge-case dlouhé streaky, stejný vzor jako u intimacy/memory)?
-2. Latest shared note — mám připravit `.orderBy + limit(1)` verzi a ty/já nasadíte composite index do Firebase konzole/`firestore.indexes.json`? Nebo preferuješ levnější bezindexovou opravu (např. cache poslední známé poznámky v `couples/{id}` dokumentu při zápisu, aktualizovanou při každém vytvoření sdílené poznámky)?
+**Rozhodnuto uživatelem (implementováno, viz change #2 a #3 v tabulce výše):**
+1. Haptic streak → **bound na posledních 90 dní** (`where(timestamp > cutoff)`). Hotovo v commitu `134d8e6`.
+2. Latest shared note → **`orderBy + limit(1)` + composite index** v `firestore.indexes.json`. Hotovo v commitu `89300dc`. **Čeká na `firebase deploy --only firestore:indexes` od tebe** (viz akce na začátku souboru).
