@@ -74,3 +74,12 @@ Tyto změny se přenesly na novou branch (git checkout -b nic nemaže). Nejsou s
 | # | Změna | Soubor | analyze | test | Výsledek |
 |---|---|---|---|---|---|
 | 1 | Odstranění nepoužité lokální `isPremium` v `RootShell.build()` (mrtvý kód + zbytečný rebuild trigger na `isPremiumProvider`) | `lib/core/router/app_router.dart:550` | 389→388 issues (warning zmizel) | 148/148 ✅ | commit `547990f` |
+
+### Priorita 1 (mrtvý kód) — uzavřeno
+Po change #1 byly provedeny další kontroly, žádný další nález:
+- **Nepoužité soubory**: cross-check importů přes celý `lib/` (167 souborů) — každý soubor má ≥1 odkaz odjinud. Žádný orphan.
+- **Nepoužité importy/elementy**: `flutter analyze` po opravě #1 nehlásí žádný `unused_import`/`unused_element`/`unused_field`/`unused_local_variable`.
+- **Nepoužité assety**: žádný `assets:` blok v pubspec.yaml.
+- **Nepoužité závislosti**: ověřeno grepem i u balíčků s jen 1 výskytem (`firebase_crashlytics`, `fl_chart`, `flutter_local_notifications`, `flutter_staggered_grid_view`, `geocoding`, `google_sign_in`, `http`, `permission_handler`, `shared_preferences`, `url_launcher`) — všechny mají reálné, aktivní použití (Crashlytics init, chart na Data screen, lokální notifikace, staggered grid na home, reverse geocoding, Google sign-in, notification permissions, lokální persistence, externí odkazy na premium landing). Žádná se nemaže.
+
+**Závěr**: mechanicky ověřitelný mrtvý kód je vyčerpaný. Přecházím na Prioritu 2 (Firestore náklady).
