@@ -47,7 +47,9 @@ class IntimacyHistoryList extends ConsumerWidget {
     final isFullHistory = limit == null;
     final feedState = isFullHistory ? ref.watch(intimacyFeedControllerProvider) : null;
     final logsAsync = isFullHistory ? null : ref.watch(intimacyLogsStreamProvider);
-    final currentUserAsync = ref.watch(userProvider);
+    final currentUserId = ref.watch(
+      userProvider.select((async) => async.valueOrNull?.uid),
+    );
     final currentUserDataAsync = ref.watch(currentUserDataProvider);
     final partnerAsync = ref.watch(partnerProvider);
 
@@ -93,7 +95,7 @@ class IntimacyHistoryList extends ConsumerWidget {
                 child: _IntimacyMonthSection(
                   month: monthLabel,
                   logs: monthLogs,
-                  currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
+                  currentUserId: currentUserId ?? '',
                   currentUserPhotoUrl: currentUserPhotoUrl,
                   partnerPhotoUrl: partnerPhotoUrl,
                 ),
