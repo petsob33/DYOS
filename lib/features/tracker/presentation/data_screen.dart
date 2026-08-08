@@ -23,7 +23,9 @@ class DataScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final logsAsync = ref.watch(intimacyLogsStreamProvider);
-    final currentUserAsync = ref.watch(userProvider);
+    final currentUserId = ref.watch(
+      userProvider.select((async) => async.valueOrNull?.uid),
+    );
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -83,7 +85,7 @@ class DataScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                     child: _InitiatorChart(
                       logs: logs,
-                      currentUserId: currentUserAsync.valueOrNull?.uid ?? '',
+                      currentUserId: currentUserId ?? '',
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
