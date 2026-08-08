@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/firebase/firestore_parsing.dart';
 import '../domain/event_model.dart';
 
 part 'event_repository.g.dart';
@@ -145,13 +146,6 @@ class EventRepository {
 
   /// Helper method to parse event documents
   List<Event> _parseEvents(List<QueryDocumentSnapshot> docs) {
-    return docs.map((doc) {
-      try {
-        return Event.fromFirestore(doc);
-      } catch (e) {
-        // Skip invalid documents
-        return null;
-      }
-    }).where((event) => event != null).cast<Event>().toList();
+    return parseFirestoreDocs(docs, Event.fromFirestore);
   }
 }

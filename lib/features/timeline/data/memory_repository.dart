@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/firebase/firestore_parsing.dart';
 import '../domain/memory_model.dart';
 
 part 'memory_repository.g.dart';
@@ -254,13 +255,6 @@ class MemoryRepository {
 
   /// Helper method to parse memory documents
   List<Memory> _parseMemories(List<QueryDocumentSnapshot> docs) {
-    return docs.map((doc) {
-      try {
-        return Memory.fromFirestore(doc);
-      } catch (e) {
-        // Skip invalid documents
-        return null;
-      }
-    }).where((memory) => memory != null).cast<Memory>().toList();
+    return parseFirestoreDocs(docs, Memory.fromFirestore);
   }
 }

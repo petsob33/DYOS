@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/firebase/firestore_parsing.dart';
 import '../domain/note_item.dart';
 
 part 'notes_repository.g.dart';
@@ -164,14 +165,7 @@ class NotesRepository {
 
   /// Helper method to parse note documents
   List<NoteItem> _parseNotes(List<QueryDocumentSnapshot> docs) {
-    return docs.map((doc) {
-      try {
-        return NoteItem.fromFirestore(doc);
-      } catch (e) {
-        // Skip invalid documents
-        return null;
-      }
-    }).where((note) => note != null).cast<NoteItem>().toList();
+    return parseFirestoreDocs(docs, NoteItem.fromFirestore);
   }
 
   /// Get notes filtered by type
