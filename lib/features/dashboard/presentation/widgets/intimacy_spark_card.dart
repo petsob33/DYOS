@@ -7,7 +7,6 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/widgets/bento_card.dart';
 import '../../../tracker/presentation/intimacy_provider.dart';
-import '../../../tracker/domain/intimacy_log_model.dart';
 import 'package:flutter/services.dart';
 
 class IntimacySparkCard extends ConsumerWidget {
@@ -44,9 +43,9 @@ class IntimacySparkCard extends ConsumerWidget {
         }
 
         // Get the most recent log
-        final sortedLogs = List<IntimacyLog>.from(logs)
-          ..sort((a, b) => b.date.compareTo(a.date));
-        final lastLog = sortedLogs.first;
+        final lastLog = logs.reduce(
+          (a, b) => a.date.isAfter(b.date) ? a : b,
+        );
         final daysSince = DateTime.now().difference(lastLog.date).inDays;
 
         final sparkText = context.l10n.intimacySparkCardDaysAgo(daysSince);
