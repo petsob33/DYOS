@@ -97,7 +97,12 @@ Stream<UserModel?> partner(PartnerRef ref) {
 
 @riverpod
 Stream<CoupleModel?> couple(CoupleRef ref) {
-  return ref.watch(currentCoupleProvider.stream);
+  // Read the AsyncValue directly rather than re-wrapping currentCoupleProvider.stream,
+  // which is a broadcast stream that doesn't replay an already-emitted value to a
+  // late subscriber - see the comment on currentCouple above. Without this, XP
+  // (and anything else built on this provider) could get stuck showing 0 until
+  // the couple document happened to receive another write.
+  return Stream.value(ref.watch(currentCoupleProvider).valueOrNull);
 }
 
 @riverpod
