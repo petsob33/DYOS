@@ -62,3 +62,4 @@ tmp/
 
 # Firebase emulator logs
 *-debug.log
+functions/.env

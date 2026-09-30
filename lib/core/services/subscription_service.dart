@@ -5,21 +5,6 @@ class SubscriptionService {
 
   final FirebaseFirestore _firestore;
 
-  Future<void> updateCoupleSubscription(
-    String coupleId, {
-    required String subscriptionTier,
-    DateTime? subscriptionExpiry,
-  }) async {
-    final coupleRef = _firestore.collection('couples').doc(coupleId);
-    final updates = <String, dynamic>{'subscriptionTier': subscriptionTier};
-    if (subscriptionExpiry != null) {
-      updates['subscriptionExpiry'] = Timestamp.fromDate(subscriptionExpiry);
-    } else {
-      updates['subscriptionExpiry'] = FieldValue.delete();
-    }
-    await coupleRef.update(updates);
-  }
-
   Future<void> addCoupleXp(String coupleId, int amount) async {
     if (amount <= 0) return;
     await _firestore.collection('couples').doc(coupleId).update({

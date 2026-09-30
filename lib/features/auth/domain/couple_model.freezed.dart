@@ -21,6 +21,10 @@ CoupleModel _$CoupleModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CoupleModel {
+  // Freezed constructor param, not a field/getter yet when the analyzer
+  // checks this; source_gen still honors it correctly (id is excluded
+  // from toJson in couple_model.g.dart).
+  // ignore: invalid_annotation_target
   @JsonKey(includeFromJson: true, includeToJson: false)
   String get id => throw _privateConstructorUsedError;
   List<String> get members =>
@@ -259,8 +263,7 @@ class __$$CoupleModelImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$CoupleModelImpl extends _CoupleModel with DiagnosticableTreeMixin {
   const _$CoupleModelImpl({
     @JsonKey(includeFromJson: true, includeToJson: false) required this.id,
@@ -284,6 +287,10 @@ class _$CoupleModelImpl extends _CoupleModel with DiagnosticableTreeMixin {
   factory _$CoupleModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$CoupleModelImplFromJson(json);
 
+  // Freezed constructor param, not a field/getter yet when the analyzer
+  // checks this; source_gen still honors it correctly (id is excluded
+  // from toJson in couple_model.g.dart).
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(includeFromJson: true, includeToJson: false)
   final String id;
@@ -478,6 +485,10 @@ abstract class _CoupleModel extends CoupleModel {
   factory _CoupleModel.fromJson(Map<String, dynamic> json) =
       _$CoupleModelImpl.fromJson;
 
+  // Freezed constructor param, not a field/getter yet when the analyzer
+  // checks this; source_gen still honors it correctly (id is excluded
+  // from toJson in couple_model.g.dart).
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(includeFromJson: true, includeToJson: false)
   String get id;
@@ -642,8 +653,7 @@ class __$$CoupleStatusImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$CoupleStatusImpl with DiagnosticableTreeMixin implements _CoupleStatus {
   const _$CoupleStatusImpl({
     required this.emoji,

@@ -44,14 +44,21 @@ service cloud.firestore {
       // Číst mohou jen členové páru
       allow read: if isMember();
       
+      // Premium (subscriptionTier/Expiry) smí měnit jen server (RevenueCat webhook, Admin SDK)
+      function subscriptionUntouched() {
+        return !request.resource.data.diff(resource.data).affectedKeys()
+                 .hasAny(['subscriptionTier', 'subscriptionExpiry']);
+      }
+
       // Vytvořit lze jen pár o 2 lidech, kde jsem členem
       allow create: if request.auth != null &&
+                       !request.resource.data.keys().hasAny(['subscriptionTier', 'subscriptionExpiry']) &&
                        request.resource.data.members != null &&
                        request.auth.uid in request.resource.data.members &&
                        request.resource.data.members.size() == 2;
       
       // Update: Jen členové, musí zůstat členy a počet členů musí zůstat 2 (bezpečnostní fix)
-      allow update: if isMember() && willBeMember() && request.resource.data.members.size() == 2;
+      allow update: if isMember() && willBeMember() && request.resource.data.members.size() == 2 && subscriptionUntouched();
       
       // Mazání párů zakázáno
       allow delete: if false;

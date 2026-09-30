@@ -183,8 +183,7 @@ class __$$CycleSettingsImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$CycleSettingsImpl implements _CycleSettings {
   const _$CycleSettingsImpl({
     required this.id,

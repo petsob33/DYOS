@@ -1,6 +1,6 @@
 const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
-const { FieldValue } = require("firebase-admin/firestore");
+const { FieldValue, Timestamp } = require("firebase-admin/firestore");
 const sharp = require("sharp");
 const {
   normalizeInviteCode,
@@ -13,6 +13,11 @@ const {
   shouldCountFinalizeEvent,
   clampNonNegative,
 } = require("./storage_usage_helpers");
+
+const {
+  isAuthorizedWebhook,
+  parseRevenueCatEvent,
+} = require("./revenuecat_helpers");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -563,4 +568,51 @@ exports.trackMemoryUsageOnDelete = functions.storage.object().onDelete(async (ob
     tx.set(usageRef, { bytesUsed: clampNonNegative(current - size) }, { merge: true });
   });
   return null;
+});
+
+/**
+ * RevenueCat webhook: the only writer of couples/{id}.subscriptionTier/Expiry
+ * (Firestore rules forbid clients from touching them). RevenueCat app_user_id
+ * is the Firebase uid. Configure the URL in RevenueCat > Integrations >
+ * Webhooks with Authorization header = REVENUECAT_WEBHOOK_AUTH.
+ */
+exports.revenuecatWebhook = functions.https.onRequest(async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+  if (!isAuthorizedWebhook(req.get("Authorization"), process.env.REVENUECAT_WEBHOOK_AUTH)) {
+    res.status(401).send("Unauthorized");
+    return;
+  }
+
+  const { action, uid, expiryMs } = parseRevenueCatEvent(req.body);
+  if (action === "ignore") {
+    res.status(200).send("ignored");
+    return;
+  }
+
+  const userSnap = await db.collection("users").doc(uid).get();
+  const coupleId = userSnap.exists ? userSnap.get("coupleId") : null;
+  if (!coupleId) {
+    // Buyer not paired (yet). Return 200 so RevenueCat doesn't retry forever.
+    console.warn(`revenuecatWebhook: no couple for uid ${uid}, action ${action}`);
+    res.status(200).send("no couple");
+    return;
+  }
+
+  const coupleRef = db.collection("couples").doc(coupleId);
+  if (action === "grant") {
+    await coupleRef.update({
+      subscriptionTier: "premium",
+      subscriptionExpiry:
+        expiryMs === null ? FieldValue.delete() : Timestamp.fromMillis(expiryMs),
+    });
+  } else {
+    await coupleRef.update({
+      subscriptionTier: "free",
+      subscriptionExpiry: FieldValue.delete(),
+    });
+  }
+  res.status(200).send(action);
 });

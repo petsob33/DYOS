@@ -167,8 +167,7 @@ class __$$CycleLogImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$CycleLogImpl implements _CycleLog {
   const _$CycleLogImpl({
     required this.id,

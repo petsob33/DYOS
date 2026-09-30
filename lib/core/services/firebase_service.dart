@@ -100,20 +100,6 @@ class FirebaseService {
     return result;
   }
 
-  /// Update subscription fields on the couple document.
-  /// Called after a successful RevenueCat purchase so both partners get premium via the couple stream.
-  Future<void> updateCoupleSubscription(
-    String coupleId, {
-    required String subscriptionTier,
-    DateTime? subscriptionExpiry,
-  }) async {
-    await _subscriptionService.updateCoupleSubscription(
-      coupleId,
-      subscriptionTier: subscriptionTier,
-      subscriptionExpiry: subscriptionExpiry,
-    );
-  }
-
   // Check if user is paired
   Future<bool> isUserPaired() async {
     return _pairingService.isUserPaired(getUserData);

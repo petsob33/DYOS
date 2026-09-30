@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test security_helpers.test.js"
+    "test": "node --test security_helpers.test.js storage_usage_helpers.test.js revenuecat_helpers.test.js"
   },
   "keywords": [],
   "author": "",

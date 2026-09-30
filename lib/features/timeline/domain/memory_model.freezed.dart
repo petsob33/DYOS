@@ -221,8 +221,7 @@ class __$$MemoryImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$MemoryImpl implements _Memory {
   const _$MemoryImpl({
     required this.id,

@@ -142,7 +142,7 @@ final partnerProvider = AutoDisposeStreamProvider<UserModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PartnerRef = AutoDisposeStreamProviderRef<UserModel?>;
-String _$coupleHash() => r'3f43b2d6d06b16d1ff1f41f8ac060f30773385c3';
+String _$coupleHash() => r'13529da5393c63e36f7bd2de5b9be686904a9303';
 
 /// See also [couple].
 @ProviderFor(couple)

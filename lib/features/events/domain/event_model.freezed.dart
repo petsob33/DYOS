@@ -131,8 +131,7 @@ class __$$EventImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$EventImpl implements _Event {
   const _$EventImpl({
     required this.id,

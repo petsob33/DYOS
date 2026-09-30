@@ -181,8 +181,7 @@ class __$$NoteItemImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$NoteItemImpl implements _NoteItem {
   const _$NoteItemImpl({
     required this.id,
