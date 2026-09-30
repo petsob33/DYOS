@@ -3373,13 +3373,13 @@ abstract class AppLocalizations {
   /// No description provided for @insightMemoriesThisMonth.
   ///
   /// In en, this message translates to:
-  /// **'memories\\nthis month'**
+  /// **'memories\nthis month'**
   String get insightMemoriesThisMonth;
 
   /// No description provided for @insightMomentsThisMonth.
   ///
   /// In en, this message translates to:
-  /// **'moments\\nthis month'**
+  /// **'moments\nthis month'**
   String get insightMomentsThisMonth;
 
   /// No description provided for @insightToday.
@@ -3445,7 +3445,7 @@ abstract class AppLocalizations {
   /// No description provided for @insightDaysToPeriod.
   ///
   /// In en, this message translates to:
-  /// **'days to\\nnext period'**
+  /// **'days to\nnext period'**
   String get insightDaysToPeriod;
 
   /// No description provided for @insightEventToday.
@@ -3463,7 +3463,7 @@ abstract class AppLocalizations {
   /// No description provided for @insightDaysTogether.
   ///
   /// In en, this message translates to:
-  /// **'days\\ntogether'**
+  /// **'days\ntogether'**
   String get insightDaysTogether;
 
   /// No description provided for @dashCardChat.

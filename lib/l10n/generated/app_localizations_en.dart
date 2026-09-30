@@ -1922,10 +1922,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get insightMemoriesThisMonth => 'memories\\nthis month';
+  String get insightMemoriesThisMonth => 'memories\nthis month';
 
   @override
-  String get insightMomentsThisMonth => 'moments\\nthis month';
+  String get insightMomentsThisMonth => 'moments\nthis month';
 
   @override
   String get insightToday => 'Today';
@@ -1960,7 +1960,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get insightPeriodToday => 'period today';
 
   @override
-  String get insightDaysToPeriod => 'days to\\nnext period';
+  String get insightDaysToPeriod => 'days to\nnext period';
 
   @override
   String get insightEventToday => 'today';
@@ -1971,7 +1971,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get insightDaysTogether => 'days\\ntogether';
+  String get insightDaysTogether => 'days\ntogether';
 
   @override
   String get dashCardChat => 'Chat';

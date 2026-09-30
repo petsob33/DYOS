@@ -1943,10 +1943,10 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get insightMemoriesThisMonth => 'vzpomínek\\ntento měsíc';
+  String get insightMemoriesThisMonth => 'vzpomínek\ntento měsíc';
 
   @override
-  String get insightMomentsThisMonth => 'chvilek\\ntento měsíc';
+  String get insightMomentsThisMonth => 'chvilek\ntento měsíc';
 
   @override
   String get insightToday => 'Dnes';
@@ -1981,7 +1981,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get insightPeriodToday => 'menstruace dnes';
 
   @override
-  String get insightDaysToPeriod => 'dní do další\\nmenstruace';
+  String get insightDaysToPeriod => 'dní do další\nmenstruace';
 
   @override
   String get insightEventToday => 'dnes';
@@ -1992,7 +1992,7 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get insightDaysTogether => 'dní\\nspolu';
+  String get insightDaysTogether => 'dní\nspolu';
 
   @override
   String get dashCardChat => 'Chat';
