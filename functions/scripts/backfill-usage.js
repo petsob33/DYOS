@@ -9,7 +9,7 @@
 
 const admin = require("firebase-admin");
 
-admin.initializeApp();
+admin.initializeApp({ storageBucket: process.env.STORAGE_BUCKET });
 const db = admin.firestore();
 const bucket = admin.storage().bucket();
 
