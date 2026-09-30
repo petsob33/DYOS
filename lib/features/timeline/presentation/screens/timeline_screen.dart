@@ -15,6 +15,7 @@ import '../../../premium/presentation/premium_provider.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 import '../widgets/memory_card.dart';
+import '../memory_category_label.dart';
 
 /// Timeline screen displaying all memories in chronological order
 class TimelineScreen extends ConsumerWidget {
@@ -37,11 +38,6 @@ class TimelineScreen extends ConsumerWidget {
     final memoriesCount = memories.length;
     final currentSp = ref.watch(currentXpProvider);
     final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
-    final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
-      FeatureID.memories,
-      currentSp,
-      isPremium,
-    );
     final mapViewUnlocked = ProgressionPlan.isFeatureUnlocked(
       FeatureID.mapView,
       currentSp,
@@ -94,11 +90,6 @@ class TimelineScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (!memoriesUnlocked) {
-            showLevelUpUnlockSheet(context, ref, FeatureID.memories);
-            return;
-          }
-
           const freeLimit = 30;
           if (!isPremium && memoriesCount >= freeLimit) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -200,7 +191,7 @@ class _CategoryFilter extends ConsumerWidget {
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: ChoiceChip(
-              label: Text(category?.displayName ?? context.l10n.timelineScreenAllCategoriesLabel),
+              label: Text(category?.label(context) ?? context.l10n.timelineScreenAllCategoriesLabel),
               selected: isSelected,
               onSelected: (selected) {
                 if (selected) {

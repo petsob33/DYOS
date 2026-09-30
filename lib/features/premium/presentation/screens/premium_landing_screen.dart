@@ -417,6 +417,8 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
     final packages = <Package>[];
     if (annual != null) packages.add(annual);
     if (monthly != null) packages.add(monthly);
+    final lifetime = offering.lifetime;
+    if (lifetime != null) packages.add(lifetime);
     if (packages.isEmpty) {
       return BentoCard(
         child: Padding(
@@ -433,6 +435,7 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
     return Column(
       children: packages.map((package) {
         final isYearly = package.packageType == PackageType.annual;
+        final isLifetime = package.packageType == PackageType.lifetime;
         final isSelected = _selectedPackage == package;
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -470,7 +473,11 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                       Row(
                         children: [
                           Text(
-                            isYearly ? context.l10n.premiumLandingScreenYearly : context.l10n.premiumLandingScreenMonthly,
+                            isLifetime
+                                ? context.l10n.premiumLandingScreenLifetime
+                                : isYearly
+                                    ? context.l10n.premiumLandingScreenYearly
+                                    : context.l10n.premiumLandingScreenMonthly,
                             style: GoogleFonts.inter(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -501,9 +508,11 @@ class _PremiumLandingScreenState extends ConsumerState<PremiumLandingScreen> {
                         ],
                       ),
                       Text(
-                        isYearly
-                            ? context.l10n.premiumLandingScreenYearlyBilling
-                            : context.l10n.premiumLandingScreenMonthlyBilling,
+                        isLifetime
+                            ? context.l10n.premiumLandingScreenLifetimeBilling
+                            : isYearly
+                                ? context.l10n.premiumLandingScreenYearlyBilling
+                                : context.l10n.premiumLandingScreenMonthlyBilling,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: c.textSecondary,

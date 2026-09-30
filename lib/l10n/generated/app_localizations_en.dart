@@ -1794,6 +1794,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumLandingScreenMonthlyBilling => 'Monthly billing';
 
   @override
+  String get premiumLandingScreenLifetime => 'Lifetime';
+
+  @override
+  String get premiumLandingScreenLifetimeBilling =>
+      'One-time payment, yours forever';
+
+  @override
   String get premiumLandingScreenGetPremiumNow => 'Get DYOS+ now';
 
   @override
@@ -1824,5 +1831,164 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paywallModalMonthlyBilling => 'Monthly billing';
 
   @override
+  String get paywallModalLifetime => 'Lifetime';
+
+  @override
+  String get paywallModalLifetimeBilling => 'One-time payment, yours forever';
+
+  @override
   String get paywallModalRestorePurchases => 'Restore purchases';
+
+  @override
+  String get memoryCategoryDateNight => 'Date Night';
+
+  @override
+  String get memoryCategoryTrip => 'Trip';
+
+  @override
+  String get memoryCategoryMilestone => 'Milestone';
+
+  @override
+  String get memoryCategoryDailyLife => 'Daily Life';
+
+  @override
+  String get memoryCategoryFood => 'Food';
+
+  @override
+  String get memoryCategoryParty => 'Party';
+
+  @override
+  String get memoryCategoryFunny => 'Funny';
+
+  @override
+  String get memoryCategoryIntimacy => 'Intimacy';
+
+  @override
+  String get memoryCategoryNature => 'Nature';
+
+  @override
+  String get memoryCategoryOther => 'Other';
+
+  @override
+  String get insightPartnerTitle => 'For your partner';
+
+  @override
+  String get insightTipNoData =>
+      'No period data yet. Track your period to get predictions.';
+
+  @override
+  String insightTipPeriod(int day) {
+    return 'Day $day: Period in progress. Be supportive and patient.';
+  }
+
+  @override
+  String insightTipFertileHigh(int day) {
+    return 'Day $day: Fertile window open! High chance of conception.';
+  }
+
+  @override
+  String insightTipFertileApproaching(int day) {
+    return 'Day $day: Fertile window approaching. Be attentive and understanding.';
+  }
+
+  @override
+  String insightTipEarlyCycle(int day) {
+    return 'Day $day: Early cycle. Energy levels rising.';
+  }
+
+  @override
+  String insightTipApproachingFertile(int day) {
+    return 'Day $day: Approaching fertile window. Stay connected.';
+  }
+
+  @override
+  String insightTipOvulation(int day) {
+    return 'Day $day: Ovulation day! Peak fertility.';
+  }
+
+  @override
+  String insightTipPmsDanger(int day) {
+    return 'Day $day: PMS danger zone. Be extra patient and understanding.';
+  }
+
+  @override
+  String insightTipPrePms(int day) {
+    return 'Day $day: Pre-PMS phase. Mood changes possible. Stay supportive.';
+  }
+
+  @override
+  String insightTipPostOvulation(int day) {
+    return 'Day $day: Post-ovulation. Mood may stabilize.';
+  }
+
+  @override
+  String get insightMemoriesThisMonth => 'memories\\nthis month';
+
+  @override
+  String get insightMomentsThisMonth => 'moments\\nthis month';
+
+  @override
+  String get insightToday => 'Today';
+
+  @override
+  String get insightOneDayAgo => '1 day ago';
+
+  @override
+  String insightDaysAgo(int n) {
+    return '$n days ago';
+  }
+
+  @override
+  String get insightLastMoment => 'last moment';
+
+  @override
+  String get insightLastMemory => 'last memory';
+
+  @override
+  String get insightMemory => 'Memory';
+
+  @override
+  String get insightAMoment => 'A moment';
+
+  @override
+  String get insightAboutMonthAgo => 'about a month ago';
+
+  @override
+  String get insightYearAgoToday => 'a year ago today';
+
+  @override
+  String get insightPeriodToday => 'period today';
+
+  @override
+  String get insightDaysToPeriod => 'days to\\nnext period';
+
+  @override
+  String get insightEventToday => 'today';
+
+  @override
+  String insightEventInDays(int n) {
+    return 'in $n days';
+  }
+
+  @override
+  String get insightDaysTogether => 'days\\ntogether';
+
+  @override
+  String get dashCardChat => 'Chat';
+
+  @override
+  String get dashCardQuestions => 'Questions';
+
+  @override
+  String get dashCardLists => 'Lists';
+
+  @override
+  String get dashCardEvents => 'Events';
+
+  @override
+  String get dashCardLastMoment => 'Last moment';
+
+  @override
+  String get addMemoryStorageLimitReached =>
+      'You\'ve reached your couple\'s storage limit. Delete some memories to free up space.';
 }

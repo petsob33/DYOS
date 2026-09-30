@@ -124,7 +124,7 @@ class ProgressionPlan {
       spRequired: 25,
       type: MilestoneType.reward,
       title: 'Memory Core',
-      description: 'Unlock Memories',
+      description: 'Earned at 25 SP',
       rewardKind: RewardKind.badge,
       emoji: '🔓',
     ),
@@ -132,7 +132,7 @@ class ProgressionPlan {
       spRequired: 50,
       type: MilestoneType.reward,
       title: 'Blueprint Protocol',
-      description: 'Unlock Daily Questions',
+      description: 'Earned at 50 SP',
       rewardKind: RewardKind.blueprintPack,
       emoji: '🔓',
     ),
@@ -140,7 +140,7 @@ class ProgressionPlan {
       spRequired: 100,
       type: MilestoneType.reward,
       title: 'Badge: Initiate',
-      description: 'First milestone badge',
+      description: 'Earned at 100 SP',
       rewardKind: RewardKind.badge,
       emoji: '🏅',
     ),
@@ -148,7 +148,7 @@ class ProgressionPlan {
       spRequired: 150,
       type: MilestoneType.reward,
       title: 'Taptic Touch',
-      description: 'Unlock Haptic Touch',
+      description: 'Earned at 150 SP',
       rewardKind: RewardKind.taptic,
       emoji: '🔓',
     ),
@@ -156,7 +156,7 @@ class ProgressionPlan {
       spRequired: 200,
       type: MilestoneType.reward,
       title: 'Quick Link',
-      description: 'Unlock Quick Messages',
+      description: 'Earned at 200 SP',
       rewardKind: RewardKind.badge,
       emoji: '🔓',
     ),
@@ -180,7 +180,7 @@ class ProgressionPlan {
       spRequired: 750,
       type: MilestoneType.reward,
       title: 'BP Expansion I',
-      description: 'Blueprint expansion pack',
+      description: 'Earned at 750 SP',
       rewardKind: RewardKind.blueprintPack,
       emoji: '📦',
     ),
@@ -188,16 +188,15 @@ class ProgressionPlan {
       spRequired: 1000,
       type: MilestoneType.reward,
       title: 'Badge: Verified Couple',
-      description: '1 Month Free',
+      description: 'Earned at 1000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🎁',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 2000,
       type: MilestoneType.reward,
       title: 'BP Expansion II',
-      description: 'Blueprint expansion pack',
+      description: 'Earned at 2000 SP',
       rewardKind: RewardKind.blueprintPack,
       emoji: '📦',
     ),
@@ -229,91 +228,81 @@ class ProgressionPlan {
       spRequired: 10000,
       type: MilestoneType.reward,
       title: 'Golden Frame',
-      description: '1 Month Free',
+      description: 'Earned at 10000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🎁',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 20000,
       type: MilestoneType.reward,
       title: 'Badge: 20k SP',
-      description: '1 Month Free',
+      description: 'Earned at 20000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 30000,
       type: MilestoneType.reward,
       title: 'Badge: 30k SP',
-      description: '1 Month Free',
+      description: 'Earned at 30000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 40000,
       type: MilestoneType.reward,
       title: 'Badge: 40k SP',
-      description: '1 Month Free',
+      description: 'Earned at 40000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 50000,
       type: MilestoneType.reward,
       title: 'Badge: 50k SP',
-      description: '1 Month Free',
+      description: 'Earned at 50000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 60000,
       type: MilestoneType.reward,
       title: 'Badge: 60k SP',
-      description: '1 Month Free',
+      description: 'Earned at 60000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 70000,
       type: MilestoneType.reward,
       title: 'Badge: 70k SP',
-      description: '1 Month Free',
+      description: 'Earned at 70000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 80000,
       type: MilestoneType.reward,
       title: 'Badge: 80k SP',
-      description: '1 Month Free',
+      description: 'Earned at 80000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 90000,
       type: MilestoneType.reward,
       title: 'Badge: 90k SP',
-      description: '1 Month Free',
+      description: 'Earned at 90000 SP',
       rewardKind: RewardKind.premiumTrial,
       emoji: '🏅',
-      subscriptionReward: true,
     ),
     ProgressionMilestone(
       spRequired: 100000,
       type: MilestoneType.reward,
       title: 'Singularity Frame',
-      description: '1 Year Free',
+      description: 'Earned at 100000 SP',
       rewardKind: RewardKind.lifetimeLicense,
       emoji: '🏆',
-      subscriptionReward: true,
     ),
   ];
 
@@ -381,21 +370,23 @@ class ProgressionPlan {
   /// Whether the milestone at [spRequired] is unlocked for given [sp].
   static bool isMilestoneUnlocked(int sp, int spRequired) => sp >= spRequired;
 
-  /// Functional unlocks (Map, Daily Questions pack, Taptic, Widget) are
-  /// unlocked immediately with DYOS+; otherwise they follow SP milestones.
-  /// Cosmetic rewards (badges, icons, wallpapers) and Lifetime are SP-only.
+  /// Functional rewards that used to be SP-gated. They are now free for every
+  /// couple so new users get the whole product from day one; only the Memory
+  /// Map stays a DYOS+ (or 5000 SP) perk. Cosmetic rewards (badges, icons,
+  /// wallpapers) and Lifetime remain SP-only.
   static const Set<RewardKind> functionalRewardKinds = {
     RewardKind.widget,
     RewardKind.taptic,
     RewardKind.blueprintPack,
-    RewardKind.mapView,
   };
 
-  /// True if the reward for [kind] is unlocked: premium unlocks all functional
-  /// features; otherwise uses [currentSp] vs milestone threshold.
+  /// True if the reward for [kind] is unlocked: free functional rewards are
+  /// always unlocked, premium unlocks the Memory Map; otherwise uses
+  /// [currentSp] vs milestone threshold.
   /// For feature gates (Memories, Daily Questions, Quick Messages, Map View) use [isFeatureUnlocked] with [FeatureID].
   static bool isRewardUnlocked(RewardKind kind, int currentSp, bool isPremium) {
-    if (isPremium && functionalRewardKinds.contains(kind)) return true;
+    if (functionalRewardKinds.contains(kind)) return true;
+    if (isPremium && kind == RewardKind.mapView) return true;
     final list = milestones.where((m) => m.rewardKind == kind).toList();
     if (list.isEmpty) return false;
     return currentSp >= list.first.spRequired;
@@ -415,10 +406,18 @@ class ProgressionPlan {
     }
   }
 
-  /// True if [feature] is unlocked: user has active premium or has reached the required SP.
+  /// True if [feature] is unlocked. Memories, Daily Questions and Quick
+  /// Messages are free for everyone; the Memory Map needs active premium or
+  /// the required SP.
   static bool isFeatureUnlocked(FeatureID feature, int currentSp, bool isPremium) {
-    if (isPremium) return true;
-    return currentSp >= spRequiredForFeature(feature);
+    switch (feature) {
+      case FeatureID.memories:
+      case FeatureID.blueprints:
+      case FeatureID.quickMessages:
+        return true;
+      case FeatureID.mapView:
+        return isPremium || currentSp >= spRequiredForFeature(feature);
+    }
   }
 
   /// Short tip for "next reward" in UI.

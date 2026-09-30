@@ -1,18 +1,21 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'app.dart';
+import 'core/firebase/firebase_functions_factory.dart';
 import 'core/services/app_logger.dart';
 import 'firebase_options.dart';
 
@@ -23,6 +26,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   // Optional: handle data payload; system shows notification from payload when in background
 }
+
+/// Local development only: `--dart-define=USE_EMULATOR=true` routes Auth,
+/// Firestore, Functions and Storage to the Firebase Emulator Suite
+/// (`firebase emulators:start`) so nothing touches production. Ignored in
+/// release builds.
+const bool _useEmulator = bool.fromEnvironment('USE_EMULATOR');
 
 /// RevenueCat API key. Set via --dart-define=REVENUECAT_API_KEY=your_key
 /// or leave empty to skip RevenueCat (e.g. for development without store).
@@ -192,6 +201,18 @@ Future<void> _configureCrashlytics() async {
   };
 }
 
+Future<void> _configureEmulators() async {
+  // Android emulator reaches the host machine via 10.0.2.2.
+  final host = (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
+      ? '10.0.2.2'
+      : 'localhost';
+  await FirebaseAuth.instance.useAuthEmulator(host, 9099);
+  FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
+  createFirebaseFunctions().useFunctionsEmulator(host, 5001);
+  await FirebaseStorage.instance.useStorageEmulator(host, 9199);
+  AppLogger.debug('Using Firebase Emulator Suite at $host.');
+}
+
 Future<void> main() async {
   await runZonedGuarded(
     () async {
@@ -200,6 +221,7 @@ Future<void> main() async {
       await Firebase.initializeApp(
         options: kIsWeb ? DefaultFirebaseOptions.web : null,
       );
+      if (_useEmulator && !kReleaseMode) await _configureEmulators();
       await _configureCrashlytics();
       await _configureAppCheck();
       await _configureRevenueCat();

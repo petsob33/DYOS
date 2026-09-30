@@ -8,6 +8,7 @@ import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/memory_model.dart';
 import 'memory_detail_dialog.dart';
+import '../memory_category_label.dart';
 
 /// Memory card widget with Apple-style design
 class MemoryCard extends StatefulWidget {
@@ -97,7 +98,7 @@ class _MemoryCardState extends State<MemoryCard> {
                           ),
                           const SizedBox(width: AppSpacing.xs),
                           Text(
-                            widget.memory.category.displayName,
+                            widget.memory.category.label(context),
                             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                   color: context.colors.primary,
                                   fontWeight: FontWeight.w600,

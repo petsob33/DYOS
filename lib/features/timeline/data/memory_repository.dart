@@ -8,6 +8,15 @@ import '../domain/memory_model.dart';
 
 part 'memory_repository.g.dart';
 
+/// Thrown when a media upload is rejected because the couple reached its
+/// storage limit (or the file exceeds the per-file cap).
+class StorageQuotaExceededException implements Exception {
+  const StorageQuotaExceededException();
+
+  @override
+  String toString() => 'StorageQuotaExceededException';
+}
+
 /// Riverpod provider that creates a singleton MemoryRepository instance
 /// This follows the repository pattern for clean architecture
 @riverpod
@@ -108,6 +117,12 @@ class MemoryRepository {
             // Get download URL
             final downloadUrl = await storageRef.getDownloadURL();
             downloadUrls.add(downloadUrl);
+          } on FirebaseException catch (e) {
+            // Storage Rules deny the write once the couple is over quota.
+            if (e.code == 'unauthorized') {
+              throw const StorageQuotaExceededException();
+            }
+            throw Exception('Failed to upload file ${i + 1}/${mediaFiles.length}: $e');
           } catch (e) {
             // Re-throw with more context
             throw Exception('Failed to upload file ${i + 1}/${mediaFiles.length}: $e');

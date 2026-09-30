@@ -1814,6 +1814,13 @@ class AppLocalizationsCs extends AppLocalizations {
   String get premiumLandingScreenMonthlyBilling => 'Měsíční fakturace';
 
   @override
+  String get premiumLandingScreenLifetime => 'Navždy';
+
+  @override
+  String get premiumLandingScreenLifetimeBilling =>
+      'Jednorázová platba, tvoje navždy';
+
+  @override
   String get premiumLandingScreenGetPremiumNow => 'Získej DYOS+ hned';
 
   @override
@@ -1845,5 +1852,164 @@ class AppLocalizationsCs extends AppLocalizations {
   String get paywallModalMonthlyBilling => 'Měsíční fakturace';
 
   @override
+  String get paywallModalLifetime => 'Navždy';
+
+  @override
+  String get paywallModalLifetimeBilling => 'Jednorázová platba, tvoje navždy';
+
+  @override
   String get paywallModalRestorePurchases => 'Obnovit nákupy';
+
+  @override
+  String get memoryCategoryDateNight => 'Rande';
+
+  @override
+  String get memoryCategoryTrip => 'Výlet';
+
+  @override
+  String get memoryCategoryMilestone => 'Milník';
+
+  @override
+  String get memoryCategoryDailyLife => 'Všední den';
+
+  @override
+  String get memoryCategoryFood => 'Jídlo';
+
+  @override
+  String get memoryCategoryParty => 'Párty';
+
+  @override
+  String get memoryCategoryFunny => 'Legrace';
+
+  @override
+  String get memoryCategoryIntimacy => 'Intimita';
+
+  @override
+  String get memoryCategoryNature => 'Příroda';
+
+  @override
+  String get memoryCategoryOther => 'Ostatní';
+
+  @override
+  String get insightPartnerTitle => 'Pro tvého partnera';
+
+  @override
+  String get insightTipNoData =>
+      'Zatím žádná data o menstruaci. Zaznamenej ji a dostaneš předpovědi.';
+
+  @override
+  String insightTipPeriod(int day) {
+    return 'Den $day: Probíhá menstruace. Buď oporou a trpělivý.';
+  }
+
+  @override
+  String insightTipFertileHigh(int day) {
+    return 'Den $day: Plodné okno je otevřené! Vysoká šance na početí.';
+  }
+
+  @override
+  String insightTipFertileApproaching(int day) {
+    return 'Den $day: Blíží se plodné okno. Buď pozorný a chápavý.';
+  }
+
+  @override
+  String insightTipEarlyCycle(int day) {
+    return 'Den $day: Začátek cyklu. Energie roste.';
+  }
+
+  @override
+  String insightTipApproachingFertile(int day) {
+    return 'Den $day: Blíží se plodné okno. Zůstaňte v kontaktu.';
+  }
+
+  @override
+  String insightTipOvulation(int day) {
+    return 'Den $day: Den ovulace! Nejvyšší plodnost.';
+  }
+
+  @override
+  String insightTipPmsDanger(int day) {
+    return 'Den $day: PMS zóna. Buď extra trpělivý a chápavý.';
+  }
+
+  @override
+  String insightTipPrePms(int day) {
+    return 'Den $day: Před PMS. Možné změny nálad. Podpoř ji.';
+  }
+
+  @override
+  String insightTipPostOvulation(int day) {
+    return 'Den $day: Po ovulaci. Nálada se může ustálit.';
+  }
+
+  @override
+  String get insightMemoriesThisMonth => 'vzpomínek\\ntento měsíc';
+
+  @override
+  String get insightMomentsThisMonth => 'chvilek\\ntento měsíc';
+
+  @override
+  String get insightToday => 'Dnes';
+
+  @override
+  String get insightOneDayAgo => 'před 1 dnem';
+
+  @override
+  String insightDaysAgo(int n) {
+    return 'před $n dny';
+  }
+
+  @override
+  String get insightLastMoment => 'poslední chvilka';
+
+  @override
+  String get insightLastMemory => 'poslední vzpomínka';
+
+  @override
+  String get insightMemory => 'Vzpomínka';
+
+  @override
+  String get insightAMoment => 'Chvilka';
+
+  @override
+  String get insightAboutMonthAgo => 'asi před měsícem';
+
+  @override
+  String get insightYearAgoToday => 'před rokem dnes';
+
+  @override
+  String get insightPeriodToday => 'menstruace dnes';
+
+  @override
+  String get insightDaysToPeriod => 'dní do další\\nmenstruace';
+
+  @override
+  String get insightEventToday => 'dnes';
+
+  @override
+  String insightEventInDays(int n) {
+    return 'za $n dní';
+  }
+
+  @override
+  String get insightDaysTogether => 'dní\\nspolu';
+
+  @override
+  String get dashCardChat => 'Chat';
+
+  @override
+  String get dashCardQuestions => 'Otázky';
+
+  @override
+  String get dashCardLists => 'Seznamy';
+
+  @override
+  String get dashCardEvents => 'Události';
+
+  @override
+  String get dashCardLastMoment => 'Naposledy';
+
+  @override
+  String get addMemoryStorageLimitReached =>
+      'Dosáhli jste limitu úložiště vašeho páru. Smažte pár vzpomínek, abyste uvolnili místo.';
 }

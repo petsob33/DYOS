@@ -204,6 +204,7 @@ class OurOSUniversalCalendar extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16),
       child: TableCalendar(
+        locale: Localizations.localeOf(context).toString(),
         firstDay: firstDay ?? DateTime.utc(1970, 1, 1),
         lastDay: lastDay ?? DateTime.utc(2070, 12, 31),
         focusedDay: focusedDay,

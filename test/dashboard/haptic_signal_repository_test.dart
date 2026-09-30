@@ -33,8 +33,9 @@ void main() {
     });
 
     test('streams all signals for a couple, including already-read ones', () async {
-      await addSignal('user_1', DateTime(2026, 7, 1));
-      await addSignal('user_2', DateTime(2026, 7, 2));
+      final base = DateTime.now().subtract(const Duration(days: 10));
+      await addSignal('user_1', base);
+      await addSignal('user_2', base.add(const Duration(days: 1)));
 
       final signals = await repository.watchSignals(coupleId).first;
 

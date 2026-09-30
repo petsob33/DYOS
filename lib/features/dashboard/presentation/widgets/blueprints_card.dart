@@ -1,42 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
-import '../../../gamification/presentation/user_stats_provider.dart';
-import '../../../gamification/domain/progression_plan.dart';
-import '../../../gamification/presentation/widgets/level_up_unlock_sheet.dart';
-import '../../../premium/presentation/premium_provider.dart';
+import '../../../../core/widgets/icon_label.dart';
 
-class BlueprintsCard extends ConsumerWidget {
+class BlueprintsCard extends StatelessWidget {
   const BlueprintsCard();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentSp = ref.watch(currentXpProvider);
-    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
-    final unlocked = ProgressionPlan.isFeatureUnlocked(
-      FeatureID.blueprints,
-      currentSp,
-      isPremium,
-    );
-
+  Widget build(BuildContext context) {
     final c = context.colors;
 
     return BentoCard(
-      onTap: () => unlocked
-          ? context.push('/blueprints')
-          : showLevelUpUnlockSheet(context, ref, FeatureID.blueprints),
+      onTap: () => context.push('/blueprints'),
       background: c.card,
-      child: Center(
-        child: Icon(
-          PhosphorIconsBold.clipboardText,
-          color: c.primary,
-          size: 52,
-        ),
-      ),
+      child: IconLabel(
+            icon: PhosphorIconsBold.clipboardText,
+            color: c.primary,
+            label: context.l10n.dashCardQuestions,
+          )
     );
   }
 }

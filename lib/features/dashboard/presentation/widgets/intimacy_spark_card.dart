@@ -73,6 +73,17 @@ class IntimacySparkCard extends ConsumerWidget {
                     color: context.colors.love,
                     size: 20,
                   ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      context.l10n.dashCardLastMoment,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),

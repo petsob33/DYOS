@@ -10,6 +10,7 @@ import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/memory_repository.dart';
 import '../../domain/memory_model.dart';
+import '../memory_category_label.dart';
 
 class MemoryDetailDialog extends ConsumerStatefulWidget {
   const MemoryDetailDialog({
@@ -420,7 +421,7 @@ class _MemoryDetailDialogState extends ConsumerState<MemoryDetailDialog> {
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    widget.memory.category.displayName,
+                                    widget.memory.category.label(context),
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall

@@ -27,20 +27,42 @@ service firebase.storage {
         return isAuthenticated() && request.auth.token.coupleId == coupleId;
       }
       
+      function isImage() {
+        return request.resource.contentType.matches('image/.*') ||
+               fileName.matches('.*\\.(jpg|jpeg|png|gif|webp)$');
+      }
+
+      function isVideo() {
+        return request.resource.contentType.matches('video/.*') ||
+               fileName.matches('.*\\.(mp4|mov|avi)$');
+      }
+
+      // Per-couple storage ceiling. couples/{coupleId}/usage/current is
+      // seeded at couple-creation time and kept live by
+      // trackMemoryUsageOnFinalize/OnDelete (functions/index.js). A missing
+      // doc fails the read, and therefore the write, closed.
+      function bytesUsed() {
+        return firestore.get(/databases/(default)/documents/couples/$(coupleId)/usage/current).data.bytesUsed;
+      }
+
+      function withinQuota() {
+        // Decimal MB (150,000,000 bytes), not binary MiB.
+        return bytesUsed() < 150 * 1000 * 1000;
+      }
+
       // Allow reading if user is a couple member
       allow read: if isCoupleMember();
-      
-      // Allow writing (upload/update) if user is authenticated and couple member
-      // Only allow files up to 10MB (images/videos)
-      // Note: contentType might be null during upload, so we check file extension via path
-      allow write: if isAuthenticated() && 
+
+      // Allow writing if authenticated, a couple member, under the couple's
+      // quota and within the per-file cap for its type (images 2MB, videos 10MB).
+      allow write: if isAuthenticated() &&
                      isCoupleMember() &&
-                     request.resource.size < 10 * 1024 * 1024 &&
-                     // Allow common image and video formats (check contentType or path)
-                     (request.resource.contentType.matches('image/.*') ||
-                      request.resource.contentType.matches('video/.*') ||
-                      fileName.matches('.*\\.(jpg|jpeg|png|gif|webp|mp4|mov|avi)$'));
-      
+                     withinQuota() &&
+                     (
+                       (isImage() && request.resource.size < 2 * 1024 * 1024) ||
+                       (isVideo() && request.resource.size < 10 * 1024 * 1024)
+                     );
+
       // Allow deletion if user is a couple member
       allow delete: if isCoupleMember();
     }

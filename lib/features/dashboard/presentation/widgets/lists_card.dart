@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
+import '../../../../core/widgets/icon_label.dart';
 import '../../../notes/domain/note_item.dart';
 import '../../../notes/presentation/notes_provider.dart';
 
@@ -26,13 +28,11 @@ class ListsCard extends ConsumerWidget {
             context.push('/lists');
           },
           background: c.card,
-          child: Center(
-            child: Icon(
-              PhosphorIconsBold.listChecks,
-              color: c.warning,
-              size: 52,
-            ),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.listChecks,
+            color: c.warning,
+            label: context.l10n.dashCardLists,
+          )
         );
       },
       loading: () {
@@ -42,13 +42,11 @@ class ListsCard extends ConsumerWidget {
             context.push('/lists');
           },
           background: c.card,
-          child: Center(
-            child: Icon(
-              PhosphorIconsBold.listChecks,
-              color: c.warning,
-              size: 52,
-            ),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.listChecks,
+            color: c.warning,
+            label: context.l10n.dashCardLists,
+          )
         );
       },
       error: (error, stackTrace) {
@@ -58,13 +56,11 @@ class ListsCard extends ConsumerWidget {
             context.push('/lists');
           },
           background: c.card,
-          child: Center(
-            child: Icon(
-              PhosphorIconsBold.listChecks,
-              color: c.warning,
-              size: 52,
-            ),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.listChecks,
+            color: c.warning,
+            label: context.l10n.dashCardLists,
+          )
         );
       },
     );

@@ -9,6 +9,20 @@ enum CyclePhase {
   luteal,
 }
 
+/// Which tip the partner should see; localized in the presentation layer.
+enum PartnerTip {
+  noData,
+  period,
+  fertileHigh,
+  fertileApproaching,
+  earlyCycle,
+  approachingFertile,
+  ovulation,
+  pmsDanger,
+  prePms,
+  postOvulation,
+}
+
 /// Model representing daily cycle status
 class DailyCycleStatus {
   const DailyCycleStatus({
@@ -16,12 +30,14 @@ class DailyCycleStatus {
     required this.isFertile,
     required this.dayInCycle,
     required this.partnerMessage,
+    this.partnerTip = PartnerTip.noData,
   });
 
   final CyclePhase phase;
   final bool isFertile;
   final int dayInCycle;
   final String partnerMessage;
+  final PartnerTip partnerTip;
 }
 
 /// Pure Dart class for calculating menstrual cycle status
@@ -95,6 +111,13 @@ class CycleCalculator {
     }
 
     // Generate partner message based on phase and day
+    final partnerTip = _partnerTip(
+      dayInCycle: dayInCycle,
+      phase: phase,
+      isFertile: isFertile,
+      periodLength: settings.periodLength,
+      ovulationDay: ovulationDayInCycle,
+    );
     final partnerMessage = _generatePartnerMessage(
       dayInCycle: dayInCycle,
       phase: phase,
@@ -108,6 +131,7 @@ class CycleCalculator {
       isFertile: isFertile,
       dayInCycle: dayInCycle,
       partnerMessage: partnerMessage,
+      partnerTip: partnerTip,
     );
   }
 
@@ -186,6 +210,36 @@ class CycleCalculator {
           return 'Day $dayInCycle: Pre-PMS phase. Mood changes possible. Stay supportive.';
         }
         return 'Day $dayInCycle: Post-ovulation. Mood may stabilize.';
+    }
+  }
+
+  static PartnerTip _partnerTip({
+    required int dayInCycle,
+    required CyclePhase phase,
+    required bool isFertile,
+    required int periodLength,
+    required int ovulationDay,
+  }) {
+    switch (phase) {
+      case CyclePhase.menstruation:
+        return PartnerTip.period;
+      case CyclePhase.follicular:
+        if (isFertile) {
+          return dayInCycle == ovulationDay - 1
+              ? PartnerTip.fertileHigh
+              : PartnerTip.fertileApproaching;
+        }
+        return dayInCycle < ovulationDay - 5
+            ? PartnerTip.earlyCycle
+            : PartnerTip.approachingFertile;
+      case CyclePhase.ovulation:
+        return PartnerTip.ovulation;
+      case CyclePhase.luteal:
+        final daysUntilPeriod =
+            periodLength + (28 - ovulationDay) - (dayInCycle - ovulationDay - 1);
+        if (daysUntilPeriod <= 3) return PartnerTip.pmsDanger;
+        if (daysUntilPeriod <= 7) return PartnerTip.prePms;
+        return PartnerTip.postOvulation;
     }
   }
 }

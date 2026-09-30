@@ -276,14 +276,15 @@ class _BestOfCarousel extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        SizedBox(
-          height: MediaQuery.textScalerOf(context).scale(152).clamp(152.0, 260.0),
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            itemCount: cards.length,
-            separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
-            itemBuilder: (context, index) => SizedBox(width: 160, child: cards[index]),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Row(
+            children: [
+              for (var i = 0; i < cards.length; i++) ...[
+                if (i > 0) const SizedBox(width: AppSpacing.md),
+                Expanded(child: cards[i]),
+              ],
+            ],
           ),
         ),
       ],
@@ -328,41 +329,40 @@ class _CurrentMonthStats extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          SizedBox(
-            height: MediaQuery.textScalerOf(context).scale(152).clamp(152.0, 260.0),
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: 3,
-              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
-              itemBuilder: (context, index) {
-                final cards = [
-                  _StatCard(
-                    icon: PhosphorIconsBold.heart,
-                    title: context.l10n.dataScreenTotalTitle,
-                    value: stats.count.toString(),
-                    subtitle: context.l10n.dataScreenThisMonthSubtitle,
-                    color: context.colors.love,
-                  ),
-                  _StatCard(
-                    icon: PhosphorIconsBold.timer,
-                    title: context.l10n.dataScreenAvgDurationTitle,
-                    value: stats.avgDurationMinutes == null
-                        ? '–'
-                        : '${stats.avgDurationMinutes!.toStringAsFixed(1)}m',
-                    subtitle: context.l10n.dataScreenThisMonthSubtitle,
-                    color: context.colors.warning,
-                  ),
-                  _StatCard(
-                    icon: PhosphorIconsBold.fire,
-                    title: context.l10n.dataScreenAvgOrgasmsTitle,
-                    value: stats.avgOrgasms.toStringAsFixed(1),
-                    subtitle: context.l10n.dataScreenThisMonthSubtitle,
-                    color: context.colors.love,
-                  ),
-                ];
-                return SizedBox(width: 160, child: cards[index]);
-              },
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: _StatCard(
+                  icon: PhosphorIconsBold.heart,
+                  title: context.l10n.dataScreenTotalTitle,
+                  value: stats.count.toString(),
+                  subtitle: context.l10n.dataScreenThisMonthSubtitle,
+                  color: context.colors.love,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _StatCard(
+                  icon: PhosphorIconsBold.timer,
+                  title: context.l10n.dataScreenAvgDurationTitle,
+                  value: stats.avgDurationMinutes == null
+                      ? '–'
+                      : '${stats.avgDurationMinutes!.toStringAsFixed(1)}m',
+                  subtitle: context.l10n.dataScreenThisMonthSubtitle,
+                  color: context.colors.warning,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _StatCard(
+                  icon: PhosphorIconsBold.fire,
+                  title: context.l10n.dataScreenAvgOrgasmsTitle,
+                  value: stats.avgOrgasms.toStringAsFixed(1),
+                  subtitle: context.l10n.dataScreenThisMonthSubtitle,
+                  color: context.colors.love,
+                ),
+              ),
+            ],
           ),
         ],
       ),

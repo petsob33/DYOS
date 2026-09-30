@@ -21,6 +21,8 @@ final List<String> availableTags = [
   'Morning',
   'Evening',
   'Oral',
+  'Anal',
+  'Threesome',
   'Toy',
   'Massage',
   'Experiment',

@@ -285,6 +285,8 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
     final packages = <Package>[];
     if (monthly != null) packages.add(monthly);
     if (annual != null) packages.add(annual);
+    final lifetime = offering.lifetime;
+    if (lifetime != null) packages.add(lifetime);
     if (packages.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -298,8 +300,17 @@ class _PaywallModalState extends ConsumerState<PaywallModal> {
     return Column(
       children: packages.map((package) {
         final isYearly = package.packageType == PackageType.annual;
-        final title = isYearly ? context.l10n.paywallModalYearly : context.l10n.paywallModalMonthly;
-        final subtitle = isYearly ? PremiumCopy.yearlySavings : context.l10n.paywallModalMonthlyBilling;
+        final isLifetime = package.packageType == PackageType.lifetime;
+        final title = isLifetime
+            ? context.l10n.paywallModalLifetime
+            : isYearly
+                ? context.l10n.paywallModalYearly
+                : context.l10n.paywallModalMonthly;
+        final subtitle = isLifetime
+            ? context.l10n.paywallModalLifetimeBilling
+            : isYearly
+                ? PremiumCopy.yearlySavings
+                : context.l10n.paywallModalMonthlyBilling;
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: Material(

@@ -9,10 +9,6 @@ import '../../core/constants/app_spacing.dart';
 import '../l10n/build_context_l10n_extension.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/auth/presentation/auth_providers.dart';
-import '../../features/gamification/domain/progression_plan.dart';
-import '../../features/gamification/presentation/user_stats_provider.dart';
-import '../../features/gamification/presentation/widgets/level_up_unlock_sheet.dart';
-import '../../features/premium/presentation/premium_provider.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/firebase_test_screen.dart';
@@ -513,14 +509,6 @@ class RootShell extends ConsumerWidget {
   static const double _swipeUpVelocityThreshold = 400; // px/s – swipe nahoru otevře Quick Add
 
   void _onTabSelected(BuildContext context, WidgetRef ref, int index) {
-    if (index == 1) {
-      final currentSp = ref.read(currentXpProvider);
-      final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
-      if (!ProgressionPlan.isFeatureUnlocked(FeatureID.memories, currentSp, isPremium)) {
-        showLevelUpUnlockSheet(context, ref, FeatureID.memories);
-        return;
-      }
-    }
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
@@ -530,16 +518,7 @@ class RootShell extends ConsumerWidget {
   void _onHorizontalSwipe(BuildContext context, WidgetRef ref, double velocity) {
     final current = navigationShell.currentIndex;
     if (velocity < -_swipeVelocityThreshold && current < _branchCount - 1) {
-      final nextIndex = current + 1;
-      if (nextIndex == 1) {
-        final currentSp = ref.read(currentXpProvider);
-        final isPremium = ref.read(isPremiumProvider).valueOrNull ?? false;
-        if (!ProgressionPlan.isFeatureUnlocked(FeatureID.memories, currentSp, isPremium)) {
-          showLevelUpUnlockSheet(context, ref, FeatureID.memories);
-          return;
-        }
-      }
-      navigationShell.goBranch(nextIndex);
+      navigationShell.goBranch(current + 1);
     } else if (velocity > _swipeVelocityThreshold && current > 0) {
       navigationShell.goBranch(current - 1);
     }
@@ -714,14 +693,6 @@ class _QuickAddSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentSp = ref.watch(currentXpProvider);
-    final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
-    final memoriesUnlocked = ProgressionPlan.isFeatureUnlocked(
-      FeatureID.memories,
-      currentSp,
-      isPremium,
-    );
-
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -757,16 +728,7 @@ class _QuickAddSheet extends ConsumerWidget {
               _QuickActionChip(
                 icon: PhosphorIconsBold.camera,
                 label: context.l10n.appRouterQuickActionAddMemory,
-                navigationRoute: memoriesUnlocked ? '/add-memory' : null,
-                onTap: memoriesUnlocked
-                    ? null
-                    : () {
-                        showLevelUpUnlockSheet(
-                          parentContext,
-                          ref,
-                          FeatureID.memories,
-                        );
-                      },
+                navigationRoute: '/add-memory',
               ),
               _QuickActionChip(
                 icon: PhosphorIconsBold.heart,

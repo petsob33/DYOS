@@ -10,6 +10,7 @@ import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/memory_repository.dart';
 import '../../domain/memory_model.dart';
+import '../memory_category_label.dart';
 
 /// Full-screen page showing memory details (used when navigating from map or timeline).
 class MemoryDetailScreen extends ConsumerStatefulWidget {
@@ -134,7 +135,7 @@ class _MemoryDetailScreenState extends ConsumerState<MemoryDetailScreen> {
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
-                  widget.memory.category.displayName,
+                  widget.memory.category.label(context),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.colors.textSecondary,
                         fontWeight: FontWeight.w500,

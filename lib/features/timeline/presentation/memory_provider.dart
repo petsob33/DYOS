@@ -132,6 +132,9 @@ class AddMemorySuccess extends AddMemoryState {
 }
 
 class AddMemoryError extends AddMemoryState {
+  /// Sentinel message; the UI swaps it for a localized text.
+  static const storageQuotaMessage = 'storage_quota_exceeded';
+
   final String message;
   AddMemoryError(this.message);
 }
@@ -179,6 +182,8 @@ class AddMemoryController extends StateNotifier<AddMemoryState> {
       );
 
       state = AddMemorySuccess(createdMemory);
+    } on StorageQuotaExceededException {
+      state = AddMemoryError(AddMemoryError.storageQuotaMessage);
     } catch (e) {
       state = AddMemoryError(
         e.toString().replaceFirst('Exception: ', ''),

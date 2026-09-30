@@ -16,7 +16,7 @@ notes access-control rules do.
 cd test/security/rules
 npm install
 cd ../../..
-firebase emulators:exec --project demo-dyos-rules-test --only firestore \
+firebase emulators:exec --project demo-dyos-rules-test --only firestore,storage \
   "cd test/security/rules && npm test"
 ```
 

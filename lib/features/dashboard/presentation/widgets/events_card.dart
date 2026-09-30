@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
+import '../../../../core/widgets/icon_label.dart';
 import '../../../events/presentation/event_provider.dart';
 
 class EventsCard extends ConsumerWidget {
@@ -23,9 +25,11 @@ class EventsCard extends ConsumerWidget {
             context.push('/events');
           },
           background: c.card,
-          child: Center(
-            child: Icon(PhosphorIconsBold.calendar, color: c.success, size: 52),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.calendar,
+            color: c.success,
+            label: context.l10n.dashCardEvents,
+          )
         );
       },
       loading: () {
@@ -35,9 +39,11 @@ class EventsCard extends ConsumerWidget {
             context.push('/events');
           },
           background: c.card,
-          child: Center(
-            child: Icon(PhosphorIconsBold.calendar, color: c.success, size: 52),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.calendar,
+            color: c.success,
+            label: context.l10n.dashCardEvents,
+          )
         );
       },
       error: (error, stackTrace) {
@@ -47,9 +53,11 @@ class EventsCard extends ConsumerWidget {
             context.push('/events');
           },
           background: c.card,
-          child: Center(
-            child: Icon(PhosphorIconsBold.calendar, color: c.success, size: 52),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.calendar,
+            color: c.success,
+            label: context.l10n.dashCardEvents,
+          )
         );
       },
     );

@@ -1,5 +1,6 @@
 const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
+const { FieldValue } = require("firebase-admin/firestore");
 const sharp = require("sharp");
 const {
   normalizeInviteCode,
@@ -7,6 +8,11 @@ const {
   shouldRejectForMissingAppCheck,
   evaluateRateLimitWindow,
 } = require("./security_helpers");
+const {
+  parseCoupleIdFromMemoryPath,
+  shouldCountFinalizeEvent,
+  clampNonNegative,
+} = require("./storage_usage_helpers");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -35,7 +41,7 @@ async function enforceRateLimit(uid, action, maxRequests, windowSeconds) {
         action,
         count: 1,
         windowStartMs: nowMs,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       });
       return;
     }
@@ -57,7 +63,7 @@ async function enforceRateLimit(uid, action, maxRequests, windowSeconds) {
           action,
           count: 1,
           windowStartMs: nowMs,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true }
       );
@@ -75,7 +81,7 @@ async function enforceRateLimit(uid, action, maxRequests, windowSeconds) {
       ref,
       {
         count: next.nextCount,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
@@ -214,7 +220,7 @@ exports.pairWithInviteCode = functions.https.onCall(async (data, context) => {
       }
 
       partnerDisplayName = partnerData.displayName || null;
-      const now = admin.firestore.FieldValue.serverTimestamp();
+      const now = FieldValue.serverTimestamp();
 
       tx.set(coupleRef, {
         members: [currentUid, partnerUid],
@@ -318,7 +324,7 @@ exports.pairWithEmail = functions.https.onCall(async (data, context) => {
       }
 
       partnerDisplayName = partnerData.displayName || null;
-      const now = admin.firestore.FieldValue.serverTimestamp();
+      const now = FieldValue.serverTimestamp();
 
       tx.set(coupleRef, {
         members: [currentUid, partnerUid],
@@ -359,6 +365,15 @@ async function setCoupleClaims(uid1, uid2, coupleId) {
   await Promise.all([
     admin.auth().setCustomUserClaims(uid1, { coupleId }),
     admin.auth().setCustomUserClaims(uid2, { coupleId }),
+    // Storage Rules read bytesUsed via firestore.get() before the triggers
+    // below have ever written it, so the doc must exist from the couple's
+    // very first moment or their first upload would be denied.
+    db
+      .collection("couples")
+      .doc(coupleId)
+      .collection("usage")
+      .doc("current")
+      .set({ bytesUsed: 0 }, { merge: true }),
   ]);
 }
 
@@ -505,5 +520,47 @@ exports.compressImage = functions.storage.object().onFinalize(async (object) => 
     }
   }
 
+  return null;
+});
+
+/**
+ * Keep couples/{coupleId}/usage/current.bytesUsed in sync with Storage
+ * usage under memories/. See shouldCountFinalizeEvent for why the raw
+ * pre-compression image upload is skipped in favor of the compressed echo.
+ */
+exports.trackMemoryUsageOnFinalize = functions.storage.object().onFinalize(async (object) => {
+  const coupleId = parseCoupleIdFromMemoryPath(object.name);
+  if (!coupleId) return null;
+
+  const alreadyCompressed = Boolean(
+    object.metadata && object.metadata.compressed === "true"
+  );
+  if (!shouldCountFinalizeEvent({ contentType: object.contentType, alreadyCompressed })) {
+    return null;
+  }
+
+  const size = Number(object.size) || 0;
+  await db
+    .collection("couples")
+    .doc(coupleId)
+    .collection("usage")
+    .doc("current")
+    .set({ bytesUsed: FieldValue.increment(size) }, { merge: true });
+  return null;
+});
+
+/** Decrement bytesUsed when a memory file is deleted, floored at zero. */
+exports.trackMemoryUsageOnDelete = functions.storage.object().onDelete(async (object) => {
+  const coupleId = parseCoupleIdFromMemoryPath(object.name);
+  if (!coupleId) return null;
+
+  const size = Number(object.size) || 0;
+  const usageRef = db.collection("couples").doc(coupleId).collection("usage").doc("current");
+
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(usageRef);
+    const current = (snap.exists && snap.data().bytesUsed) || 0;
+    tx.set(usageRef, { bytesUsed: clampNonNegative(current - size) }, { merge: true });
+  });
   return null;
 });

@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../../core/l10n/build_context_l10n_extension.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/bento_card.dart';
+import '../../../../core/widgets/icon_label.dart';
 import '../../../auth/presentation/auth_providers.dart';
-import '../../../gamification/presentation/user_stats_provider.dart';
-import '../../../gamification/domain/progression_plan.dart';
-import '../../../gamification/presentation/widgets/level_up_unlock_sheet.dart';
-import '../../../premium/presentation/premium_provider.dart';
 
 class QuickMessageCard extends ConsumerWidget {
   const QuickMessageCard();
@@ -24,68 +22,46 @@ class QuickMessageCard extends ConsumerWidget {
           final c = context.colors;
           return BentoCard(
             background: c.card,
-            child: Center(
-              child: Icon(
-                PhosphorIconsBold.chatCircle,
-                color: c.primary,
-                size: 52,
-              ),
-            ),
+            child: IconLabel(
+            icon: PhosphorIconsBold.chatCircle,
+            color: c.primary,
+            label: context.l10n.dashCardChat,
+          )
           );
         }
-
-        final currentSp = ref.watch(currentXpProvider);
-        final isPremium = ref.watch(isPremiumProvider).valueOrNull ?? false;
-        final quickMessagesUnlocked = ProgressionPlan.isFeatureUnlocked(
-          FeatureID.quickMessages,
-          currentSp,
-          isPremium,
-        );
 
         final c = context.colors;
 
         return BentoCard(
-          onTap: () {
-            if (quickMessagesUnlocked) {
-              context.push('/chat');
-            } else {
-              showLevelUpUnlockSheet(context, ref, FeatureID.quickMessages);
-            }
-          },
+          onTap: () => context.push('/chat'),
           background: c.card,
-          child: Center(
-            child: Icon(
-              PhosphorIconsBold.chatCircle,
-              color: c.primary,
-              size: 44,
-            ),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.chatCircle,
+            color: c.primary,
+            label: context.l10n.dashCardChat,
+          )
         );
       },
       loading: () {
         final c = context.colors;
         return BentoCard(
           background: c.card,
-          child: Center(
-            child: Icon(
-              PhosphorIconsBold.chatCircle,
-              color: c.primary,
-              size: 52,
-            ),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.chatCircle,
+            color: c.primary,
+            label: context.l10n.dashCardChat,
+          )
         );
       },
       error: (_, __) {
         final c = context.colors;
         return BentoCard(
           background: c.card,
-          child: Center(
-            child: Icon(
-              PhosphorIconsBold.chatCircle,
-              color: c.primary,
-              size: 52,
-            ),
-          ),
+          child: IconLabel(
+            icon: PhosphorIconsBold.chatCircle,
+            color: c.primary,
+            label: context.l10n.dashCardChat,
+          )
         );
       },
     );

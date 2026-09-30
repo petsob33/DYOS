@@ -16,6 +16,7 @@ import '../../../premium/presentation/premium_provider.dart';
 import '../../domain/memory_model.dart';
 import '../memory_provider.dart';
 import '../widgets/pick_place_screen.dart';
+import '../memory_category_label.dart';
 
 /// Screen for adding a new memory or editing an existing one (caption, date, category, place only).
 class AddMemoryScreen extends ConsumerStatefulWidget {
@@ -312,7 +313,11 @@ class _AddMemoryScreenState extends ConsumerState<AddMemoryScreen> {
         } else if (next is AddMemoryError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(next.message),
+              content: Text(
+                next.message == AddMemoryError.storageQuotaMessage
+                    ? context.l10n.addMemoryStorageLimitReached
+                    : next.message,
+              ),
               backgroundColor: context.colors.love,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -720,7 +725,7 @@ class _CategorySelectionSection extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
-                    category.displayName,
+                    category.label(context),
                     style: TextStyle(
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       fontSize: 14,

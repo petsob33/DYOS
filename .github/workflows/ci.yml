@@ -37,8 +37,9 @@ jobs:
       # compile/type problems without blocking on lint-cleanup debt.
       - name: flutter analyze (fail only on real errors)
         run: |
-          set -o pipefail
-          flutter analyze | tee analyze_output.txt
+          # `|| true`: analyze exits 1 on info/warning lints too; the grep
+          # below is the real gate.
+          flutter analyze | tee analyze_output.txt || true
           if grep -qE '^\s*error •' analyze_output.txt; then
             echo "::error::flutter analyze found real errors (see above)"
             exit 1

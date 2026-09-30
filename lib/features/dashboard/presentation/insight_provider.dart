@@ -1,6 +1,10 @@
+import 'dart:ui' show Locale, PlatformDispatcher;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../../core/l10n/locale_provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../auth/presentation/auth_providers.dart';
 import '../../cycle/domain/cycle_calculator.dart';
 import '../../cycle/presentation/cycle_provider.dart';
@@ -17,6 +21,31 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
   final nextEventAsync = ref.watch(nextEventProvider);
   final eventsAsync = ref.watch(eventsStreamProvider);
   final coupleAsync = ref.watch(coupleProvider);
+  final savedLocale = ref.watch(localeControllerProvider).valueOrNull;
+  final deviceLang = PlatformDispatcher.instance.locale.languageCode;
+  final l = lookupAppLocalizations(
+    savedLocale ?? (deviceLang == 'cs' ? const Locale('cs') : const Locale('en')),
+  );
+  String daysAgo(int d) => d == 0
+      ? l.insightToday
+      : d == 1
+          ? l.insightOneDayAgo
+          : l.insightDaysAgo(d);
+  String tip(DailyCycleStatus st) {
+    final day = st.dayInCycle;
+    return switch (st.partnerTip) {
+      PartnerTip.noData => l.insightTipNoData,
+      PartnerTip.period => l.insightTipPeriod(day),
+      PartnerTip.fertileHigh => l.insightTipFertileHigh(day),
+      PartnerTip.fertileApproaching => l.insightTipFertileApproaching(day),
+      PartnerTip.earlyCycle => l.insightTipEarlyCycle(day),
+      PartnerTip.approachingFertile => l.insightTipApproachingFertile(day),
+      PartnerTip.ovulation => l.insightTipOvulation(day),
+      PartnerTip.pmsDanger => l.insightTipPmsDanger(day),
+      PartnerTip.prePms => l.insightTipPrePms(day),
+      PartnerTip.postOvulation => l.insightTipPostOvulation(day),
+    };
+  }
 
   return memoriesAsync.when(
     data: (memories) {
@@ -52,8 +81,8 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                           targetDate: now,
                         );
                         items.add(InsightItem(
-                          title: 'For your partner',
-                          subtitle: status.partnerMessage,
+                          title: l.insightPartnerTitle,
+                          subtitle: tip(status),
                           icon: PhosphorIconsBold.heart,
                         ));
                       }
@@ -61,12 +90,12 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                       // Memories & moments this month
                       items.add(InsightItem(
                         title: '$memoriesThisMonth',
-                        subtitle: 'memories\nthis month',
+                        subtitle: l.insightMemoriesThisMonth,
                         icon: PhosphorIconsBold.images,
                       ));
                       items.add(InsightItem(
                         title: '$intimacyThisMonth',
-                        subtitle: 'moments\nthis month',
+                        subtitle: l.insightMomentsThisMonth,
                         icon: PhosphorIconsBold.heart,
                       ));
 
@@ -79,12 +108,8 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                         final daysSince =
                             today.difference(DateTime(last.date.year, last.date.month, last.date.day)).inDays;
                         items.add(InsightItem(
-                          title: daysSince == 0
-                              ? 'Today'
-                              : daysSince == 1
-                                  ? '1 day ago'
-                                  : '$daysSince days ago',
-                          subtitle: 'last moment',
+                          title: daysAgo(daysSince),
+                          subtitle: l.insightLastMoment,
                           icon: PhosphorIconsBold.heart,
                         ));
                       }
@@ -101,16 +126,12 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                             ? (last.caption.length > 20
                                 ? '${last.caption.substring(0, 20)}…'
                                 : last.caption)
-                            : (daysSince == 0
-                                ? 'Today'
-                                : daysSince == 1
-                                    ? '1 day ago'
-                                    : '$daysSince days ago');
+                            : daysAgo(daysSince);
                         items.add(InsightItem(
                           title: title,
                           subtitle: daysSince <= 1
-                              ? 'last memory'
-                              : '$daysSince days ago',
+                              ? l.insightLastMemory
+                              : l.insightDaysAgo(daysSince),
                           icon: PhosphorIconsBold.images,
                         ));
                       }
@@ -126,10 +147,10 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                               ? (memoryMonthAgo.caption.length > 18
                                   ? '${memoryMonthAgo.caption.substring(0, 18)}…'
                                   : memoryMonthAgo.caption)
-                              : 'Memory';
+                              : l.insightMemory;
                           items.add(InsightItem(
                             title: caption,
-                            subtitle: 'about a month ago',
+                            subtitle: l.insightAboutMonthAgo,
                             icon: PhosphorIconsBold.images,
                           ));
                         }
@@ -137,8 +158,8 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                         final d = (momentMonthAgo.date.difference(monthAgo).inDays).abs();
                         if (d <= 7) {
                           items.add(InsightItem(
-                            title: 'A moment',
-                            subtitle: 'about a month ago',
+                            title: l.insightAMoment,
+                            subtitle: l.insightAboutMonthAgo,
                             icon: PhosphorIconsBold.heart,
                           ));
                         }
@@ -160,10 +181,10 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                             ? (m.caption.length > 22
                                 ? '${m.caption.substring(0, 22)}…'
                                 : m.caption)
-                            : 'Memory';
+                            : l.insightMemory;
                         items.add(InsightItem(
                           title: title,
-                          subtitle: 'a year ago today',
+                          subtitle: l.insightYearAgoToday,
                           icon: PhosphorIconsBold.images,
                         ));
                       } else if (eventYearAgo.isNotEmpty) {
@@ -172,7 +193,7 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                           title: e.title.length > 22
                               ? '${e.title.substring(0, 22)}…'
                               : e.title,
-                          subtitle: 'a year ago today',
+                          subtitle: l.insightYearAgoToday,
                           icon: PhosphorIconsBold.calendarStar,
                         ));
                       }
@@ -190,10 +211,10 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                           final daysUntil = nextPeriodDay.difference(today).inDays;
                           if (daysUntil >= 0) {
                             items.add(InsightItem(
-                              title: daysUntil == 0 ? 'Today' : '$daysUntil',
+                              title: daysUntil == 0 ? l.insightToday : '$daysUntil',
                               subtitle: daysUntil == 0
-                                  ? 'period today'
-                                  : 'days to\nnext period',
+                                  ? l.insightPeriodToday
+                                  : l.insightDaysToPeriod,
                               icon: PhosphorIconsBold.calendar,
                             ));
                           }
@@ -213,8 +234,8 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                                 ? '${nextEvent.title.substring(0, 20)}…'
                                 : nextEvent.title,
                             subtitle: daysUntil == 0
-                                ? 'today'
-                                : 'in $daysUntil days',
+                                ? l.insightEventToday
+                                : l.insightEventInDays(daysUntil),
                             icon: PhosphorIconsBold.calendarStar,
                           ));
                         }
@@ -231,7 +252,7 @@ final insightItemsProvider = Provider<AsyncValue<List<InsightItem>>>((ref) {
                             if (daysTogether >= 0) {
                               items.add(InsightItem(
                                 title: '$daysTogether',
-                                subtitle: 'days\ntogether',
+                                subtitle: l.insightDaysTogether,
                                 icon: PhosphorIconsBold.heartStraight,
                               ));
                             }

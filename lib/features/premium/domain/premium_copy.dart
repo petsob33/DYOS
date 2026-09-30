@@ -5,10 +5,10 @@ class PremiumCopy {
   PremiumCopy._();
 
   /// Display price for monthly (when store price not available).
-  static const String monthlyPrice = '\$4.99 / month';
+  static const String monthlyPrice = '79 Kč / month';
 
   /// Display price for yearly (when store price not available).
-  static const String yearlyPrice = '\$39.99 / year';
+  static const String yearlyPrice = '599 Kč / year';
 
   /// Yearly savings note (e.g. "2 months free").
   static const String yearlySavings = '2 months free';
@@ -16,12 +16,16 @@ class PremiumCopy {
   /// Instant unlock benefits (same on landing and paywall).
   static const List<(String, String)> instantBenefits = [
     (
-      'Unlocks ALL functional blocks from the Roadmap instantly',
-      'Maps, Daily Questions, Taptic',
+      'Memory Map',
+      'See every memory you made together on the map',
     ),
     (
-      'Unlimited History',
-      'Your full photo and chat history forever',
+      'Unlimited Memories',
+      'No 30-memory limit – keep your whole story',
+    ),
+    (
+      'One plan for both of you',
+      'One purchase unlocks DYOS+ for you and your partner',
     ),
     (
       'Priority Support',
@@ -31,5 +35,5 @@ class PremiumCopy {
 
   /// Footer note: with Premium users still collect SP for cosmetics and Lifetime.
   static const String footerNoteWithRoadmap =
-      'Even with a Premium account you still collect SP on the Roadmap for cosmetic rewards (badges, icons) and the final goal – Lifetime account.';
+      'With DYOS+ you still collect SP on the Roadmap for cosmetic rewards (badges, icons).';
 }

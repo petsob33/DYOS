@@ -3154,6 +3154,18 @@ abstract class AppLocalizations {
   /// **'Monthly billing'**
   String get premiumLandingScreenMonthlyBilling;
 
+  /// No description provided for @premiumLandingScreenLifetime.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime'**
+  String get premiumLandingScreenLifetime;
+
+  /// No description provided for @premiumLandingScreenLifetimeBilling.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time payment, yours forever'**
+  String get premiumLandingScreenLifetimeBilling;
+
   /// No description provided for @premiumLandingScreenGetPremiumNow.
   ///
   /// In en, this message translates to:
@@ -3214,11 +3226,281 @@ abstract class AppLocalizations {
   /// **'Monthly billing'**
   String get paywallModalMonthlyBilling;
 
+  /// No description provided for @paywallModalLifetime.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime'**
+  String get paywallModalLifetime;
+
+  /// No description provided for @paywallModalLifetimeBilling.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time payment, yours forever'**
+  String get paywallModalLifetimeBilling;
+
   /// No description provided for @paywallModalRestorePurchases.
   ///
   /// In en, this message translates to:
   /// **'Restore purchases'**
   String get paywallModalRestorePurchases;
+
+  /// No description provided for @memoryCategoryDateNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Night'**
+  String get memoryCategoryDateNight;
+
+  /// No description provided for @memoryCategoryTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get memoryCategoryTrip;
+
+  /// No description provided for @memoryCategoryMilestone.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone'**
+  String get memoryCategoryMilestone;
+
+  /// No description provided for @memoryCategoryDailyLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Life'**
+  String get memoryCategoryDailyLife;
+
+  /// No description provided for @memoryCategoryFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get memoryCategoryFood;
+
+  /// No description provided for @memoryCategoryParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Party'**
+  String get memoryCategoryParty;
+
+  /// No description provided for @memoryCategoryFunny.
+  ///
+  /// In en, this message translates to:
+  /// **'Funny'**
+  String get memoryCategoryFunny;
+
+  /// No description provided for @memoryCategoryIntimacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Intimacy'**
+  String get memoryCategoryIntimacy;
+
+  /// No description provided for @memoryCategoryNature.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature'**
+  String get memoryCategoryNature;
+
+  /// No description provided for @memoryCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get memoryCategoryOther;
+
+  /// No description provided for @insightPartnerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'For your partner'**
+  String get insightPartnerTitle;
+
+  /// No description provided for @insightTipNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No period data yet. Track your period to get predictions.'**
+  String get insightTipNoData;
+
+  /// No description provided for @insightTipPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Period in progress. Be supportive and patient.'**
+  String insightTipPeriod(int day);
+
+  /// No description provided for @insightTipFertileHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Fertile window open! High chance of conception.'**
+  String insightTipFertileHigh(int day);
+
+  /// No description provided for @insightTipFertileApproaching.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Fertile window approaching. Be attentive and understanding.'**
+  String insightTipFertileApproaching(int day);
+
+  /// No description provided for @insightTipEarlyCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Early cycle. Energy levels rising.'**
+  String insightTipEarlyCycle(int day);
+
+  /// No description provided for @insightTipApproachingFertile.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Approaching fertile window. Stay connected.'**
+  String insightTipApproachingFertile(int day);
+
+  /// No description provided for @insightTipOvulation.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Ovulation day! Peak fertility.'**
+  String insightTipOvulation(int day);
+
+  /// No description provided for @insightTipPmsDanger.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: PMS danger zone. Be extra patient and understanding.'**
+  String insightTipPmsDanger(int day);
+
+  /// No description provided for @insightTipPrePms.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Pre-PMS phase. Mood changes possible. Stay supportive.'**
+  String insightTipPrePms(int day);
+
+  /// No description provided for @insightTipPostOvulation.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: Post-ovulation. Mood may stabilize.'**
+  String insightTipPostOvulation(int day);
+
+  /// No description provided for @insightMemoriesThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'memories\\nthis month'**
+  String get insightMemoriesThisMonth;
+
+  /// No description provided for @insightMomentsThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'moments\\nthis month'**
+  String get insightMomentsThisMonth;
+
+  /// No description provided for @insightToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get insightToday;
+
+  /// No description provided for @insightOneDayAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day ago'**
+  String get insightOneDayAgo;
+
+  /// No description provided for @insightDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} days ago'**
+  String insightDaysAgo(int n);
+
+  /// No description provided for @insightLastMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'last moment'**
+  String get insightLastMoment;
+
+  /// No description provided for @insightLastMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'last memory'**
+  String get insightLastMemory;
+
+  /// No description provided for @insightMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get insightMemory;
+
+  /// No description provided for @insightAMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'A moment'**
+  String get insightAMoment;
+
+  /// No description provided for @insightAboutMonthAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'about a month ago'**
+  String get insightAboutMonthAgo;
+
+  /// No description provided for @insightYearAgoToday.
+  ///
+  /// In en, this message translates to:
+  /// **'a year ago today'**
+  String get insightYearAgoToday;
+
+  /// No description provided for @insightPeriodToday.
+  ///
+  /// In en, this message translates to:
+  /// **'period today'**
+  String get insightPeriodToday;
+
+  /// No description provided for @insightDaysToPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'days to\\nnext period'**
+  String get insightDaysToPeriod;
+
+  /// No description provided for @insightEventToday.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get insightEventToday;
+
+  /// No description provided for @insightEventInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'in {n} days'**
+  String insightEventInDays(int n);
+
+  /// No description provided for @insightDaysTogether.
+  ///
+  /// In en, this message translates to:
+  /// **'days\\ntogether'**
+  String get insightDaysTogether;
+
+  /// No description provided for @dashCardChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get dashCardChat;
+
+  /// No description provided for @dashCardQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions'**
+  String get dashCardQuestions;
+
+  /// No description provided for @dashCardLists.
+  ///
+  /// In en, this message translates to:
+  /// **'Lists'**
+  String get dashCardLists;
+
+  /// No description provided for @dashCardEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get dashCardEvents;
+
+  /// No description provided for @dashCardLastMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'Last moment'**
+  String get dashCardLastMoment;
+
+  /// No description provided for @addMemoryStorageLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached your couple\'s storage limit. Delete some memories to free up space.'**
+  String get addMemoryStorageLimitReached;
 }
 
 class _AppLocalizationsDelegate
